@@ -6,6 +6,7 @@
 
 # %%
 import sys
+import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -325,17 +326,24 @@ steppersDict = {"FE": (FEStepper,{}),
                }
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description = 'Script to Run Stepper')
+    parser.add_argument('--problem', help = "Problem To Run")
+    parser.add_argument('--stepper', help = "Stepper To Use")
+    parser.add_argument('--factor', help = "Time Step Multiplication Factor", nargs='*', default=1)
+    parser.add_argument('--krylovsize', help = "Dimention of the Kyrlov Subspace", nargs='*', default=5)
+    parser.add_argument('--refinement', help = "Refinement of the Grid", nargs='*', default=0)
+    sysargs = parser.parse_args()
+
     threading.use = max(8,threading.max)
 
-    # # Numerical experiment
-    if False:
-        from parabolicTest import dimR, time, sourceTime, domain
-        from parabolicTest import paraTest1 as problem
-        baseName = "parabolic1"
-    else:
-        from allenCahn import dimR, time, sourceTime, domain
-        from allenCahn import test2 as problem
-        baseName = "allenCahn2"
+    match sysargs.problem:
+        case "AllenCahn":
+            from allenCahn import dimR, time, sourceTime, domain
+            from allenCahn import test2 as problem
+            baseName = "allenCahn2"
+        case _:
+            print("No Valid Problem Provided")
+            quit()
 
     # ## Setup grid, space, and operator
     gridView = view( leafGridView(cartesianDomain(*domain)) )
@@ -343,23 +351,16 @@ if __name__ == "__main__":
 
     model, T, tauFE, u0, exact = problem(gridView)
 
-    # %% [markdown]
-    #
-    # ## Time loop
-    #
+    stepperFct, args = steppersDict[sysargs.stepper]
+    if "exp_v" in args.keys():
+        m = int(sysargs.krylovsize)
+        args["expv_args"] = {"m":m}
 
-    # %%
-    stepperFct, args = steppersDict[sys.argv[1]]
-    if len(sys.argv) >= 5:
-        if "exp_v" in args.keys():
-            m = int(sys.argv[4])
-            args["expv_args"] = {"m":m}
-
-    factor = float(sys.argv[2])
+    factor = float(sysargs.factor)
     tau = tauFE * factor
 
     # refinement
-    level = int(sys.argv[3])
+    level = int(sysargs.refinement)
 
     if level>0:
         gridView.hierarchicalGrid.globalRefine(level)
@@ -382,7 +383,7 @@ if __name__ == "__main__":
     plotTime = T/10
     nextTime = plotTime
     fileCount = 0
-    
+
     if exact is not None:
         printResult(time.value,u_h-exact(time))
 
@@ -391,6 +392,7 @@ if __name__ == "__main__":
     fileCount += 1
 
     while time.value < T:
+        print(time.value)
         # this actually depends probably on the method we use, i.e., BE would
         # be + tau and the others without
         sourceTime.value = time.value
@@ -402,7 +404,7 @@ if __name__ == "__main__":
         n += 1
         if time.value >= plotTime:
             print(f"[{fileCount}]: time step {n}, time {time.value}, N {stepper.countN}, iterations {info}",
-                  flush=True)
+                    flush=True)
             if exact is not None:
                 printResult(time.value,u_h-exact(time),stepper.countN)
             run += [(stepper.countN,linIter)]
