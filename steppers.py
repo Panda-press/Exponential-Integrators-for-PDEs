@@ -336,14 +336,13 @@ if __name__ == "__main__":
 
     threading.use = max(8,threading.max)
 
-    match sysargs.problem:
-        case "AllenCahn":
-            from allenCahn import dimR, time, sourceTime, domain
-            from allenCahn import test2 as problem
-            baseName = "allenCahn2"
-        case _:
-            print("No Valid Problem Provided")
-            quit()
+    if sysargs.problem=="AllenCahn":
+        from allenCahn import dimR, time, sourceTime, domain
+        from allenCahn import test2 as problem
+        baseName = "allenCahn2"
+    else:
+        print("No Valid Problem Provided")
+        quit()
 
     # ## Setup grid, space, and operator
     gridView = view( leafGridView(cartesianDomain(*domain)) )
