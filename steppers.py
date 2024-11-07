@@ -336,10 +336,11 @@ if __name__ == "__main__":
 
     threading.use = max(8,threading.max)
 
-    if sysargs.problem=="AllenCahn":
-        from allenCahn import dimR, time, sourceTime, domain
-        from allenCahn import test2 as problem
-        baseName = "allenCahn2"
+    if sysargs.problem=="TravellingWaveAllenCahn":
+        from allenCahn import dimR, time, sourceTime
+        from allenCahn import test3 as problem
+        domain = [-4, -4], [4, 4], [60, 60]
+        baseName = "TravellingWaveAllenCahn"
     else:
         print("No Valid Problem Provided")
         quit()

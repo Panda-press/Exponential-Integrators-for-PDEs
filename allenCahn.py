@@ -41,3 +41,21 @@ def test2(gridView):
         return 1.8*np.random.rand(1)[0]-0.9
     np.random.seed(100)
     return a, 24, tauFE, u0, None
+
+def test3(gridView, alpha=0.4449):
+    tauFE = 0.8
+    c = sqrt(2)*(0.5 - alpha)
+    a = ( eps**2 * inner(grad(u),grad(v))
+      + dot(u,v) * dot(u - as_vector([alpha]), as_vector([1]) - u)
+    ) * dx
+    x_val = x[0]
+    exact = lambda t: as_vector([exp((x_val-c*t)/sqrt(2))/(1+exp((x_val-c*t)/sqrt(2)))])
+    return a, 24, tauFE, exact(0), exact
+
+def paraTest0(gridView):
+    tauFE = 7e-5 # check if this is correct
+    freq = 6*pi
+    xExact = as_vector([ cos(freq*x[0]) ])
+    exact = lambda t: exp(-freq**2*t) * xExact
+    dtExact = lambda t: -freq**2*exp(-freq**2*t) * xExact
+    return model(exact,dtExact, lambda u: as_vector([0])), 0.5, tauFE, exact(time), exact
