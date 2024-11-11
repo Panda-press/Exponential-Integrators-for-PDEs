@@ -131,10 +131,11 @@ class Tester():
         self.run_test(tau, stepper, stepper_args, end_time)
 
 if __name__ == "__main__":
-    if False:
+    if True:
         from allenCahn import dimR, time, sourceTime, domain
+        domain = [-8, -1], [16, 1], []
         from allenCahn import test2 as problem
-        problemName = "Allen Cahn Test2"
+        problemName = "Allen Cahn Test3"
         start_time = 4
         end_time = 6
         tau0 = 1e-1
@@ -152,7 +153,7 @@ if __name__ == "__main__":
     domain = list(domain)
     for exp_method in exp_methods:
         print("EXP method:{0}".format(exp_method))
-        for N in [10, 30, 60]:
+        for N in [10, 30, 60, 120]:
             print("N:{0}".format(N))
             for tau in tau0*np.array([1/2**i for i in range(0, 5)]):
                 print("Tau:{0}".format(tau))

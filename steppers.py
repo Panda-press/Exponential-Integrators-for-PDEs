@@ -339,7 +339,7 @@ if __name__ == "__main__":
     if sysargs.problem=="TravellingWaveAllenCahn":
         from allenCahn import dimR, time, sourceTime
         from allenCahn import test3 as problem
-        domain = [-4, -4], [4, 4], [60, 60]
+        domain = [-8, -1], [16, 1], [120, 10]
         baseName = "TravellingWaveAllenCahn"
     else:
         print("No Valid Problem Provided")

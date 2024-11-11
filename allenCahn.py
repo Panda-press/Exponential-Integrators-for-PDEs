@@ -42,7 +42,7 @@ def test2(gridView):
     np.random.seed(100)
     return a, 24, tauFE, u0, None
 
-def test3(gridView, alpha=0.4449):
+def test3(gridView, alpha=0.25):
     tauFE = 0.8
     c = sqrt(2)*(0.5 - alpha)
     a = ( eps**2 * inner(grad(u),grad(v))
@@ -50,7 +50,7 @@ def test3(gridView, alpha=0.4449):
     ) * dx
     x_val = x[0]
     exact = lambda t: as_vector([exp((x_val-c*t)/sqrt(2))/(1+exp((x_val-c*t)/sqrt(2)))])
-    return a, 24, tauFE, exact(0), exact
+    return a, 4, tauFE, exact(0), exact
 
 def paraTest0(gridView):
     tauFE = 7e-5 # check if this is correct
