@@ -134,18 +134,22 @@ if __name__ == "__main__":
     if True:
         from allenCahn import dimR, time, sourceTime, domain
         domain = [-8, -1], [16, 1], []
-        from allenCahn import test2 as problem
-        problemName = "Allen Cahn Test3"
-        start_time = 4
-        end_time = 6
+        from allenCahn import test3 as problem
+        problemName = "Travelling Wave"
+        start_time = 0
+        end_time = 4
         tau0 = 1e-1
+        taus = 5
+        grids = [[5, 10], [10, 10], [30, 10], [60, 10], [120, 10]]#, [240, 10]]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
         problemName = "Parabolic Test2"
-        tau0 = 2e-4  # 2e-3,N:32,Tau:0.002: compare m=5->m=10
+        tau0 = 1e-4  # 2e-3,N:32,Tau:0.002: compare m=5->m=10
+        taus = 5
         start_time = 0.00
         end_time = 0.02
+        grids = [[10, 10], [30, 30], [60, 60]]
     exp_methods = ["EXPARN", "EXPLAN", "EXPKIOPS", "BE"]
 
     results = []
@@ -153,12 +157,12 @@ if __name__ == "__main__":
     domain = list(domain)
     for exp_method in exp_methods:
         print("EXP method:{0}".format(exp_method))
-        for N in [10, 30, 60, 120]:
-            print("N:{0}".format(N))
-            for tau in tau0*np.array([1/2**i for i in range(0, 5)]):
+        for grid in grids:
+            print("N:{0}".format(grid))
+            for tau in np.array([tau0**i for i in range(0, taus)]):
                 print("Tau:{0}".format(tau))
 
-                domain[2] = [N,N]
+                domain[2] = grid
 
                 gridView = view(leafGridView(cartesianDomain(*domain)) )
                 space = lagrange(gridView, order=1, dimRange=dimR)
