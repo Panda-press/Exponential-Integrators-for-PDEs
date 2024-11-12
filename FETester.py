@@ -147,13 +147,13 @@ if __name__ == "__main__":
         start_time = 0
         end_time = 4
         if sysargs.debug == True:
-            tau0 = 2e-2
+            tau0 = 1e-2
             taus = 3
             grids = [[5, 10], [10, 10], [30, 10]]
             exp_methods = ["EXPARN", "BE"]
         else:
             tau0 = 1e-2 # Using this value as a higher value such as 8e-2 causes numerical issues
-            taus = 3
+            taus = 4
             grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10]]
             exp_methods = ["EXPARN", "EXPLAN", "EXPKIOPS", "BE"]
     else:
