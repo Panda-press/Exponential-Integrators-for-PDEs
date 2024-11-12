@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import sys
 from ufl import *
 from dune.ufl import Space, Constant
-from dune.fem import integrate
+from dune.fem import integrate, threading
 from dune.fem.function import gridFunction
 from dune.fem.space import lagrange
 from dune.grid import cartesianDomain
@@ -131,36 +131,51 @@ class Tester():
         self.run_test(tau, stepper, stepper_args, end_time)
 
 if __name__ == "__main__":
-    if True:
+    import sys
+    import argparse
+    parser = argparse.ArgumentParser(description = 'Script to Run Tests')
+    parser.add_argument('--problem', help = "Problem To Run")
+    parser.add_argument('--debug', help = "Is this just to test the script or to produce results", action='store_true')
+    sysargs = parser.parse_args()
+
+    threading.use = max(8,threading.max)
+    if sysargs.problem == "TravellingWaveAllenCahn":
         from allenCahn import dimR, time, sourceTime, domain
         domain = [-8, -1], [16, 1], []
         from allenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
         end_time = 4
-        tau0 = 1e-1
-        taus = 5
-        grids = [[5, 10], [10, 10], [30, 10], [60, 10], [120, 10]]#, [240, 10]]
+        if sysargs.debug == True:
+            tau0 = 2e-2
+            taus = 3
+            grids = [[5, 10], [10, 10], [30, 10]]
+            exp_methods = ["EXPARN", "BE"]
+        else:
+            tau0 = 1e-2 # Using this value as a higher value such as 8e-2 causes numerical issues
+            taus = 3
+            grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10]]
+            exp_methods = ["EXPARN", "EXPLAN", "EXPKIOPS", "BE"]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
         problemName = "Parabolic Test2"
         tau0 = 1e-4  # 2e-3,N:32,Tau:0.002: compare m=5->m=10
-        taus = 5
+        taus = 4
         start_time = 0.00
         end_time = 0.02
-        grids = [[10, 10], [30, 30], [60, 60]]
-    exp_methods = ["EXPARN", "EXPLAN", "EXPKIOPS", "BE"]
+        grids = [[10, 10]]#, [30, 30], [60, 60]]
+        exp_methods = ["EXPARN", "EXPLAN", "EXPKIOPS", "BE"]
 
     results = []
 
     domain = list(domain)
-    for exp_method in exp_methods:
-        print("EXP method:{0}".format(exp_method))
+    for tau in tau0*np.array([2**-i for i in range(0, taus)]):
+        print("Tau:{0}".format(tau))
         for grid in grids:
             print("N:{0}".format(grid))
-            for tau in np.array([tau0**i for i in range(0, taus)]):
-                print("Tau:{0}".format(tau))
+            for exp_method in exp_methods:
+                print("EXP method:{0}".format(exp_method))
 
                 domain[2] = grid
 
@@ -181,6 +196,7 @@ if __name__ == "__main__":
                 tester = Tester(u_h, op, problemName, start_time, exact=exact)
                 
                 tester.produce_results(tau, exp_stepper, args, end_time)
+                
 
                 #tester.test_results.plot()
                 #tester.target.plot()
@@ -230,12 +246,12 @@ if __name__ == "__main__":
     markers = ["1", "2", "3", "4"]
     for grid_size in results["Grid Size"].unique():
         if "BE" not in exp_methods:
-            plt.plot(results["Target N Count"], results["Error H1"], marker="x", label="BE Method")
+            plt.plot(results["Target N Count"], results["Error L2"], marker="x", label="BE Method")
         for i, exp_method in enumerate(exp_methods):
             trimmed_data = results[results["Method"] == exp_method]
             trimmed_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
 
-            plt.plot(trimmed_data["Test N Count"], trimmed_data["Error H1"], marker=markers[i], label=exp_method)
+            plt.plot(trimmed_data["Test N Count"], trimmed_data["Error L2"], marker=markers[i], label=exp_method)
 
         plt.legend()
         plt.xlabel("Calls")
