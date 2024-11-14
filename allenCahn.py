@@ -2,6 +2,7 @@ import numpy as np
 from ufl import *
 from dune.ufl import Space, Constant
 from dune.fem.function import gridFunction
+from parabolicTest import model
 
 dimR = 1
 time = Constant(0,"time")
@@ -43,11 +44,12 @@ def test2(gridView):
     return a, 24, tauFE, u0, None
 
 def test3(gridView, alpha=0.25):
-    tauFE = 0.8
+    tauFE = 0.2
     c = sqrt(2)*(0.5 - alpha)
     _a = (inner(grad(u),grad(v))
       + dot(u,v) * dot(u - as_vector([alpha]), as_vector([1]) - u)
     ) * dx
     x_val = x[0]
     exact = lambda t: as_vector([exp((x_val-c*t)/sqrt(2))/(1+exp((x_val-c*t)/sqrt(2)))])
-    return _a, 4, tauFE, exact(0), exact
+    dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 
+    return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
