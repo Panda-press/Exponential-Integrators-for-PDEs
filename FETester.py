@@ -141,21 +141,21 @@ if __name__ == "__main__":
     threading.use = max(8,threading.max)
     if sysargs.problem == "TravellingWaveAllenCahn":
         from allenCahn import dimR, time, sourceTime, domain
-        domain = [-8, -1], [16, 1], []
+        domain = [-4, -1], [8, 1], []
         from allenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
-        end_time = 4
+        end_time = 8
         if sysargs.debug == True:
-            tau0 = 1e-2
+            tau0 = 2e-1
             taus = 3
             grids = [[5, 10], [10, 10], [30, 10]]
-            exp_methods = ["EXPARN", "BE"]
+            exp_methods = ["EXPLAN", "BE"]
         else:
-            tau0 = 1e-2 # Using this value as a higher value such as 8e-2 causes numerical issues
-            taus = 4
-            grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10]]
-            exp_methods = ["EXPARN", "EXPLAN", "EXPKIOPS", "BE"]
+            tau0 = 2e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
+            taus = 6
+            grids = [[10, 10], [30, 10], [60, 10], [120, 10]]
+            exp_methods = ["EXPLAN", "BE"]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
