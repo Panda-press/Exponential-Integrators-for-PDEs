@@ -131,6 +131,7 @@ class Tester():
         self.run_test(tau, stepper, stepper_args, end_time)
 
 if __name__ == "__main__":
+    threading.use = max(8,threading.max)
     import sys
     import argparse
     parser = argparse.ArgumentParser(description = 'Script to Run Tests')
