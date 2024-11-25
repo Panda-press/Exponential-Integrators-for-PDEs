@@ -182,9 +182,10 @@ if __name__ == "__main__":
 
                     exp_stepper, args = steppersDict[exp_method]
                     if "exp_v" in args.keys() and exp_method != "EXPKIOPS":
-                        m = 5
                         args["expv_args"] = {"m":kyrlovSize}
+                        name = f"{exp_method} {kyrlovSize}"
                     else:
+                        name = exp_method
                         if exp_method == "EXPKIOPS":
                             args["expv_args"] = {"m":None}
                         if kyrlovSize != krylovSizes[0]:
@@ -206,7 +207,6 @@ if __name__ == "__main__":
                     tester = Tester(u_h, op, problemName, start_time, exact=exact)
                     
                     tester.produce_results(tau, exp_stepper, args, end_time)
-                    
 
                     #tester.test_results.plot()
                     #tester.target.plot()
@@ -218,12 +218,12 @@ if __name__ == "__main__":
                     H1err = [ np.sqrt(e)/r
                             for r,e in zip(ref,integrate([error**2,inner(grad(error),grad(error))])) ]
 
-                    print(f"{exp_method},{tau},{gridView.size(0)}: {H1err}")
+                    print(f"{name},{tau},{gridView.size(0)}: {H1err}")
                     # if exact is not None:
                     #     exact_error = ...
 
                     # write file self.test_results.plot()
-                    results += [ [exp_method,gridView.size(0),tau,H1err[0],H1err[1],
+                    results += [ [name,gridView.size(0),tau,H1err[0],H1err[1],
                                         tester.target_countN,tester.test_countN] ]
 
     # produce plots using 'results'
@@ -232,15 +232,15 @@ if __name__ == "__main__":
     results.columns = ["Method", "Grid Size", "Tau", "Error L2", "Error H1", "Target N Count", "Test N Count"]
 
     # N count vs tau
-    markers = ["1", "2", "3", "4"]
+    # markers = ["1", "2", "3", "4"]
     for grid_size in results["Grid Size"].unique():
         if "BE" not in exp_methods:
             plt.scatter(results["Tau"], results["Target N Count"], marker="x", label="BE Method")
-        for i, exp_method in enumerate(exp_methods):
+        for i, exp_method in enumerate(results["Method"].unique()):
             trimmed_data = results[results["Method"] == exp_method]
             trimmed_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
 
-            plt.scatter(trimmed_data["Tau"], trimmed_data["Test N Count"], marker=markers[i], label=exp_method)
+            plt.scatter(trimmed_data["Tau"], trimmed_data["Test N Count"], marker="x", label=exp_method)
 
         plt.legend()
         plt.xlabel("Tau")
@@ -253,15 +253,15 @@ if __name__ == "__main__":
         plt.close()
 
     # N count v Error
-    markers = ["1", "2", "3", "4"]
+    # markers = ["1", "2", "3", "4"]
     for grid_size in results["Grid Size"].unique():
         if "BE" not in exp_methods:
             plt.plot(results["Target N Count"], results["Error L2"], marker="x", label="BE Method")
-        for i, exp_method in enumerate(exp_methods):
+        for i, exp_method in enumerate(results["Method"].unique()):
             trimmed_data = results[results["Method"] == exp_method]
             trimmed_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
 
-            plt.plot(trimmed_data["Test N Count"], trimmed_data["Error L2"], marker=markers[i], label=exp_method)
+            plt.plot(trimmed_data["Test N Count"], trimmed_data["Error L2"], marker="x", label=exp_method)
 
         plt.legend()
         plt.xlabel("Calls")
@@ -274,7 +274,7 @@ if __name__ == "__main__":
         plt.close()
 
     # Tau vs error
-    for exp_method in exp_methods:
+    for exp_method in results["Method"].unique():
         trimmed_data = results[results["Method"] == exp_method]
         for grid_size in results["Grid Size"].unique():
             grid_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
