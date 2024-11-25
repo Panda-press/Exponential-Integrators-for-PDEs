@@ -147,11 +147,12 @@ if __name__ == "__main__":
         problemName = "Travelling Wave"
         start_time = 0
         end_time = 8
+        krylovSizes = [5, 10, 20]
         if sysargs.debug == True:
             tau0 = 2e-1
             taus = 3
             grids = [[5, 10], [10, 10], [30, 10]]
-            exp_methods = ["EXPLAN", "BE"]
+            exp_methods = ["EXPLAN", "BE", "EXPKIOPS"]
         else:
             tau0 = 2e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
             taus = 8
@@ -177,45 +178,53 @@ if __name__ == "__main__":
             print("N:{0}".format(grid))
             for exp_method in exp_methods:
                 print("EXP method:{0}".format(exp_method))
+                for kyrlovSize in krylovSizes:
 
-                domain[2] = grid
+                    exp_stepper, args = steppersDict[exp_method]
+                    if "exp_v" in args.keys() and exp_method != "EXPKIOPS":
+                        m = 5
+                        args["expv_args"] = {"m":kyrlovSize}
+                    else:
+                        if exp_method == "EXPKIOPS":
+                            args["expv_args"] = {"m":None}
+                        if kyrlovSize != krylovSizes[0]:
+                            break
 
-                gridView = view(leafGridView(cartesianDomain(*domain)) )
-                space = lagrange(gridView, order=1, dimRange=dimR)
 
-                model, T, tauFE, u0, exact = problem(gridView)
-                op = galerkin(model, domainSpace=space, rangeSpace=space)
 
-                u_h = space.interpolate(u0, name='u_h')
+                    domain[2] = grid
 
-                exp_stepper, args = steppersDict[exp_method]
-                if "exp_v" in args.keys():
-                    m = 5
-                    args["expv_args"] = {"m":m}
-                # else if kiops....
+                    gridView = view(leafGridView(cartesianDomain(*domain)) )
+                    space = lagrange(gridView, order=1, dimRange=dimR)
 
-                tester = Tester(u_h, op, problemName, start_time, exact=exact)
-                
-                tester.produce_results(tau, exp_stepper, args, end_time)
-                
+                    model, T, tauFE, u0, exact = problem(gridView)
+                    op = galerkin(model, domainSpace=space, rangeSpace=space)
 
-                #tester.test_results.plot()
-                #tester.target.plot()
-                error = tester.test_results - tester.target
-                ref = [ np.sqrt(r) for r in
-                        integrate([tester.target**2,
-                                   inner(grad(tester.target),grad(tester.target))]
-                                 )]
-                H1err = [ np.sqrt(e)/r
-                          for r,e in zip(ref,integrate([error**2,inner(grad(error),grad(error))])) ]
+                    u_h = space.interpolate(u0, name='u_h')
 
-                print(f"{exp_method},{tau},{gridView.size(0)}: {H1err}")
-                # if exact is not None:
-                #     exact_error = ...
 
-                # write file self.test_results.plot()
-                results += [ [exp_method,gridView.size(0),tau,H1err[0],H1err[1],
-                                    tester.target_countN,tester.test_countN] ]
+                    tester = Tester(u_h, op, problemName, start_time, exact=exact)
+                    
+                    tester.produce_results(tau, exp_stepper, args, end_time)
+                    
+
+                    #tester.test_results.plot()
+                    #tester.target.plot()
+                    error = tester.test_results - tester.target
+                    ref = [ np.sqrt(r) for r in
+                            integrate([tester.target**2,
+                                    inner(grad(tester.target),grad(tester.target))]
+                                    )]
+                    H1err = [ np.sqrt(e)/r
+                            for r,e in zip(ref,integrate([error**2,inner(grad(error),grad(error))])) ]
+
+                    print(f"{exp_method},{tau},{gridView.size(0)}: {H1err}")
+                    # if exact is not None:
+                    #     exact_error = ...
+
+                    # write file self.test_results.plot()
+                    results += [ [exp_method,gridView.size(0),tau,H1err[0],H1err[1],
+                                        tester.target_countN,tester.test_countN] ]
 
     # produce plots using 'results'
 

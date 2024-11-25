@@ -43,12 +43,11 @@ def test2(gridView):
     np.random.seed(100)
     return a, 24, tauFE, u0, None
 
+
+"""Traveling Wave"""
 def test3(gridView, alpha=0.25):
     tauFE = 0.2
     c = sqrt(2)*(0.5 - alpha)
-    _a = (inner(grad(u),grad(v))
-      + dot(u,v) * dot(u - as_vector([alpha]), as_vector([1]) - u)
-    ) * dx
     x_val = x[0]
     exact = lambda t: as_vector([exp((x_val-c*t)/sqrt(2))/(1+exp((x_val-c*t)/sqrt(2)))])
     dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 

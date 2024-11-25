@@ -303,7 +303,7 @@ class SIStepper(BaseStepper):
 class ExponentialStepper(SIStepper):
     def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped'):
         SIStepper.__init__(self,N, method=method, mass=mass)
-        self.name = f"ExpInt({method},{exp_v[1]})"
+        self.name = f"ExpInt({method},{exp_v[1]},{expv_args})"
         self.exp_v = exp_v[0]
         self.expv_args = expv_args
 
@@ -341,19 +341,25 @@ if __name__ == "__main__":
         from allenCahn import test3 as problem
         domain = [-4, -1], [8, 1], [30, 30]
         baseName = "TravellingWaveAllenCahn"
+        order = 1
+    elif sysargs.problem=="Snowflake":
+        from snowflakes import dimR, time, sourceTime, domain
+        from snowflakes import test1 as problem
+        baseName = "Snowflake"
+        order = 1
     else:
         print("No Valid Problem Provided")
         quit()
 
     # ## Setup grid, space, and operator
     gridView = view( leafGridView(cartesianDomain(*domain)) )
-    space = lagrange(gridView, order=1, dimRange=dimR)
+    space = lagrange(gridView, order=order, dimRange=dimR)
 
     model, T, tauFE, u0, exact = problem(gridView)
 
     stepperFct, args = steppersDict[sysargs.stepper]
     if "exp_v" in args.keys():
-        m = int(sysargs.krylovsize)
+        m = int(sysargs.krylovsize[0])
         args["expv_args"] = {"m":m}
 
     factor = float(sysargs.factor)
@@ -408,7 +414,7 @@ if __name__ == "__main__":
             if exact is not None:
                 printResult(time.value,u_h-exact(time),stepper.countN)
             run += [(stepper.countN,linIter)]
-            u_h.plot(gridLines=None, block=False)
+            u_h[0].plot(gridLines=None, block=False)
             plt.savefig(outputName(fileCount))
             fileCount += 1
             plotTime += nextTime
