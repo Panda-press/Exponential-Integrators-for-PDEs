@@ -156,7 +156,7 @@ if __name__ == "__main__":
         else:
             tau0 = 2e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
             taus = 8
-            grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10]]
+            grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10], [480,10]]
             exp_methods = ["EXPLAN", "EXPKIOPS", "BE"]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
