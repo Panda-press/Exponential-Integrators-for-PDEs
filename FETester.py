@@ -147,8 +147,8 @@ if __name__ == "__main__":
         problemName = "Travelling Wave"
         start_time = 0
         end_time = 8
-        krylovSizes = [5, 10, 20]
         if sysargs.debug == True:
+            krylovSizes = [5, 10]
             tau0 = 2e-1
             taus = 3
             grids = [[5, 10], [10, 10], [30, 10]]
@@ -158,6 +158,7 @@ if __name__ == "__main__":
             taus = 10
             grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10], [480,10]]
             exp_methods = ["EXPLAN", "EXPKIOPS", "BE"]
+            krylovSizes = [5, 10, 20]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
