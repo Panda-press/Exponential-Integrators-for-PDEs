@@ -35,14 +35,13 @@ from dune.fem.view import adaptiveLeafGridView as view
 from dune.fem.operator import galerkin
 from dune.fem.function import gridFunction
 from ufl import dx, dot, inner, grad, TestFunction, TrialFunction
-
 # %% [markdown]
 #
 # Simple utility function to show the result of a simulation
 
 # %%
 def printResult(time,error,*args):
-    print(time,'{:0.5e}, {:0.5e}'.format(
+    print(time,'L2:{:0.5e}, H1:{:0.5e}'.format(
                  *[ np.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
           *args, " # gnuplot", flush=True)
 
@@ -329,8 +328,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = 'Script to Run Stepper')
     parser.add_argument('--problem', help = "Problem To Run")
     parser.add_argument('--stepper', help = "Stepper To Use")
-    parser.add_argument('--factor', help = "Time Step Multiplication Factor", nargs='*', default=1)
-    parser.add_argument('--krylovsize', help = "Dimention of the Kyrlov Subspace", nargs='*', default=5)
+    parser.add_argument('--factor', help = "Time Step Multiplication Factor", nargs='*', default=[1])
+    parser.add_argument('--krylovsize', help = "Dimention of the Kyrlov Subspace", nargs='*', default=[5])
     parser.add_argument('--refinement', help = "Refinement of the Grid", nargs='*', default=0)
     sysargs = parser.parse_args()
 
@@ -339,13 +338,18 @@ if __name__ == "__main__":
     if sysargs.problem=="TravellingWaveAllenCahn":
         from allenCahn import dimR, time, sourceTime
         from allenCahn import test3 as problem
-        domain = [-4, -1], [8, 1], [30, 30]
+        domain = [-20, -1], [20, 1], [300, 10]
         baseName = "TravellingWaveAllenCahn"
         order = 1
     elif sysargs.problem=="Snowflake":
         from snowflakes import dimR, time, sourceTime, domain
         from snowflakes import test1 as problem
         baseName = "Snowflake"
+        order = 1
+    elif sysargs.problem=="Parabolic":
+        from parabolicTest import dimR, time, sourceTime, domain
+        from parabolicTest import paraTest2 as problem
+        baseName = "Parabolic Test2"
         order = 1
     else:
         print("No Valid Problem Provided")
@@ -362,7 +366,7 @@ if __name__ == "__main__":
         m = int(sysargs.krylovsize[0])
         args["expv_args"] = {"m":m}
 
-    factor = float(sysargs.factor)
+    factor = float(sysargs.factor[0])
     tau = tauFE * factor
 
     # refinement
@@ -408,6 +412,7 @@ if __name__ == "__main__":
         totalIter += info["iterations"]
         linIter   += info["linIter"]
         n += 1
+        
         if time.value >= plotTime:
             print(f"[{fileCount}]: time step {n}, time {time.value}, N {stepper.countN}, iterations {info}",
                     flush=True)
@@ -422,3 +427,8 @@ if __name__ == "__main__":
     print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}")
     u_h.plot(gridLines=None, block=False)
     plt.savefig(outputName(fileCount))
+    c = np.sqrt(2)*(0.5 - 0.25)
+    exact = lambda t, x: ([np.exp((x - c * t) / np.sqrt(2)) / (1 + np.exp((x - c * t) / np.sqrt(2)))])
+
+    print(f"value at (t=0,x=8):{exact(0,8)[0]}")
+    print(f"value at (t=8,x=8):{exact(8,8)[0]}")
