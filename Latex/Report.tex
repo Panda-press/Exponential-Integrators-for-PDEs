@@ -1,0 +1,48 @@
+\documentclass[11pt,a4paper,twoside]{article}
+
+% You should not change the line above.
+% Nor change any of the formating.
+
+% At a minimum, you need to edit the preamble file for your name and project
+% title. There are a lot of latex commands there you might find useful.
+\input{preamble}
+
+\begin{document}
+
+\pagenumbering{roman}
+\include{titlepage}
+\setcounter{page}{2}
+\include{contents}
+\onehalfspacing
+\pagenumbering{arabic}
+\onehalfspacing
+\raggedbottom
+
+% Now starts the main part of the report. 
+% Each section/chapter is in a separate file. Two examples are include.
+% 
+% This part (between TOC and Bibliograpy) must obey:
+% for MA4K8 must not exceed 30 pages.
+% for MA4K9 the target is approx 30 pages and must not exceed 40 pages.
+
+\input{Introduction}
+\input{SolutionSchemes}
+\input{NumericalExperiments}
+\input{Conclusion}
+\pagebreak
+
+{\Huge \bf Bibliography}
+
+\bibliographystyle{plain}
+\bibliography{References.bib}
+\bigskip
+
+% These are examples of the book titles as they can be put in. 
+% You can use different labeling methods, if you prefer, 
+% e.g., just enumerating the items  as [1], [2], etc.,
+% instead of making them [ATLAS], [B], etc.
+% Or use bibtex
+
+
+
+\end{document}

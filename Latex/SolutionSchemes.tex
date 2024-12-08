@@ -1,0 +1,22 @@
+\section{Solution Schemes}
+
+When solving the following ODE:
+\begin{align*}
+M\dot u_h(t) &= N(u_h(t)) \text{ where $M$ is the mass matrix}\\
+\text{using } R(u_h(t)) &= N(u_h(t)) - DN(u_h(t))u_h(t) \text{ gives}\\
+M\dot u_h(t) &= DN(u_h(t))u_h(t) + R(u_h(t))\\
+\dot u_h(t) &= M^{-1}(DN(u_h(t))u_h(t) + R(u_h(t)))
+\end{align*}
+for some $N(t)$ where $u_h$ is the discritised PDE.
+For a time step $\tau$ we compute $u_h(t+\tau)$ in the following ways: 
+\subsection{Backward Euler}
+The backward euler method is given by:
+\begin{align*}
+u_h(t+\tau) = u_h(t) + \tau M^{-1}N(u_h(t+\tau))
+\end{align*}
+\subsection{Explicit Exponential Scheme} %check this is correct%
+For the explicity exponential integrator schemes we use the following formular:
+\begin{align*}
+u_h(t+\tau) &= e^{\tau M^{-1} DN(u_h(t))}(u_h(t) + M^{-1}R(u_h(t)))
+\end{align*}
+where the action of the matrix exponential on a vector is computed according the the various Krylov methods.
