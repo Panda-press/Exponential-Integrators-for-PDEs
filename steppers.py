@@ -338,7 +338,7 @@ if __name__ == "__main__":
     if sysargs.problem=="TravellingWaveAllenCahn":
         from allenCahn import dimR, time, sourceTime
         from allenCahn import test3 as problem
-        domain = [-20, -1], [20, 1], [300, 10]
+        domain = [-4, -1], [8, 1], [30, 10]
         baseName = "TravellingWaveAllenCahn"
         order = 1
     elif sysargs.problem=="Snowflake":
