@@ -49,7 +49,7 @@ def test3(gridView, alpha=0.25):
     tauFE = 0.2
     x_val = x[0]
 
-    exact = lambda t: as_vector([exp(x_val/sqrt(2)+(0.5-alpha)*t)/(1+exp(x_val/sqrt(2)+(0.5-alpha)*t))])
+    exact = lambda t: as_vector([exp((-x_val/sqrt(2)+(0.5-alpha)*t))/(1+exp((-x_val/sqrt(2)+(0.5-alpha)*t)))])
     #dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 
 
     boundary = lambda t: dot(dot(grad(exact(t)[0]),n),v[0])*ds
