@@ -11,14 +11,16 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import norm
-from scipy.sparse.linalg import lgmres, gmres, LinearOperator, aslinearoperator
+from scipy.sparse.linalg import lgmres, gmres, LinearOperator, aslinearoperator, expm_multiply
 from scipy.sparse import identity, diags
 from scipy.optimize import newton_krylov, KrylovJacobian
+from scipy.special import factorial
+import scipy.integrate as scipyintegrate
 import random
 
 from scipy.sparse.linalg import expm_multiply
 expm_sci = [lambda A,x,m: expm_multiply(A,x),"Scipy"]
-from Stable_Lanzcos import LanzcosExp
+from Stable_Lanzcos import LanzcosExp, Lanzcos
 expm_lanzcos = [lambda A,x,m: LanzcosExp(A,x,m),"Lanzcos"]
 from NBLA import NBLAExp
 expm_nbla = [lambda A,x,m: NBLAExp(A,x,m),"NBLA"]
@@ -314,11 +316,85 @@ class ExponentialStepper(SIStepper):
         target.as_numpy[:] = self.exp_v(- self.A, self.res.as_numpy, **self.expv_args)
         return {"iterations":0, "linIter":0}
 
+
+class FristOrderExponentialStepper(ExponentialStepper):
+    def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped', integration='simple'):
+        ExponentialStepper.__init__(self,N,exp_v=exp_v, expv_args=expv_args, method=method, mass=mass)
+        self.name = f"ExpIntFirstOrder({method},{exp_v[1]},{expv_args})"
+        self.integration = integration
+
+    def __call__(self, target, tau):
+        self.setup(target, tau)
+
+        self.res.as_numpy[:] = self.exp_v(- self.A, target.as_numpy, **self.expv_args)
+
+        R = self.evalN(target.as_numpy) - self.A@target.as_numpy[:]
+
+        H, V, beta = Lanzcos(self.A, R, self.expv_args["m"])
+        
+        target.as_numpy[:] = self.res.as_numpy[:] - tau*V@self.phi_k(H, tau, 1)*norm(R)
+        #target.as_numpy[:] = self.res.as_numpy[:] - V@np.sum(xs, 0)*dx*norm(R)
+        return {"iterations":0, "linIter":0}
+
+    def phi_k(self, H, tau, k):
+        e_1 = np.zeros((self.expv_args["m"]))
+        e_1[0] = 1
+        func = lambda t: expm_multiply((1-t) * -H, e_1) * (t)**(k-1)/factorial(k-1)
+        return self.integrate(func, 0, 1)/tau
+
+    def integrate(self, func, a, b):
+        if self.integration == 'simple':
+            n = 5
+            xs, dx = np.linspace(a+(b-a)/(2*(n)),b-(b-a)/(2*(n)),n, retstep=True) # might not work for all a and b
+            xs = [func(x) for x in xs]
+            return np.sum(xs, 0)*dx
+        else:
+            return scipyintegrate.quad_vec(func, a, b)[0]
+
+
+# Doesn't work (fix it) TODO
+class SecondOrderExponentialStepper(FristOrderExponentialStepper):
+    def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped', integration='simple', c=0.5):
+        FristOrderExponentialStepper.__init__(self, N=N, exp_v=exp_v, expv_args=expv_args, method=method, mass=mass, integration=integration)
+        self.name = f"ExpIntSecondOrder({method},{exp_v[1]},{expv_args})"
+        self.c = c
+
+    def __call__(self, target, tau):
+        self.setup(target, tau)
+
+        result = self.exp_v(- self.A, target.as_numpy, **self.expv_args) #This subspace can be reused (should fix)
+
+        R = self.evalN(target.as_numpy) - self.A@target.as_numpy[:]
+
+        H, V, beta = Lanzcos(self.A, R, 5)
+        
+        result -= tau*V@(self.phi_k(H, tau, 1) - 1/self.c * self.phi_k(H, tau, 2))*beta
+
+
+        self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
+        self.res.as_numpy[:] += self.c * tau * V@self.phi_k(H, tau*self.c, 1)*beta
+
+        temp = sourceTime.value
+        sourceTime.value += self.c * tau
+        self.linearize(self.res)
+        R2 = self.evalN(self.res.as_numpy) - self.A@self.res.as_numpy[:]
+        sourceTime.value = temp
+        self.linearize(target) # Don't actually need to linearize twice just store the value of self.A prior to linearization
+        H, V, beta = Lanzcos(self.A, R2, 5)
+        
+
+        result += tau*V@(1/self.c * self.phi_k(H, tau, 2) * beta)
+
+        target.as_numpy[:] = result
+        return {"iterations":0, "linIter":0}
+
 steppersDict = {"FE": (FEStepper,{}),
                 "BE": (BEStepper,{}),
                 "SI": (SIStepper,{}),
                 "EXPSCI": (ExponentialStepper, {"exp_v":expm_sci}),
                 "EXPLAN": (ExponentialStepper, {"exp_v":expm_lanzcos}),
+                "EXP1LAN": (FristOrderExponentialStepper, {"exp_v":expm_lanzcos}),
+                "EXP2LAN": (SecondOrderExponentialStepper, {"exp_v":expm_lanzcos}),
                 "EXPNBLA": (ExponentialStepper, {"exp_v":expm_nbla}),
                 "EXPARN": (ExponentialStepper, {"exp_v":expm_arnoldi}),
                 "EXPKIOPS": (ExponentialStepper, {"exp_v":expm_kiops}),
@@ -427,8 +503,4 @@ if __name__ == "__main__":
     print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}")
     u_h.plot(gridLines=None, block=False)
     plt.savefig(outputName(fileCount))
-    c = np.sqrt(2)*(0.5 - 0.25)
-    exact = lambda t, x: ([np.exp((x - c * t) / np.sqrt(2)) / (1 + np.exp((x - c * t) / np.sqrt(2)))])
-
-    print(f"value at (t=0,x=8):{exact(0,8)[0]}")
-    print(f"value at (t=8,x=8):{exact(8,8)[0]}")
+    
