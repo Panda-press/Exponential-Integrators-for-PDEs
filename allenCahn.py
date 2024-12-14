@@ -46,7 +46,7 @@ def test2(gridView):
 
 """Traveling Wave"""
 def test3(gridView, alpha=0.25):
-    tauFE = 0.2
+    tauFE = 0.1
     x_val = x[0]
 
     exact = lambda t: as_vector([exp((-x_val/sqrt(2)+(0.5-alpha)*t))/(1+exp((-x_val/sqrt(2)+(0.5-alpha)*t)))])
