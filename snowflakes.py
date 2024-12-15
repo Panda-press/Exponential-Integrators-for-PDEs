@@ -12,7 +12,7 @@ from parabolicTest import model
 dimR = 2
 time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
-domain = [4, 4], [8, 8], [100, 100]
+domain = [4, 4], [8, 8], [200, 200]
 
 space = Space(2,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
@@ -23,7 +23,7 @@ initial = as_vector( [conditional(r>0.3,0,1), -0.5] )
 
 
 alpha        = 0.015
-tau          = 3.e-4
+tau          = 3e-4
 kappa1       = 0.9
 kappa2       = 20.
 c            = 0.02
@@ -60,5 +60,5 @@ a_alt = (1/tau * (dtheta
 
 
 def test1(gridView):
-    return a_im, 0.003, 2e-4, initial, None
+    return -a_im, 0.09, 3e-4, initial, None
 
