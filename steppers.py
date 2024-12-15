@@ -332,7 +332,7 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
         H, V, beta = Lanzcos(self.A, R, self.expv_args["m"])
         
-        target.as_numpy[:] = self.res.as_numpy[:] - tau*V@self.phi_k(H, tau, 1)*norm(R)
+        target.as_numpy[:] = self.res.as_numpy[:] - tau*V@self.phi_k(H, tau, 1)*beta
         #target.as_numpy[:] = self.res.as_numpy[:] - V@np.sum(xs, 0)*dx*norm(R)
         return {"iterations":0, "linIter":0}
 
@@ -352,7 +352,7 @@ class FristOrderExponentialStepper(ExponentialStepper):
             return scipyintegrate.quad_vec(func, a, b)[0]
 
 
-# Doesn't work (fix it) TODO
+# Seems to work?
 class SecondOrderExponentialStepper(FristOrderExponentialStepper):
     def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped', integration='simple', c=0.5):
         FristOrderExponentialStepper.__init__(self, N=N, exp_v=exp_v, expv_args=expv_args, method=method, mass=mass, integration=integration)
@@ -364,7 +364,7 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
 
         result = self.exp_v(- self.A, target.as_numpy, **self.expv_args) #This subspace can be reused (should fix)
 
-        R = self.evalN(target.as_numpy) - self.A@target.as_numpy[:]
+        R = self.evalN(target.as_numpy[:]) - self.A@target.as_numpy[:]
 
         H, V, beta = Lanzcos(self.A, R, 5)
         
@@ -372,18 +372,18 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
 
 
         self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
-        self.res.as_numpy[:] += self.c * tau * V@self.phi_k(H, tau*self.c, 1)*beta
+        self.res.as_numpy[:] -= self.c * tau * V@self.phi_k(H*self.c, tau, 1)*beta
 
         temp = sourceTime.value
         sourceTime.value += self.c * tau
         self.linearize(self.res)
-        R2 = self.evalN(self.res.as_numpy) - self.A@self.res.as_numpy[:]
+        R2 = self.evalN(self.res.as_numpy[:]) - self.A@self.res.as_numpy[:]
         sourceTime.value = temp
         self.linearize(target) # Don't actually need to linearize twice just store the value of self.A prior to linearization
         H, V, beta = Lanzcos(self.A, R2, 5)
         
 
-        result += tau*V@(1/self.c * self.phi_k(H, tau, 2) * beta)
+        result -= tau*V@(1/self.c * self.phi_k(H, tau, 2) * beta)
 
         target.as_numpy[:] = result
         return {"iterations":0, "linIter":0}
