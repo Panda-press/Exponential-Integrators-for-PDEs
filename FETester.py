@@ -157,7 +157,7 @@ if __name__ == "__main__":
             tau0 = 1e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
             taus = 9
             grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10], [480,10]]
-            exp_methods = ["EXPLAN", "EXPKIOPS", "BE", "EXP1LAN"]
+            exp_methods = ["EXPLAN", "EXPKIOPS", "BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [5, 10, 20]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
