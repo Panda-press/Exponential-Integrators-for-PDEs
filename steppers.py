@@ -366,7 +366,7 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
 
         R = self.evalN(target.as_numpy[:]) - self.A@target.as_numpy[:]
 
-        H, V, beta = Lanzcos(self.A, R, 5)
+        H, V, beta = Lanzcos(self.A, R, self.expv_args["m"])
         
         result -= tau*V@(self.phi_k(H, tau, 1) - 1/self.c * self.phi_k(H, tau, 2))*beta
 
@@ -374,13 +374,13 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
         self.res.as_numpy[:] -= self.c * tau * V@self.phi_k(H*self.c, tau, 1)*beta
 
-        temp = sourceTime.value
-        sourceTime.value += self.c * tau
+        temp = self.N.model.sourceTime
+        self.N.model.sourceTime += self.c * tau
         self.linearize(self.res)
         R2 = self.evalN(self.res.as_numpy[:]) - self.A@self.res.as_numpy[:]
-        sourceTime.value = temp
+        self.N.model.sourceTime = temp
         self.linearize(target) # Don't actually need to linearize twice just store the value of self.A prior to linearization
-        H, V, beta = Lanzcos(self.A, R2, 5)
+        H, V, beta = Lanzcos(self.A, R2, self.expv_args["m"])
         
 
         result -= tau*V@(1/self.c * self.phi_k(H, tau, 2) * beta)
