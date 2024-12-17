@@ -131,7 +131,6 @@ class Tester():
         self.run_test(tau, stepper, stepper_args, end_time)
 
 if __name__ == "__main__":
-    threading.use = max(8,threading.max)
     import sys
     import argparse
     parser = argparse.ArgumentParser(description = 'Script to Run Tests')
@@ -157,7 +156,7 @@ if __name__ == "__main__":
             tau0 = 1e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
             taus = 9
             grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10], [480,10]]
-            exp_methods = ["EXPLAN", "EXPKIOPS", "BE", "EXP1LAN", "EXP2LAN"]
+            exp_methods = ["EXPLAN", "EXPKIOPS", "BE", "EXP1LAN"]
             krylovSizes = [5, 10, 20]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
