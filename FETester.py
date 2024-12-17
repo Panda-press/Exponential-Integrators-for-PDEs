@@ -233,7 +233,6 @@ if __name__ == "__main__":
     results.columns = ["Method", "Grid Size", "Tau", "Error L2", "Error H1", "Target N Count", "Test N Count"]
 
     # N count vs tau
-    # markers = ["1", "2", "3", "4"]
     for grid_size in results["Grid Size"].unique():
         if "BE" not in exp_methods:
             plt.scatter(results["Tau"], results["Target N Count"], marker="x", label="BE Method")
@@ -254,7 +253,6 @@ if __name__ == "__main__":
         plt.close()
 
     # N count v Error
-    # markers = ["1", "2", "3", "4"]
     for grid_size in results["Grid Size"].unique():
         if "BE" not in exp_methods:
             plt.plot(results["Target N Count"], results["Error L2"], marker="x", label="BE Method")
@@ -274,7 +272,27 @@ if __name__ == "__main__":
         plt.savefig(f"FEMethodPlots/Operator Calls V Error for {problemName} with grid size {grid_size}.png")
         plt.close()
 
-    # Tau vs error
+    # Tau v Error all on one graph
+    for grid_size in results["Grid Size"].unique():
+        if "BE" not in exp_methods:
+            plt.plot(results["Tau"], results["Error L2"], marker="x", label="BE Method")
+        for i, exp_method in enumerate(results["Method"].unique()):
+            trimmed_data = results[results["Method"] == exp_method]
+            trimmed_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
+
+            plt.plot(trimmed_data["Tau"], trimmed_data["Error L2"], marker="x", label=exp_method)
+
+        plt.legend()
+        plt.xlabel("Tau")
+        plt.ylabel("L2 Error")
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.grid(True, which="both")
+        plt.title(f"Tau V L2 Error for {problemName} with grid size {grid_size}")
+        plt.savefig(f"FEMethodPlots/Tau V L2 Error for {problemName} with grid size {grid_size}.png")
+        plt.close()
+
+    # Tau vs error split my method
     for exp_method in results["Method"].unique():
         trimmed_data = results[results["Method"] == exp_method]
         for grid_size in results["Grid Size"].unique():
