@@ -119,7 +119,7 @@ class Tester():
         # Runs for a given stepper
         current_step = initial_condition.copy()
         time = start_time
-        while time < end_time:
+        while time < end_time - tau/2:
             stepper.N.model.sourceTime = time
             stepper(target=current_step, tau = tau)
             time += tau
