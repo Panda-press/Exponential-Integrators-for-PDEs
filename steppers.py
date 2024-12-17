@@ -204,8 +204,8 @@ class BaseStepper:
 # ## Forward Euler method
 # solve d_t u + N(u) = 0 using u^{n+1} = u^n - tau N(u^n)
 class FEStepper(BaseStepper):
-    def __init__(self, N, *, mass='lumped'):
-        BaseStepper.__init__(self,N, method="explicit", mass=mass)
+    def __init__(self, N, *, mass='lumped', **kwargs):
+        BaseStepper.__init__(self,N, method="explicit", mass=mass, **kwargs)
         self.name = "FE"
 
     def __call__(self, target, tau):
@@ -218,9 +218,9 @@ class FEStepper(BaseStepper):
 # solve d_t u + N(u) = 0 using u^{n+1} = u^n - tau N(u^{n+1})
 class BEStepper(BaseStepper):
     def __init__(self, N, *, method="approx", mass='lumped',
-                 ftol=1e-6, verbose=False):
-        BaseStepper.__init__(self,N, method=method, mass=mass)
-        self.name = f"BE({method})"
+                 ftol=1e-6, verbose=False, **kwargs):
+        BaseStepper.__init__(self,N, method=method, mass=mass, **kwargs)
+        self.name = f"BE({self.method})"
         self.verbose = self.callback if verbose else None
         self.ftol = ftol
 
@@ -253,9 +253,9 @@ class BEStepper(BaseStepper):
 #                         = ( I + tau A^n ) u^n - tau N(u^n)
 # u^{n+1} = u^n - tau ( I + tau A^n )^{-1} N(u^n)
 class SIStepper(BaseStepper):
-    def __init__(self, N, *, method="approx", mass='lumped'):
-        BaseStepper.__init__(self,N, method=method, mass=mass)
-        self.name = f"SI({method})"
+    def __init__(self, N, *, method="approx", mass='lumped', **kwargs):
+        BaseStepper.__init__(self,N, method=method, mass=mass, **kwargs)
+        self.name = f"SI({self.method})"
 
     def explStep(self, target, tau):
         # this sets D = I + tau A^n and initialized u^n
@@ -302,9 +302,9 @@ class SIStepper(BaseStepper):
 #         = e^{-A^n tau} ( (I + tau A^n)u^n - tau N(u^n) )
 
 class ExponentialStepper(SIStepper):
-    def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped'):
-        SIStepper.__init__(self,N, method=method, mass=mass)
-        self.name = f"ExpInt({method},{exp_v[1]},{expv_args})"
+    def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped', **kwargs):
+        SIStepper.__init__(self,N, method=method, mass=mass, **kwargs)
+        self.name = f"ExpInt({self.method},{exp_v[1]},{expv_args})"
         self.exp_v = exp_v[0]
         self.expv_args = expv_args
 
@@ -318,9 +318,9 @@ class ExponentialStepper(SIStepper):
 
 
 class FristOrderExponentialStepper(ExponentialStepper):
-    def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped', integration='simple'):
-        ExponentialStepper.__init__(self,N,exp_v=exp_v, expv_args=expv_args, method=method, mass=mass)
-        self.name = f"ExpIntFirstOrder({method},{exp_v[1]},{expv_args})"
+    def __init__(self, N, exp_v, *, integration='simple', **kwargs):
+        ExponentialStepper.__init__(self,N,exp_v=exp_v, **kwargs)
+        self.name = f"ExpIntFirstOrder({self.method},{exp_v[1]},{self.expv_args})"
         self.integration = integration
 
     def __call__(self, target, tau):
@@ -354,9 +354,9 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
 # Seems to work?
 class SecondOrderExponentialStepper(FristOrderExponentialStepper):
-    def __init__(self, N, exp_v, *, expv_args, method='approx', mass='lumped', integration='simple', c=0.5):
-        FristOrderExponentialStepper.__init__(self, N=N, exp_v=exp_v, expv_args=expv_args, method=method, mass=mass, integration=integration)
-        self.name = f"ExpIntSecondOrder({method},{exp_v[1]},{expv_args})"
+    def __init__(self, N, exp_v, *, integration='simple', c=0.5, **kwargs):
+        FristOrderExponentialStepper.__init__(self, N=N, exp_v=exp_v, **kwargs)
+        self.name = f"ExpIntSecondOrder({self.method},{exp_v[1]},{self.expv_args})"
         self.c = c
 
     def __call__(self, target, tau):
