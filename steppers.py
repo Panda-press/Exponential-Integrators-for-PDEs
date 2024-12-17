@@ -32,7 +32,7 @@ expm_kiops = [lambda A,x,m: KiopsExp(A,x),"Kiops"]
 from dune.grid import cartesianDomain
 from dune.alugrid import aluCubeGrid as leafGridView
 from dune.fem.space import lagrange
-from dune.fem import integrate, threading, globalRefine
+from dune.fem import integrate, threading, globalRefine, mark, adapt, loadBalance
 from dune.fem.view import adaptiveLeafGridView as view
 from dune.fem.operator import galerkin
 from dune.fem.function import gridFunction
@@ -62,32 +62,17 @@ class BaseStepper:
     # - define class that wraps an operator 'N' and returns object with same
     #   interface but including M^{-1}
     # - put N on right hand side
-    def __init__(self, N, *, method="explicit", mass="lumped"):
+    def __init__(self, N, *, method="explicit", mass="lumped", grid="fixed"):
         self.N = N
         self.method = method
+        self.mass = mass
+        self.grid = grid
         self.spc = N.domainSpace
         self.un = self.spc.zero.copy()  # previous time step
         self.res = self.un.copy()       # residual
         self.shape = (self.spc.size,self.spc.size)
 
-        if mass == 'identity':
-            # This is hack!
-            # Issue: the dgoperator is set to be on the right so we need
-            # the action of -N. Since this is the only operator corrently
-            # using the identity mass matrix we change the sign here
-            # NEEDS FIXING
-            self.Minv = -identity(self.shape[0]) 
-        else:
-            # inverse (lumped) mass matrix (see the explanation given in 'wave.py' tutorial example)
-            # u^n v dx = sum_j u^n_j phi_j phi_i dx = M u^n
-            # Mu^{n+1} = Mu^n - dt N(u^n) (for FE)
-            # u^{n+1} = u^n - dt M^{-1}N(u^n)
-            # bug: u,v = TrialFunction(N.domainSpace), TestFunction(N.rangeSpace)
-            u,v = TrialFunction(N.domainSpace.as_ufl()), TestFunction(N.rangeSpace.as_ufl())
-            M = galerkin(dot(u,v)*dx).linear().as_numpy
-            if mass == 'lumped':
-                Mdiag = M.sum(axis=1) # sum up the entries onto the diagonal
-                self.Minv = diags( 1/Mdiag.A1, shape=self.shape )
+        self.getMass()
 
         # time step to use
         self.tau = None
@@ -100,10 +85,32 @@ class BaseStepper:
         self.countN = 0
         self.linIter = 0
 
+    def getMass(self):
+        if self.mass == 'identity':
+            # This is hack!
+            # Issue: the dgoperator is set to be on the right so we need
+            # the action of -N. Since this is the only operator corrently
+            # using the identity mass matrix we change the sign here
+            # NEEDS FIXING
+            self.Minv = -identity(self.shape[0]) 
+        else:
+            # inverse (lumped) mass matrix (see the explanation given in 'wave.py' tutorial example)
+            # u^n v dx = sum_j u^n_j phi_j phi_i dx = M u^n
+            # Mu^{n+1} = Mu^n - dt N(u^n) (for FE)
+            # u^{n+1} = u^n - dt M^{-1}N(u^n)
+            # bug: u,v = TrialFunction(N.domainSpace), TestFunction(N.rangeSpace)
+            u,v = TrialFunction(self.N.domainSpace.as_ufl()), TestFunction(self.N.rangeSpace.as_ufl())
+            M = galerkin(dot(u,v)*dx).linear().as_numpy
+            if self.mass == 'lumped':
+                Mdiag = M.sum(axis=1) # sum up the entries onto the diagonal
+                self.Minv = diags( 1/Mdiag.A1, shape=(np.shape(Mdiag)[0], np.shape(Mdiag)[0]) )
+
     # call before computing the next time step
     def setup(self,un,tau):
         self.un.assign(un)
         self.tau = tau
+        if self.grid != "fixed":
+            self.getMass()
         if not "expl" in self.method:
             self.linearize(self.un)
 
@@ -406,11 +413,16 @@ if __name__ == "__main__":
     parser.add_argument('--stepper', help = "Stepper To Use")
     parser.add_argument('--factor', help = "Time Step Multiplication Factor", nargs='*', default=[1])
     parser.add_argument('--krylovsize', help = "Dimention of the Kyrlov Subspace", nargs='*', default=[5])
-    parser.add_argument('--refinement', help = "Refinement of the Grid", nargs='*', default=0)
+    parser.add_argument('--refinement', help = "Refinement of the Grid", nargs='*', default=[0])
+    parser.add_argument('--adaptive', help = "Is an adaptive grid begin used", action='store_true')
     sysargs = parser.parse_args()
 
     threading.use = max(8,threading.max)
 
+    def adaptGrid(u_h):
+        return
+
+    kwargs = {}
     if sysargs.problem=="TravellingWaveAllenCahn":
         from allenCahn import dimR, time, sourceTime
         from allenCahn import test3 as problem
@@ -422,6 +434,12 @@ if __name__ == "__main__":
         from snowflakes import test1 as problem
         baseName = "Snowflake"
         order = 1
+        if sysargs.adaptive:
+            kwargs = {"grid": "adaptive"}
+            def adaptGrid(u_h):
+                indicator = dot(grad(u_h[0]),grad(u_h[0]))
+                mark(indicator,1.4,1.2,0,6)
+                adapt(u_h)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
@@ -446,12 +464,11 @@ if __name__ == "__main__":
     tau = tauFE * factor
 
     # refinement
-    level = int(sysargs.refinement)
+    level = int(sysargs.refinement[0])
 
     if level>0:
         gridView.hierarchicalGrid.globalRefine(level)
-        tau *= 0.25**level
-    u_h = space.interpolate(u0, name='u_h')
+        #tau *= 0.25**level
 
     outputName = lambda n: f"{baseName}_{level}{sys.argv[1]}_{factor}_{n}.png"
 
@@ -459,7 +476,7 @@ if __name__ == "__main__":
 
     # stepper
     op = galerkin(model, domainSpace=space, rangeSpace=space)
-    stepper = stepperFct(N=op,**args)
+    stepper = stepperFct(N=op,**args,**kwargs)
 
     # time loop
     n = 0
@@ -473,7 +490,14 @@ if __name__ == "__main__":
     if exact is not None:
         printResult(time.value,u_h-exact(time))
 
-    u_h.plot(gridLines=None, block=False)
+    u_h = space.interpolate(u0, name='u_h')
+    
+    if sysargs.adaptive:
+        for i in range(10):
+            adaptGrid(u_h)
+            u_h.interpolate(u0)
+
+    u_h.plot(block=False)
     plt.savefig(outputName(fileCount))
     fileCount += 1
 
@@ -482,6 +506,8 @@ if __name__ == "__main__":
         # this actually depends probably on the method we use, i.e., BE would
         # be + tau and the others without
         sourceTime.value = time.value
+        if sysargs.adaptive:
+            adaptGrid(u_h)
         info = stepper(target=u_h, tau=tau)
         assert not np.isnan(u_h.as_numpy).any()
         time.value += tau
@@ -495,10 +521,10 @@ if __name__ == "__main__":
             if exact is not None:
                 printResult(time.value,u_h-exact(time),stepper.countN)
             run += [(stepper.countN,linIter)]
-            u_h[0].plot(gridLines=None, block=False)
+            u_h[0].plot(block=False)
             plt.savefig(outputName(fileCount))
-            fileCount += 1
             plotTime += nextTime
+            fileCount += 1
 
     print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}")
     u_h.plot(gridLines=None, block=False)
