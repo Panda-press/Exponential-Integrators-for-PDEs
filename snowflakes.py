@@ -12,7 +12,7 @@ from parabolicTest import model
 dimR = 2
 time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
-domain = [4, 4], [8, 8], [3, 3]
+domain = [4, 4], [8, 8], [3, 3]  # Use a grid refinement of at least two when applying the inital condition
 
 space = Space(2,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
