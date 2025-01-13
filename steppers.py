@@ -432,13 +432,14 @@ if __name__ == "__main__":
     elif sysargs.problem=="Snowflake":
         from snowflakes import dimR, time, sourceTime, domain
         from snowflakes import test1 as problem
+        from dune.alugrid import aluConformGrid as leafGridView
         baseName = "Snowflake"
         order = 1
         if sysargs.adaptive:
             kwargs = {"grid": "adaptive"}
             def adaptGrid(u_h):
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))
-                mark(indicator,1.4,1.2,0,6)
+                mark(indicator,1.4,1.2,0,11)
                 adapt(u_h)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
@@ -470,7 +471,7 @@ if __name__ == "__main__":
         gridView.hierarchicalGrid.globalRefine(level)
         #tau *= 0.25**level
 
-    outputName = lambda n: f"{baseName}_{level}{sys.argv[1]}_{factor}_{n}.png"
+    outputName = lambda n: f"{baseName}_{level}{sys.argv[1]}_{factor}_{n}_{sysargs.krylovsize[0]}.png"
 
     # initial condition
 
