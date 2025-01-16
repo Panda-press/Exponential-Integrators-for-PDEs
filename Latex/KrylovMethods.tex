@@ -1,0 +1,65 @@
+\section{Krylov Methods}
+
+Here we introduce Krylov subspace methods.
+These algorithms take a matrix $A\in \mathbb{R}^{n\times n}$, a vector $v \in \mathbb{R}^n$ and an integer $m$ that determines the number of dimensions of the Krylov subspace used.
+From these algorithms we will get a matrix $H \in \mathbb{R}^{m\times m}$ and another matrix $V \in \mathbb{R}^{n\times m}$ such that $A \approx VHV^T$ and $VV^T = I$.
+From here we get $Av \approx VHV^Tv = VH||v||e_1$.\\
+We can apply this to $e^A$ as follows:
+\begin{align*}
+e^A &= \sum^{\infty}_{i=0}\frac{A^i}{i!}\\
+&= \sum^{\infty}_{i=0}\frac{(VHV^T)^i}{i!} \\
+&= \sum^{\infty}_{i=0}\frac{VH^iV^T}{i!} \\
+&\text {and then when computing $e^Av$ we get}\\
+e^Av &= (\sum^{\infty}_{i=0}\frac{VH^iV^T}{i!})v \\
+&= \sum^{\infty}_{i=0}\frac{VH^iV^Tv}{i!} \\
+&= \sum^{\infty}_{i=0}\frac{VH^i||v||e_1}{i!} \\
+&= V(\sum^{\infty}_{i=0}\frac{H^i}{i!})||v||e_1 \\
+&= Ve^H||v||e_1
+\end{align*}
+
+Here we give the algorithms for the 2 Krylov subspace methods.
+We begin with the Arnoldi algorithm.
+
+
+\begin{algorithm}[H]
+\caption{Arnoldi \cite{Fan2018}} %find better citation
+\begin{algorithmic}
+\Procedure{Arnoldi}{$A, \hat v_1,m$}
+\State $v_0 \gets 0$
+\For{$j = 1,2,...,m$}	
+\For{$i = 1,2,...,j$}
+\State$h_{ij} \gets v_i^T A v_i$
+\EndFor
+\State$\theta_j \gets Av_j - \sum^j_{i=1} h_{ij}v_i$
+\State$h_{j+1,j} \gets ||\theta_j||$
+\State$v_{j+1} \gets \theta_j/h_{j+1,j}$
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+Here V is given by $v_1,...,v_m$ and H is give by $h_1,...,h_m$.\\
+The algorithm below is the Lanczos algorithm and it requires a symmetric matrix. \cite{Moler2003}
+\begin{algorithm}[H]
+\caption{Lanczos \cite{OJALVO1970}}
+\begin{algorithmic}
+\Procedure{Lanczos}{$A$ symetric$, \hat v_1,m$}
+\State $v_0 = 0$
+\For{$i = 1,2,...,m$}	
+\State$\beta_i \gets || \hat v_i ||$
+\State$v_i \gets \hat v_i / || \hat v_i ||$
+\State$\alpha_i \gets v_i^T A v_i$
+\State$\hat v_{i+1} \gets Av_i - \alpha_iv_i - \beta_iv_{i-1}$
+\EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+Here $V$ is given by ${v_1,...,v_m}$ and $H$ is tridiagonal with the leading diagonal being $\alpha_1, ..., \alpha_m$ and the upper and lower diagonals being $\beta_2,...,\beta_m$.
+
+\subsection{Matrix Free Methods}
+The computation, storage and hence use of an explicitly computed $DN(u_h(t))$ can be very demanding.
+As we only need $DN(u_h(t))u_h(t)$ we can avoid needing to assemble $DN(u_h(t))$ using the following approximations:
+\begin{align*}
+    Au &= DN(u)\\
+    &\approx \frac{N(u+\epsilon)-N(u)}{\epsilon}
+\end{align*}
+for some small $\epsilon$

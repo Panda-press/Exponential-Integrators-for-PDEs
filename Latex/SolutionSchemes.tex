@@ -2,21 +2,44 @@
 
 When solving the following ODE:
 \begin{align*}
-M\dot u_h(t) &= N(u_h(t)) \text{ where $M$ is the mass matrix}\\
-\text{using } R(u_h(t)) &= N(u_h(t)) - DN(u_h(t))u_h(t) \text{ gives}\\
+M\dot u_h(t) &= N_h(u_h(t))\\ %\text{ where $M$ is the mass matrix}
+\text{using } R(u_h(t)) &= N_h(u_h(t)) - DN(u_h(t))u_h(t) \text{ gives}\\
 M\dot u_h(t) &= DN(u_h(t))u_h(t) + R(u_h(t))\\
 \dot u_h(t) &= M^{-1}(DN(u_h(t))u_h(t) + R(u_h(t)))
 \end{align*}
-for some $N(t)$ where $u_h$ is the discritised PDE.
+\subsection{Methods}
 For a time step $\tau$ we compute $u_h(t+\tau)$ in the following ways: 
-\subsection{Backward Euler}
+\subsubsection{Backward Euler}
 The backward euler method is given by:
 \begin{align*}
-u_h(t+\tau) = u_h(t) + \tau M^{-1}N(u_h(t+\tau))
+u_h(t+\tau) = u_h(t) + \tau M^{-1}N_h(u_h(t+\tau))
 \end{align*}
-\subsection{Explicit Exponential Scheme} %check this is correct%
+\subsubsection{Explicit Exponential Scheme} %check this is correct%
 For the explicity exponential integrator schemes we use the following formular:
 \begin{align*}
 u_h(t+\tau) &= e^{\tau M^{-1} DN(u_h(t))}(u_h(t) + M^{-1}R(u_h(t)))
 \end{align*}
 where the action of the matrix exponential on a vector is computed according the the various Krylov methods.
+
+\subsubsection{First order Exponential Integrator}
+Here we also present another integrator from Huang Et al \cite{Huang2022}
+\begin{align*}
+u_h(t+\tau) &= e^{\tau M^{-1} DN(u_h(t))}u_h(t) + \int^1_0e^{(1-\theta) -\tau M^{-1}DN(u_h(t))}d\theta R(u_h(t))
+\end{align*}
+
+We quickly look at the following part of the equation:
+\begin{align*}
+    &  \int^1_0e^{(1-\theta) -\tau M^{-1}DN(u_h(t))}d\theta R(u_h(t))\\
+    &= \int^1_0e^{(1-\theta) -\tau M^{-1}DN(u_h(t))}R(u_h(t))d\theta\\
+\intertext{moving the Kyrlov subspace with $VH||r||e_1 = M^{-1}DN(u_h(t))R(u_h(t))$ where $||r|| = ||R(u_h(t))||$ we get}
+    &= \int^1_0Ve^{(1-\theta) -\tau H}||r||e_1d\theta\\
+    &= V\int^1_0e^{(1-\theta) -\tau H}d\theta||r||e_1
+\end{align*}
+As a result of this we will only need to genarate a single subspace for when we perform our numerical integrations.
+\subsection{Mass Matrix}
+When using these schemes it is neccessary to be able to compute the inverse mass matrix $M^{-1}$.
+Attempting to compute the exact inverse can be computationally intensive and while for a fixed discretisations this may be acceptable, as it will only need to be computed once, for an adaptive grid this may be impractical.
+As a result we employ mass lumping where each row is summed up and placed on the diagonal of the matrix.
+From here computing the inverse is straight forward.
+
+
