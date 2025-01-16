@@ -177,7 +177,7 @@ if __name__ == "__main__":
         for grid in grids:
             print("N:{0}".format(grid))
             for exp_method in exp_methods:
-                print("EXP method:{0}".format(exp_method))
+                print("Stepper method:{0}".format(exp_method))
                 for kyrlovSize in krylovSizes:
 
                     exp_stepper, args = steppersDict[exp_method]
