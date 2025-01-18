@@ -368,18 +368,24 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
 
     def __call__(self, target, tau):
         self.setup(target, tau)
+        
+        e_1 = np.zeros((m))
+        e_1[0] = 1
+        #result = self.exp_v(- self.A, target.as_numpy, **self.expv_args) #This subspace can be reused (should fix)
 
-        result = self.exp_v(- self.A, target.as_numpy, **self.expv_args) #This subspace can be reused (should fix)
+        H1, V1, beta1 = Lanzcos(self.A, target.as_numpy, self.expv_args["m"])
+        result = V1@expm_multiply(-H1, e_1) * beta1
 
         R = self.evalN(target.as_numpy[:]) - self.A@target.as_numpy[:]
 
-        H, V, beta = Lanzcos(self.A, R, self.expv_args["m"])
+        H2, V2, beta2 = Lanzcos(self.A, R, self.expv_args["m"])
         
-        result -= tau*V@(self.phi_k(H, tau, 1) - 1/self.c * self.phi_k(H, tau, 2))*beta
+        result -= tau*V2@(self.phi_k(H2, tau, 1) - 1/self.c * self.phi_k(H2, tau, 2))*beta2
 
 
-        self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
-        self.res.as_numpy[:] -= self.c * tau * V@self.phi_k(H*self.c, tau, 1)*beta
+        #self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
+        self.res.as_numpy[:] = V1@expm_multiply(-H1 * self.c, e_1) * beta1
+        self.res.as_numpy[:] -= self.c * tau * V2@self.phi_k(H2*self.c, tau, 1)*beta2
 
         temp = self.N.model.sourceTime
         self.N.model.sourceTime += self.c * tau
@@ -488,8 +494,6 @@ if __name__ == "__main__":
     nextTime = plotTime
     fileCount = 0
 
-    if exact is not None:
-        printResult(time.value,u_h-exact(time))
 
     u_h = space.interpolate(u0, name='u_h')
     
