@@ -369,7 +369,7 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
     def __call__(self, target, tau):
         self.setup(target, tau)
         
-        e_1 = np.zeros((m))
+        e_1 = np.zeros((self.expv_args["m"]))
         e_1[0] = 1
         #result = self.exp_v(- self.A, target.as_numpy, **self.expv_args) #This subspace can be reused (should fix)
 

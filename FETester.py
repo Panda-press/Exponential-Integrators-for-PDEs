@@ -151,7 +151,7 @@ if __name__ == "__main__":
             tau0 = 2e-1
             taus = 3
             grids = [[5, 10], [10, 10], [30, 10]]
-            exp_methods = ["EXPLAN", "BE", "EXPKIOPS", "EXP1LAN"]
+            exp_methods = ["EXPLAN", "BE", "EXPKIOPS", "EXP1LAN", "EXP2LAN"]
         else:
             tau0 = 1e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
             taus = 9
