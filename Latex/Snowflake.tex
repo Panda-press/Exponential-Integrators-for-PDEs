@@ -1,1 +1,35 @@
-\Section {Snowflake}
+\section {Snowflake}
+Here we begin to look in the phase boundary of the formation of a snowflake.
+We will use an adaptive grid and compaire the methods described above.
+\subsection{Formulation of problem}
+
+The equaitions govening this phase boundary problem are as follows.
+\begin{align*}
+    \tau \frac{\partial \phi}{\partial t} &= \nabla \cdot D\nabla\phi +  \phi(1-\phi)m(\phi,T)\\
+    \frac{\partial T}{\partial t} &= D_T \nabla ^2T + \frac{\partial \phi}{\partial t}\\
+    \intertext{Substituting in $\frac{\partial \phi}{\partial t}$ into the second equation and rewriting in weak form gives the following}
+    \int \frac{\partial \phi}{\partial t} v_{\phi} &=  \frac 1{\tau}\int \phi(1-\phi)m(\phi,T)v_{\phi} - D \nabla \phi \cdot \nabla v_{\phi}\\
+    \int \frac{\partial T}{\partial t} v_T &= \int \frac 1{\tau}(\phi(1-\phi)m(\phi,T)v_T - \nabla v_T \cdot D \nabla \phi) - D_T \nabla v_T \cdot \nabla T
+\end{align*}
+
+Where we have that
+
+\begin{align*}
+    m(\phi, T) &= \phi - \frac 12 - \frac{\kappa_1}{\pi}arctan(\kappa_2 T)\\
+    D &= \alpha^2(1+c\beta)
+    \begin{pmatrix}
+        1+c\beta & -c\frac{\partial\beta}{\partial\psi}\\
+        c\frac{\partial\beta}{\partial\psi} & 1+c\beta
+    \end{pmatrix}\\
+    \text{With }\beta &= \frac{1-\Phi^2}{1+\Phi^2}\\
+    \Phi &= tan(\frac N2\psi)\\
+    \psi &= \theta + arctan(\frac{\frac{\partial \phi}{\partial y}}{\frac{\partial \phi}{\partial x}})\\
+\end{align*}
+and with the following constants
+\begin{align*}
+    \begin{matrix}
+    D_T = 2.25 & \alpha = 0.015 & \tau = 3\cdot 10^{-4} & \kappa_1 &= 0.9\\
+    \kappa_2 = 20 & c = 0.02 & N = 6 & \theta = \frac{\pi}8
+    \end{matrix}
+\end{align*}
+

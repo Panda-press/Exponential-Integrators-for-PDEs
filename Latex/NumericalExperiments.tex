@@ -26,10 +26,8 @@ We now procede to write the problem in its weak formulation:
     \text{we get } \int_{\Omega} \dot u_i v_i v_j &=\int_{\Omega} u_iv_i(u_iv_i-\frac14)(1-u_iv_i)v_j - \nabla (u_iv_i) \cdot \nabla v_j + \int_{\partial\Omega}  v_j\hat n \cdot \nabla u_iv_i\\
     u_i\int_{\Omega}v_iv_j &= -u_i\int_{\Omega}\nabla v_i \cdot \nabla v_j + \int_{\Omega}R(u_h)v_j\\
     \text{where we have } R(u)&=u(u-\frac14)(1-u) + \int_{\partial\Omega}  \hat n \cdot \nabla u\\
-    \intertext{writing in matrix from gives}
+    \intertext{writing in matrix form gives}
     M\dot u_h &= DN(u_h) + R(u_h)\\
-    \intertext{which, relating back to our solution scheme gives}
-    u_h &= e^{\tau M^{-1}DN(u_h(t))}(u_h(t) + M^{-1}R(u_h(t)))
 \end{align*}
 
 In these experiments we use the number of calls to the operator as an approximate estimate of compute cost and compare this to the $L_2$ error when compared to the analytic solution \eqref{TravelingWaveSol}.
