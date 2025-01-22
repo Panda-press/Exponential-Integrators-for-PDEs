@@ -147,10 +147,10 @@ if __name__ == "__main__":
         start_time = 0
         end_time = 8
         if sysargs.debug == True:
-            krylovSizes = [5, 10]
+            krylovSizes = [5, 10, 20]
             tau0 = 2e-1
             taus = 3
-            grids = [[5, 10], [10, 10], [30, 10]]
+            grids = [[30, 10]]
             exp_methods = ["EXPLAN", "BE", "EXPKIOPS", "EXP1LAN", "EXP2LAN"]
         else:
             tau0 = 1e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
@@ -291,7 +291,7 @@ if __name__ == "__main__":
         plt.savefig(f"FEMethodPlots/Tau V L2 Error for {problemName} with grid size {grid_size}.png")
         plt.close()
 
-    # Tau vs error split my method
+    # Tau vs error split by method
     for exp_method in results["Method"].unique():
         trimmed_data = results[results["Method"] == exp_method]
         for grid_size in results["Grid Size"].unique():
@@ -308,4 +308,31 @@ if __name__ == "__main__":
         plt.savefig(f"FEMethodPlots/Tau V L2 Error for {exp_method} for {problemName}.png")
         plt.close()
 
+    # EOC for each grid size:
+    for grid_size in results["Grid Size"].unique():
+        fig, ax = plt.subplots()
+        fig.patch.set_visible(False)
+        ax.axis('off')
+        ax.axis('tight')
+        eocdata = []
+        tablehead = []
+        if "BE" not in exp_methods:
+            next
+        for i, exp_method in enumerate(results["Method"].unique()):
+            tablehead.append(exp_method)
+            trimmed_data = results[results["Method"] == exp_method]
+            trimmed_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
 
+            error1 = trimmed_data["Error L2"][:-1].to_numpy()
+            error2 = trimmed_data["Error L2"][1:].to_numpy()
+            tau1 = trimmed_data["Tau"][:-1].to_numpy()
+            tau2 = trimmed_data["Tau"][1:].to_numpy()
+            eoc = np.log(error1/error2)/np.log(tau1/tau2)
+            eocdata.append(eoc.tolist())
+
+        eocdata = pd.DataFrame(np.array(eocdata).T, columns=tablehead)
+
+        ax.table(cellText=eocdata.values, colLabels=eocdata.columns, loc='center')
+
+        fig.tight_layout()
+        fig.savefig(f"FEMethodPlots/EOC for {problemName} on grid size: {grid_size}.svg", format='svg', dpi=1200)
