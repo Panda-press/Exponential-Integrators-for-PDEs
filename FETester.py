@@ -154,10 +154,10 @@ if __name__ == "__main__":
             exp_methods = ["EXPLAN", "BE", "EXPKIOPS", "EXP1LAN", "EXP2LAN"]
         else:
             tau0 = 8e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
-            taus = 12 #9
-            grids = [[10, 10], [30, 10], [60, 10], [120, 10], [240, 10], [480,10]]
-            exp_methods = ["EXPLAN", "EXPKIOPS", "BE", "EXP1LAN", "EXP2LAN"]
-            krylovSizes = [5, 10, 20]
+            taus = 6 #9
+            grids = [[10, 10], [30, 10], [60, 10]]
+            exp_methods = ["EXPLAN", "BE", "EXP1LAN", "EXP2LAN"]
+            krylovSizes = [5, 10, 20, 40]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
