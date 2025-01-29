@@ -147,17 +147,17 @@ if __name__ == "__main__":
         start_time = 0
         end_time = 16
         if sysargs.debug == True:
-            krylovSizes = [20, 40]
-            tau0 = 4e-0 # Any higher gives numerical issues
-            taus = 6
-            grids = [[120, 10]]
+            krylovSizes = [20, 40, 80]
+            tau0 = 2e-0 # Any higher gives numerical issues
+            taus = 1
+            grids = [[60, 10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
         else:
             tau0 = 2e-0
             taus = 6
             grids = [[30, 10], [60, 10], [120,10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
-            krylovSizes = [20, 40, 80]
+            krylovSizes = [20, 40, 60]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
