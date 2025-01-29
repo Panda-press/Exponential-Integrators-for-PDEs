@@ -155,7 +155,7 @@ if __name__ == "__main__":
         else:
             tau0 = 2e-0
             taus = 6
-            grids = [[10, 10], [30, 10], [60, 10]]
+            grids = [[30, 10], [60, 10], [120,10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [20, 40, 80]
     else:
