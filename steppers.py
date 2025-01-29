@@ -385,12 +385,18 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         self.res.as_numpy[:] = V1@expm_multiply(-H1 * self.c, e_1) * beta1
         self.res.as_numpy[:] += self.c * V2@self.phi_k(-H2*self.c, 1)*beta2
 
-        temp = self.N.model.sourceTime
-        self.N.model.sourceTime += self.c * tau
-        self.linearize(self.res)
+        try: # If model has no sourceTime then model is not time dependant so can safly ignore
+            temp = self.N.model.sourceTime
+            self.N.model.sourceTime += self.c * tau
+            self.linearize(self.res)
+        except:
+            pass
         R2 = self.evalN(self.res.as_numpy[:]) - self.A@self.res.as_numpy[:]
-        self.N.model.sourceTime = temp
-        self.linearize(target)
+        try:
+            self.N.model.sourceTime = temp
+            self.linearize(target)
+        except:
+            pass
 
         H3, V3, beta3 = Lanzcos(self.A, -R2, self.expv_args["m"])
         result += V3 @ (self.phi_k(-H3, 2) * (1 / self.c)) * beta3
