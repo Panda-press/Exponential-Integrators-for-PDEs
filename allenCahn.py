@@ -46,7 +46,7 @@ def test2(gridView):
 
 """Traveling Wave"""
 def test3(gridView, alpha=0.25):
-    tauFE = 0.1
+    tauFE = 1
     x_val = x[0]
 
     exact = lambda t: as_vector([exp((-x_val/sqrt(2)+(0.5-alpha)*t))/(1+exp((-x_val/sqrt(2)+(0.5-alpha)*t)))])
@@ -57,5 +57,5 @@ def test3(gridView, alpha=0.25):
     a = inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a - potential - boundary(sourceTime), 8, tauFE, exact(0), exact
+    return a - potential - boundary(sourceTime), 16, tauFE, exact(0), exact
 

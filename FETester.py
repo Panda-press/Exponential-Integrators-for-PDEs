@@ -145,7 +145,7 @@ if __name__ == "__main__":
         from allenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
-        end_time = 4
+        end_time = 16
         if sysargs.debug == True:
             krylovSizes = [20, 40]
             tau0 = 4e-0 # Any higher gives numerical issues
