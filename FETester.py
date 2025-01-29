@@ -145,19 +145,19 @@ if __name__ == "__main__":
         from allenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
-        end_time = 8
+        end_time = 16
         if sysargs.debug == True:
-            krylovSizes = [5, 10, 20]
-            tau0 = 2e-1
+            krylovSizes = [20]
+            tau0 = 1e-0 # Any higher gives numerical issues
             taus = 3
             grids = [[30, 10]]
-            exp_methods = ["EXPLAN", "BE", "EXPKIOPS", "EXP1LAN", "EXP2LAN"]
+            exp_methods = ["BE", "EXP2LAN"]
         else:
-            tau0 = 8e-1 # Using this value as a higher value such as 8e-2 causes numerical issues
-            taus = 6 #9
+            tau0 = 1e-0
+            taus = 5 #9
             grids = [[10, 10], [30, 10], [60, 10]]
-            exp_methods = ["EXPLAN", "BE", "EXP1LAN", "EXP2LAN"]
-            krylovSizes = [5, 10, 20, 40]
+            exp_methods = ["BE", "EXP1LAN"]
+            krylovSizes = [10, 20, 40]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
@@ -248,7 +248,7 @@ if __name__ == "__main__":
         plt.yscale('log')
         plt.grid(True, which="both")
         plt.title(f"Tau V Opperator Calls for {problemName} with grid size {grid_size}")
-        plt.savefig(f"FEMethodPlots/Tau V Operator Calls for {problemName} with grid size {grid_size}.png")
+        plt.savefig(f"FEMethodPlots/Tau V Operator Calls for {problemName} with grid size {grid_size}.svg")
         plt.close()
 
     # N count v Error
@@ -268,7 +268,7 @@ if __name__ == "__main__":
         plt.yscale('log')
         plt.grid(True, which="both")
         plt.title(f"Opperator Calls V L2 Error for {problemName} with grid size {grid_size}")
-        plt.savefig(f"FEMethodPlots/Operator Calls V Error for {problemName} with grid size {grid_size}.png")
+        plt.savefig(f"FEMethodPlots/Operator Calls V Error for {problemName} with grid size {grid_size}.svg")
         plt.close()
 
     # Tau v Error all on one graph
@@ -288,7 +288,7 @@ if __name__ == "__main__":
         plt.yscale('log')
         plt.grid(True, which="both")
         plt.title(f"Tau V L2 Error for {problemName} with grid size {grid_size}")
-        plt.savefig(f"FEMethodPlots/Tau V L2 Error for {problemName} with grid size {grid_size}.png")
+        plt.savefig(f"FEMethodPlots/Tau V L2 Error for {problemName} with grid size {grid_size}.svg")
         plt.close()
 
     # Tau vs error split by method
@@ -305,7 +305,7 @@ if __name__ == "__main__":
         plt.yscale('log')
         plt.legend()
         plt.grid(True, which="both")
-        plt.savefig(f"FEMethodPlots/Tau V L2 Error for {exp_method} for {problemName}.png")
+        plt.savefig(f"FEMethodPlots/Tau V L2 Error for {exp_method} for {problemName}.svg")
         plt.close()
 
     # EOC for each grid size:

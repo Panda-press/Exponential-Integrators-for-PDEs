@@ -335,19 +335,19 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
         self.res.as_numpy[:] = self.exp_v(- self.A, target.as_numpy, **self.expv_args)
 
-        R = self.evalN(target.as_numpy) - self.A@target.as_numpy[:]
+        R = - self.evalN(target.as_numpy) + self.A@target.as_numpy[:]
 
         H, V, beta = Lanzcos(self.A, R, self.expv_args["m"])
         
-        target.as_numpy[:] = self.res.as_numpy[:] - tau*V@self.phi_k(H, tau, 1)*beta
-        #target.as_numpy[:] = self.res.as_numpy[:] - V@np.sum(xs, 0)*dx*norm(R)
+        target.as_numpy[:] = self.res.as_numpy[:] + V@self.phi_k(-H, 1)*beta
+        
         return {"iterations":0, "linIter":0}
 
-    def phi_k(self, H, tau, k):
+    def phi_k(self, H, k):
         e_1 = np.zeros((self.expv_args["m"]))
         e_1[0] = 1
-        func = lambda t: expm_multiply((1-t) * -H, e_1) * (t)**(k-1)/factorial(k-1)
-        return self.integrate(func, 0, 1)/tau
+        func = lambda t: expm_multiply((1-t) * H, e_1) * (t)**(k-1)/factorial(k-1)
+        return self.integrate(func, 0, 1)
 
     def integrate(self, func, a, b):
         if self.integration == 'simple':
@@ -361,7 +361,7 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
 # Seems to work?
 class SecondOrderExponentialStepper(FristOrderExponentialStepper):
-    def __init__(self, N, exp_v, *, integration='simple', c=0.5, **kwargs):
+    def __init__(self, N, exp_v, *, integration='simple', c=1, **kwargs):
         FristOrderExponentialStepper.__init__(self, N=N, exp_v=exp_v, **kwargs)
         self.name = f"ExpIntSecondOrder({self.method},{exp_v[1]},{self.expv_args})"
         self.c = c
@@ -376,27 +376,27 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         H1, V1, beta1 = Lanzcos(self.A, target.as_numpy, self.expv_args["m"])
         result = V1@expm_multiply(-H1, e_1) * beta1
 
-        R = self.evalN(target.as_numpy[:]) - self.A@target.as_numpy[:]
+        R = - self.evalN(target.as_numpy[:]) + self.A@target.as_numpy[:]
 
         H2, V2, beta2 = Lanzcos(self.A, R, self.expv_args["m"])
         
-        result -= tau*V2@(self.phi_k(H2, tau, 1) - 1/self.c * self.phi_k(H2, tau, 2))*beta2
+        result += V2@(self.phi_k(-H2, 1) - 1/self.c * self.phi_k(-H2, 2))*beta2
 
 
         #self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
         self.res.as_numpy[:] = V1@expm_multiply(-H1 * self.c, e_1) * beta1
-        self.res.as_numpy[:] -= self.c * tau * V2@self.phi_k(H2*self.c, tau, 1)*beta2
+        self.res.as_numpy[:] += self.c * V2@self.phi_k(-H2*self.c, 1)*beta2
 
         temp = self.N.model.sourceTime
         self.N.model.sourceTime += self.c * tau
         self.linearize(self.res)
-        R2 = self.evalN(self.res.as_numpy[:]) - self.A@self.res.as_numpy[:]
+        R2 = - self.evalN(self.res.as_numpy[:]) + self.A@self.res.as_numpy[:]
         self.N.model.sourceTime = temp
-        self.linearize(target) # Don't actually need to linearize twice just store the value of self.A prior to linearization
-        H, V, beta = Lanzcos(self.A, R2, self.expv_args["m"])
-        
+        self.linearize(target)
+    
 
-        result -= tau*V@(1/self.c * self.phi_k(H, tau, 2) * beta)
+        H3, V3, beta3 = Lanzcos(self.A, R2, self.expv_args["m"])
+        result += V3 @ (self.phi_k(-H3, 2) * (1 / self.c)) * beta3
 
         target.as_numpy[:] = result
         return {"iterations":0, "linIter":0}
@@ -506,7 +506,7 @@ if __name__ == "__main__":
     plt.savefig(outputName(fileCount))
     fileCount += 1
 
-    while time.value < T:
+    while time.value < T - tau/2:
         print(time.value)
         # this actually depends probably on the method we use, i.e., BE would
         # be + tau and the others without
@@ -520,7 +520,7 @@ if __name__ == "__main__":
         linIter   += info["linIter"]
         n += 1
         
-        if time.value >= plotTime:
+        if time.value >= plotTime - tau/2:
             print(f"[{fileCount}]: time step {n}, time {time.value}, N {stepper.countN}, iterations {info}",
                     flush=True)
             if exact is not None:
