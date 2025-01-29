@@ -153,8 +153,8 @@ if __name__ == "__main__":
             grids = [[120, 10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
         else:
-            tau0 = 4e-0
-            taus = 7
+            tau0 = 2e-0
+            taus = 6
             grids = [[10, 10], [30, 10], [60, 10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [20, 40, 80]
