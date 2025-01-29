@@ -145,19 +145,19 @@ if __name__ == "__main__":
         from allenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
-        end_time = 16
+        end_time = 4
         if sysargs.debug == True:
-            krylovSizes = [20]
-            tau0 = 1e-0 # Any higher gives numerical issues
-            taus = 3
-            grids = [[30, 10]]
-            exp_methods = ["BE", "EXP2LAN"]
+            krylovSizes = [20, 40]
+            tau0 = 4e-0 # Any higher gives numerical issues
+            taus = 6
+            grids = [[120, 10]]
+            exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
         else:
-            tau0 = 1e-0
-            taus = 5 #9
+            tau0 = 4e-0
+            taus = 7
             grids = [[10, 10], [30, 10], [60, 10]]
-            exp_methods = ["BE", "EXP1LAN"]
-            krylovSizes = [10, 20, 40]
+            exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+            krylovSizes = [20, 40, 80]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem

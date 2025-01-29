@@ -335,9 +335,9 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
         self.res.as_numpy[:] = self.exp_v(- self.A, target.as_numpy, **self.expv_args)
 
-        R = - self.evalN(target.as_numpy) + self.A@target.as_numpy[:]
+        R = self.evalN(target.as_numpy) - self.A@target.as_numpy[:]
 
-        H, V, beta = Lanzcos(self.A, R, self.expv_args["m"])
+        H, V, beta = Lanzcos(self.A, -R, self.expv_args["m"])
         
         target.as_numpy[:] = self.res.as_numpy[:] + V@self.phi_k(-H, 1)*beta
         
@@ -351,8 +351,9 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
     def integrate(self, func, a, b):
         if self.integration == 'simple':
-            n = 5
-            xs, dx = np.linspace(a+(b-a)/(2*(n)),b-(b-a)/(2*(n)),n, retstep=True) # might not work for all a and b
+            n = 10
+            xs, dx = np.linspace(a+(b-a)/n,b,n, retstep=True) # might not work for all a and b
+            xs -= dx/2
             xs = [func(x) for x in xs]
             return np.sum(xs, 0)*dx
         else:
@@ -361,7 +362,7 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
 # Seems to work?
 class SecondOrderExponentialStepper(FristOrderExponentialStepper):
-    def __init__(self, N, exp_v, *, integration='simple', c=1, **kwargs):
+    def __init__(self, N, exp_v, *, integration='simple', c=0.5, **kwargs):
         FristOrderExponentialStepper.__init__(self, N=N, exp_v=exp_v, **kwargs)
         self.name = f"ExpIntSecondOrder({self.method},{exp_v[1]},{self.expv_args})"
         self.c = c
@@ -376,12 +377,9 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         H1, V1, beta1 = Lanzcos(self.A, target.as_numpy, self.expv_args["m"])
         result = V1@expm_multiply(-H1, e_1) * beta1
 
-        R = - self.evalN(target.as_numpy[:]) + self.A@target.as_numpy[:]
-
-        H2, V2, beta2 = Lanzcos(self.A, R, self.expv_args["m"])
-        
+        R = self.evalN(target.as_numpy[:]) - self.A@target.as_numpy[:]
+        H2, V2, beta2 = Lanzcos(self.A, -R, self.expv_args["m"])
         result += V2@(self.phi_k(-H2, 1) - 1/self.c * self.phi_k(-H2, 2))*beta2
-
 
         #self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
         self.res.as_numpy[:] = V1@expm_multiply(-H1 * self.c, e_1) * beta1
@@ -390,12 +388,11 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         temp = self.N.model.sourceTime
         self.N.model.sourceTime += self.c * tau
         self.linearize(self.res)
-        R2 = - self.evalN(self.res.as_numpy[:]) + self.A@self.res.as_numpy[:]
+        R2 = self.evalN(self.res.as_numpy[:]) - self.A@self.res.as_numpy[:]
         self.N.model.sourceTime = temp
         self.linearize(target)
-    
 
-        H3, V3, beta3 = Lanzcos(self.A, R2, self.expv_args["m"])
+        H3, V3, beta3 = Lanzcos(self.A, -R2, self.expv_args["m"])
         result += V3 @ (self.phi_k(-H3, 2) * (1 / self.c)) * beta3
 
         target.as_numpy[:] = result
@@ -434,6 +431,12 @@ if __name__ == "__main__":
         from allenCahn import test3 as problem
         domain = [-4, -1], [8, 1], [30, 10]
         baseName = "TravellingWaveAllenCahn"
+        order = 1
+    elif sysargs.problem=="Test":
+        from test_problem import dimR, time, sourceTime
+        from test_problem import test1 as problem
+        domain = [-1, -1], [1, 1], [10, 10]
+        baseName = "Test"
         order = 1
     elif sysargs.problem=="Snowflake":
         from snowflakes import dimR, time, sourceTime, domain
