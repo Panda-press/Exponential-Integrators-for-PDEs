@@ -166,7 +166,7 @@ if __name__ == "__main__":
         tau0 = end_time / 32
         taus = 4
         start_time = 0
-        baseName = "ReactionDiffusion"
+        problemName = "ReactionDiffusion"
         exp_methods = ["EXP1LAN", "EXP2LAN"]
         krylovSizes = [20, 40, 60]
         grids = [[2048, 1024]]
