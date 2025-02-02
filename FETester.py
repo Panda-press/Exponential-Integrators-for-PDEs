@@ -162,7 +162,9 @@ if __name__ == "__main__":
         from reaction_diffusion import dimR, time, sourceTime, domain
         from reaction_diffusion import test1 as problem
         
-        model, end_time, tau0, u0, exact = problem(gridView)
+        end_time = 3*1.414*0.05/5
+        tauFE = end_time / 32
+        tau_0 = 
         taus = 4
         start_time = 0
         baseName = "ReactionDiffusion"
