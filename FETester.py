@@ -163,7 +163,7 @@ if __name__ == "__main__":
         from reaction_diffusion import test1 as problem
         
         end_time = 3*1.414*0.05/5
-        tau_0 = end_time / 32
+        tau0 = end_time / 32
         taus = 4
         start_time = 0
         baseName = "ReactionDiffusion"
