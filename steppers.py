@@ -435,7 +435,7 @@ if __name__ == "__main__":
     if sysargs.problem=="TravellingWaveAllenCahn":
         from allenCahn import dimR, time, sourceTime
         from allenCahn import test3 as problem
-        domain = [-4, -1], [8, 1], [30, 10]
+        domain = [-4, -1], [8, 1], [120, 10]
         baseName = "TravellingWaveAllenCahn"
         order = 1
     elif sysargs.problem=="Test":
@@ -443,6 +443,11 @@ if __name__ == "__main__":
         from test_problem import test1 as problem
         domain = [-1, -1], [1, 1], [10, 10]
         baseName = "Test"
+        order = 1
+    elif sysargs.problem=="ReactionDiffusion":
+        from reaction_diffusion import dimR, time, sourceTime, domain
+        from reaction_diffusion import test1 as problem
+        baseName = "ReactionDiffusion"
         order = 1
     elif sysargs.problem=="Snowflake":
         from snowflakes import dimR, time, sourceTime, domain

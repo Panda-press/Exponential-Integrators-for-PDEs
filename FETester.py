@@ -158,6 +158,17 @@ if __name__ == "__main__":
             grids = [[30, 10], [60, 10], [120,10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [20, 40, 60]
+    elif sysargs.problem=="ReactionDiffusion":
+        from reaction_diffusion import dimR, time, sourceTime, domain
+        from reaction_diffusion import test1 as problem
+        
+        model, end_time, tau0, u0, exact = problem(gridView)
+        taus = 4
+        start_time = 0
+        baseName = "ReactionDiffusion"
+        exp_methods = ["EXP1LAN", "EXP2LAN"]
+        krylovSizes = [20, 40, 60]
+        grids = [[2048, 1024]]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
