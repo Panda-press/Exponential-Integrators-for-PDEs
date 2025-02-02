@@ -7,7 +7,7 @@ from parabolicTest import model
 dimR = 1
 time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
-domain = [0, 0], [2, 1], [16, 8]
+domain = [0, 0], [2, 1], [1024, 64]
 
 space = Space(2,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
