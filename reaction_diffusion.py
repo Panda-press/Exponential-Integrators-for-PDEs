@@ -7,7 +7,7 @@ from parabolicTest import model
 dimR = 1
 time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
-domain = [0, 0], [2, 1], [1024, 64]
+domain = [0, 0], [2, 1], [64, 4]
 
 space = Space(2,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
@@ -22,7 +22,7 @@ def test1(gridView, epsilon=0.05):
 
     epsilon = Constant(epsilon,"epsilon")
     s = Constant(3/(sqrt(2) * epsilon))
-    exact = lambda t: as_vector([0.5 * (1 - tanh((x[0] - s * sourceTime)/(2*sqrt(2)*epsilon)))])
+    exact = lambda t: as_vector([0.5 * (1 - tanh((x_val - s * t)/(2*sqrt(2)*epsilon)))])
     #dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 
 
     boundary = lambda t: dot(dot(grad(exact(t)[0]),n),v[0])*ds
@@ -30,5 +30,5 @@ def test1(gridView, epsilon=0.05):
     a = inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a + potential - boundary(time), end_time, tauFE, exact(0), exact
+    return a + potential - boundary(sourceTime), end_time, tauFE, exact(0), exact
 

@@ -167,9 +167,9 @@ if __name__ == "__main__":
         taus = 4
         start_time = 0
         problemName = "ReactionDiffusion"
-        exp_methods = ["EXP1LAN", "EXP2LAN"]
+        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
         krylovSizes = [20, 40, 60]
-        grids = [[1024, 64]]
+        grids = [[64, 4], [128, 8]]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
