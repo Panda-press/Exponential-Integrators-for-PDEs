@@ -179,7 +179,7 @@ if __name__ == "__main__":
         start_time = 0.00
         end_time = 0.02
         grids = [[10, 10], [30, 30], [60, 60], [120, 10]]
-        krylovSizes[5, 10, 20]
+        krylovSizes = [5, 10, 20]
         exp_methods = ["EXP1LAN", "EXP2LAN", "EXPKIOPS", "BE"]
 
     results = []
