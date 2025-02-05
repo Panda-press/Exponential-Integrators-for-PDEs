@@ -158,18 +158,30 @@ if __name__ == "__main__":
             grids = [[30, 10], [60, 10], [120,10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [20, 40, 60]
+    elif sysargs.problem == "TravellingWaveAllenCahn2":
+        from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
+        from travellingWaveAllenCahn2 import test3 as problem
+        problemName = "Travelling Wave2"
+        start_time = 0
+        end_time = 3*1.414*epsilon/5
+        tau0 = end_time / 16
+        taus = 1
+        krylovSizes = [20, 40]
+        grids = [[1024, 64]]
+        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
     elif sysargs.problem=="ReactionDiffusion":
         from reaction_diffusion import dimR, time, sourceTime, domain
         from reaction_diffusion import test1 as problem
         
-        end_time = 3*1.414*0.05/5
-        tau0 = end_time / 32
+        start_time = 0.00
+        end_time = 1
+        tau0 = end_time / 16
         taus = 4
         start_time = 0
         problemName = "ReactionDiffusion"
         exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
-        krylovSizes = [20, 40, 60]
-        grids = [[64, 4], [128, 8]]
+        krylovSizes = [20, 40]
+        grids = [[2048, 1024]]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem

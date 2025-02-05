@@ -433,10 +433,14 @@ if __name__ == "__main__":
 
     kwargs = {}
     if sysargs.problem=="TravellingWaveAllenCahn":
-        from travellingWaveAllenCahn import dimR, time, sourceTime
+        from travellingWaveAllenCahn import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn import test3 as problem
-        domain = [-4, -1], [8, 1], [120, 10]
         baseName = "TravellingWaveAllenCahn"
+        order = 1
+    elif sysargs.problem=="TravellingWaveAllenCahn2":
+        from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
+        from travellingWaveAllenCahn2 import test3 as problem
+        baseName = "TravellingWaveAllenCahn2"
         order = 1
     elif sysargs.problem=="Test":
         from test_problem import dimR, time, sourceTime
