@@ -212,7 +212,7 @@ if __name__ == "__main__":
                     space = lagrange(gridView, order=1, dimRange=dimR)
 
                     model, T, tauFE, u0, exact, diriBC = problem(gridView)
-                    op = galerkin([model, diriBC], domainSpace=space, rangeSpace=space)
+                    op = galerkin([model, *diriBC], domainSpace=space, rangeSpace=space)
 
                     u_h = space.interpolate(u0, name='u_h')
 

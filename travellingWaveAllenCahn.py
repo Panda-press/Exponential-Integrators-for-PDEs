@@ -1,6 +1,6 @@
 import numpy as np
 from ufl import *
-from dune.ufl import Space, Constant
+from dune.ufl import Space, Constant, DirichletBC
 from dune.fem.function import gridFunction
 
 dimR = 1
@@ -21,9 +21,15 @@ def test3(gridView, alpha=0.25):
     #dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 
 
     boundary = lambda t: dot(dot(grad(exact(t)[0]),n),v[0])*ds
+    
+    def dirichlet_boundary(x):
+        return x[0] < 1e-10 -4 or x[0] > 8 - 1e-10
+        
+
+    boundary = DirichletBC(space, [exact(sourceTime)[0]], abs(x[0] - 2) > 8 - 1e-10)
     potential = dot(u[0]-alpha,1-u[0]) * dot(u,v) * dx
     a = inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a - potential - boundary(sourceTime), 16, tauFE, exact(0), exact, None
+    return a - potential, 16, tauFE, exact(0), exact, [boundary]
 

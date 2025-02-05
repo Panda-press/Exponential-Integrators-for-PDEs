@@ -497,7 +497,7 @@ if __name__ == "__main__":
     u_h = space.interpolate(u0, name='u_h')
 
     # stepper
-    op = galerkin([model, diriBC], domainSpace=space, rangeSpace=space)
+    op = galerkin([model, *diriBC], domainSpace=space, rangeSpace=space)
     stepper = stepperFct(N=op,**args,**kwargs)
 
     # time loop

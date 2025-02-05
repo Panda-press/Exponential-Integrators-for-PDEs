@@ -30,7 +30,7 @@ def test1(gridView):
     a = 0.5 * inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a - b, end_time, tauFE, exact(0), exact, DirichletBC(space, [0.0])
+    return a - b, end_time, tauFE, exact(0), exact, [DirichletBC(space, [0.0])]
 
 
 """Traveling Wave"""
@@ -49,5 +49,5 @@ def test2(gridView, epsilon=0.5):
     a = inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a + potential - boundary(sourceTime), end_time, tauFE, exact(0), exact, None
+    return a + potential - boundary(sourceTime), end_time, tauFE, exact(0), exact, [None]
 
