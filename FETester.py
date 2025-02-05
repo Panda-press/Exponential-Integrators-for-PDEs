@@ -163,7 +163,7 @@ if __name__ == "__main__":
         from travellingWaveAllenCahn2 import test3 as problem
         problemName = "Travelling Wave2"
         start_time = 0
-        end_time = 3*1.414*epsilon/5
+        end_time = 3*1.414*0.05/5
         tau0 = end_time / 16
         taus = 1
         krylovSizes = [20, 40]
