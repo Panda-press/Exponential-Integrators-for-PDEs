@@ -140,9 +140,9 @@ if __name__ == "__main__":
 
     threading.use = max(8,threading.max)
     if sysargs.problem == "TravellingWaveAllenCahn":
-        from allenCahn import dimR, time, sourceTime, domain
+        from travellingWaveAllenCahn import dimR, time, sourceTime, domain
         domain = [-4, -1], [8, 1], []
-        from allenCahn import test3 as problem
+        from travellingWaveAllenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
         end_time = 16
@@ -211,8 +211,8 @@ if __name__ == "__main__":
                     gridView = view(leafGridView(cartesianDomain(*domain)) )
                     space = lagrange(gridView, order=1, dimRange=dimR)
 
-                    model, T, tauFE, u0, exact = problem(gridView)
-                    op = galerkin(model, domainSpace=space, rangeSpace=space)
+                    model, T, tauFE, u0, exact, diriBC = problem(gridView)
+                    op = galerkin([model, diriBC], domainSpace=space, rangeSpace=space)
 
                     u_h = space.interpolate(u0, name='u_h')
 
