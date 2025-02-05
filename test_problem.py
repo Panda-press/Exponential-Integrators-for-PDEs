@@ -21,5 +21,5 @@ def test1(gridView):
     exact = lambda t: as_vector([1/(c-t)])
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return -dot(inner(u,u), v[0])*dx, 5, tauFE, exact(0), exact
+    return -dot(inner(u,u), v[0])*dx, 5, tauFE, exact(0), exact, None
 

@@ -49,5 +49,5 @@ def test2(gridView, epsilon=0.5):
     a = inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a + potential - boundary(sourceTime), end_time, tauFE, exact(0), exact
+    return a + potential - boundary(sourceTime), end_time, tauFE, exact(0), exact, None
 
