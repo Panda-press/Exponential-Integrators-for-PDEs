@@ -433,8 +433,8 @@ if __name__ == "__main__":
 
     kwargs = {}
     if sysargs.problem=="TravellingWaveAllenCahn":
-        from allenCahn import dimR, time, sourceTime
-        from allenCahn import test3 as problem
+        from travellingWaveAllenCahn import dimR, time, sourceTime
+        from travellingWaveAllenCahn import test3 as problem
         domain = [-4, -1], [8, 1], [120, 10]
         baseName = "TravellingWaveAllenCahn"
         order = 1
@@ -474,7 +474,7 @@ if __name__ == "__main__":
     gridView = view( leafGridView(cartesianDomain(*domain)) )
     space = lagrange(gridView, order=order, dimRange=dimR)
 
-    model, T, tauFE, u0, exact = problem(gridView)
+    model, T, tauFE, u0, exact, diriBC = problem(gridView)
 
     stepperFct, args = steppersDict[sysargs.stepper]
     if "exp_v" in args.keys():
@@ -494,9 +494,10 @@ if __name__ == "__main__":
     outputName = lambda n: f"{baseName}_{level}{sys.argv[1]}_{factor}_{n}_{sysargs.krylovsize[0]}.png"
 
     # initial condition
+    u_h = space.interpolate(u0, name='u_h')
 
     # stepper
-    op = galerkin(model, domainSpace=space, rangeSpace=space)
+    op = galerkin([model, diriBC], domainSpace=space, rangeSpace=space)
     stepper = stepperFct(N=op,**args,**kwargs)
 
     # time loop
@@ -508,8 +509,6 @@ if __name__ == "__main__":
     nextTime = plotTime
     fileCount = 0
 
-
-    u_h = space.interpolate(u0, name='u_h')
     
     if sysargs.adaptive:
         for i in range(10):
@@ -548,4 +547,9 @@ if __name__ == "__main__":
     print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}")
     u_h.plot(gridLines=None, block=False)
     plt.savefig(outputName(fileCount))
+    fileCount += 1
+    u_h = space.interpolate(exact(T), name='u_h')
+    u_h.plot(block=False)
+    plt.savefig(outputName("Solution"))
+
     
