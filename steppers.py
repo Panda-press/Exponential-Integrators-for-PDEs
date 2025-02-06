@@ -550,6 +550,7 @@ if __name__ == "__main__":
 
     print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}")
     u_h.plot(gridLines=None, block=False)
+    gridView.writeVTK(baseName, pointdata={"u_h": u_h}, subsampling=2)
     plt.savefig(outputName(fileCount))
     fileCount += 1
     u_h = space.interpolate(exact(T), name='u_h')
