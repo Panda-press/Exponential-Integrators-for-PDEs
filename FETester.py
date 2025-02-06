@@ -179,7 +179,7 @@ if __name__ == "__main__":
         taus = 4
         start_time = 0
         problemName = "ReactionDiffusion"
-        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+        exp_methods = ["EXP1LAN", "EXP2LAN"]
         krylovSizes = [20, 40]
         grids = [[2048, 1024]]
     else:
