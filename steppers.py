@@ -421,7 +421,7 @@ if __name__ == "__main__":
     parser.add_argument('--problem', help = "Problem To Run")
     parser.add_argument('--stepper', help = "Stepper To Use")
     parser.add_argument('--factor', help = "Time Step Multiplication Factor", nargs='*', default=[1])
-    parser.add_argument('--krylovsize', help = "Dimention of the Kyrlov Subspace", nargs='*', default=[5])
+    parser.add_argument('--krylovsize', help = "Dimention of the Kyrlov Subspace", nargs='*', default=[20])
     parser.add_argument('--refinement', help = "Refinement of the Grid", nargs='*', default=[0])
     parser.add_argument('--adaptive', help = "Is an adaptive grid begin used", action='store_true')
     sysargs = parser.parse_args()
@@ -522,6 +522,8 @@ if __name__ == "__main__":
     u_h.plot(block=False)
     plt.savefig(outputName(fileCount))
     fileCount += 1
+    if exact is not None:
+        printResult(time.value,u_h-exact(time),stepper.countN)
 
     while time.value < T - tau/2:
         print(time.value)

@@ -145,7 +145,7 @@ if __name__ == "__main__":
         from travellingWaveAllenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
-        end_time = 16
+        end_time = 8
         if sysargs.debug == True:
             krylovSizes = [20, 40, 80]
             tau0 = 2e-0 # Any higher gives numerical issues
@@ -153,11 +153,11 @@ if __name__ == "__main__":
             grids = [[60, 10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
         else:
-            tau0 = 2e-0
-            taus = 6
-            grids = [[30, 10], [60, 10], [120,10]]
+            tau0 = 1e-0
+            taus = 4
+            grids = [[128, 8], [256, 8], [512, 8], [1024, 8]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
-            krylovSizes = [20, 40, 60]
+            krylovSizes = [16, 32, 64]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
         from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn2 import test3 as problem
