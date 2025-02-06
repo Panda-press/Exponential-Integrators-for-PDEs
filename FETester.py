@@ -174,7 +174,7 @@ if __name__ == "__main__":
         from reaction_diffusion import test1 as problem
         
         start_time = 0.00
-        end_time = 1
+        end_time = 0.1
         tau0 = end_time / 16
         taus = 4
         start_time = 0
