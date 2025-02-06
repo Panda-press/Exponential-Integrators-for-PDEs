@@ -7,7 +7,7 @@ from parabolicTest import model
 dimR = 1
 time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
-domain = [0.5, 0], [2.5, 1], [16, 16]
+domain = [0.5, 0], [2.5, 1], [16, 8]
 
 
 space = Space(2,dimRange=dimR)
