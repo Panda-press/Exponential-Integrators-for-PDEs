@@ -7,7 +7,7 @@ from scipy.sparse import diags, csc_matrix, csr_matrix, lil_matrix, lil_array, i
 import scipy.sparse
 from scipy.sparse.linalg import expm, expm_multiply
 
-def Lanzcos(Amult, _V_hat, m):
+def Lanzcos(A, _V_hat, m):
     n = _V_hat.shape[0] # np.shape(A)[-1]
     alpha = np.zeros((m+1))
     beta = np.zeros((m+1))
@@ -18,7 +18,7 @@ def Lanzcos(Amult, _V_hat, m):
     for i in range(1, m+1):
         beta[i] = norm(v_hat[:,i])
         v[:, i] = v_hat[:, i]/beta[i]
-        Av = Amult(v[:, i])
+        Av = A @ v[:, i]
         alpha[i] = Av.dot(v[:,i]) # v[:, i].T @ A @ v[:, i]
         v_hat[:, i+1] = Av - alpha[i]*v[:,i] - beta[i]*v[:,i-1]
         # print(i,alpha[i],beta[i])
@@ -30,7 +30,7 @@ def Lanzcos(Amult, _V_hat, m):
 
 def LanzcosExp(A, v_1, m):
     nv_1 = np.linalg.norm(v_1)
-    H, V, beta = Lanzcos(lambda v: A@v, v_1, m)
+    H, V, beta = Lanzcos(A, v_1, m)
     # log_nv_1 = np.log(nv_1)
     # H, V, beta = Lanzcos(lambda v: A@v + log_nv_1*v , v_1/nv_1, m)
     ## H, V, beta = Lanzcos(lambda v: A@v , v_1/nv_1, m)
