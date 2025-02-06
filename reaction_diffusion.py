@@ -15,7 +15,7 @@ x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space),
 
 """Reaction Diffusion"""
 def test1(gridView):
-    end_time = 1
+    end_time = 0.1
     tauFE = end_time / 16
     x_val = x[0]
     y_val = x[1]
