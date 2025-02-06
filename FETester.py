@@ -168,7 +168,7 @@ if __name__ == "__main__":
         taus = 1
         krylovSizes = [20, 40]
         grids = [[1024, 64]]
-        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+        exp_methods = ["EXP1LAN", "EXP2LAN"]
     elif sysargs.problem=="ReactionDiffusion":
         from reaction_diffusion import dimR, time, sourceTime, domain
         from reaction_diffusion import test1 as problem
