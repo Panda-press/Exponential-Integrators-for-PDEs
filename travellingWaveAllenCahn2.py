@@ -8,7 +8,7 @@ time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
 rhx = -0.5
 lhx = 2.5
-domain = [rhx, 0], [lhx, 1/8], [128, 8]
+domain = [rhx, 0], [lhx, 1/8], [1024, 8]
 
 space = Space(2,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
@@ -26,8 +26,8 @@ def test3(gridView, epsilon=0.05):
     #dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 
 
 
-    rboundary = DirichletBC(space, [exact(sourceTime)[0]], x[0] < rhx + 1e-10)
-    lboundary = DirichletBC(space, [exact(sourceTime)[0]], x[0] > lhx - 1e-10)
+    rboundary = DirichletBC(space, [exact(sourceTime)[0]], x[0] < rhx + 1e-100)
+    lboundary = DirichletBC(space, [exact(sourceTime)[0]], x[0] > lhx - 1e-100)
 
     potential = 1/(epsilon*epsilon) * dot(u[0] - 1, u[0] + 1) * dot(u[0], v[0]) * dx
     a = inner(grad(u),grad(v))*dx

@@ -1,6 +1,6 @@
 import numpy as np
 from ufl import *
-from dune.ufl import Space, Constant, DirichletBC
+from dune.ufl import Space, Constant, DirichletBC, BoundaryId
 from dune.fem.function import gridFunction
 
 dimR = 1
@@ -14,14 +14,14 @@ x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space),
 
 """Traveling Wave"""
 def test3(gridView, alpha=0.25):
-    tauFE = 1
+    tauFE = 0.25
     x_val = x[0]
 
     exact = lambda t: as_vector([exp((-x_val/sqrt(2)+(0.5-alpha)*t))/(1+exp((-x_val/sqrt(2)+(0.5-alpha)*t)))])
     #dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 
           
-    rboundary = DirichletBC(space, [exact(sourceTime)[0]], x[0] > 8 - 1e-100)
-    lboundary = DirichletBC(space, [exact(sourceTime)[0]], x[0] < -8 + 1e-100)
+    rboundary = DirichletBC(space, [exact(sourceTime)[0]], x_val - 8 > -1e-1000)
+    lboundary = DirichletBC(space, [exact(sourceTime)[0]], x_val + 8 < 1e-1000)
     potential = dot(u[0]-alpha,1-u[0]) * dot(u,v) * dx
     a = inner(grad(u),grad(v))*dx
 
