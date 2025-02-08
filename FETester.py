@@ -141,7 +141,6 @@ if __name__ == "__main__":
     threading.use = max(8,threading.max)
     if sysargs.problem == "TravellingWaveAllenCahn":
         from travellingWaveAllenCahn import dimR, time, sourceTime, domain
-        domain = [-4, -1], [8, 1], []
         from travellingWaveAllenCahn import test3 as problem
         problemName = "Travelling Wave"
         start_time = 0
@@ -153,9 +152,9 @@ if __name__ == "__main__":
             grids = [[60, 10]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
         else:
-            tau0 = 2.5e-1
-            taus = 4
-            grids = [[128, 8], [256, 8], [512, 8], [1024, 8]]
+            tau0 = 5e-1
+            taus = 7
+            grids = [[1024, 8]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [16, 32, 64]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
@@ -204,6 +203,7 @@ if __name__ == "__main__":
             for exp_method in exp_methods:
                 print("Stepper method:{0}".format(exp_method))
                 for kyrlovSize in krylovSizes:
+                    print(f"Krylov size {kyrlovSize}")
 
                     exp_stepper, args = steppersDict[exp_method]
                     if "exp_v" in args.keys() and exp_method != "EXPKIOPS":
