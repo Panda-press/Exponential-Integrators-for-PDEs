@@ -1,6 +1,7 @@
 \section{Numerical Experiments}
 
 In this section we run numerical experiments compairing the backward euler methods to Kyrlov methods for computing solutions to Allen Cahn equation with a traveling wave solution\cite{YukitakaFukao2004}:
+
 \begin{align}
     \hat u(x,y,t)=\frac{e^{\frac{x-ct}{\sqrt2}}}{1+e^{\frac{x-ct}{\sqrt2}}} \label{TravelingWaveSol}
 \end{align}
@@ -11,7 +12,7 @@ and where the porblem is defined as follows:
     u(x,y,t) &= \hat u(x,y,t) \text{ for $(x,y,t) \in \mathbb{R}\times\{-1,1\}\times\mathbb{R}_+$}\\
     u_0 &= \hat u(x,y,0)\\
 \end{align*}
-However for our numerical experiments we compute on the space $\Omega=[-4,8]\times[-1,1]$.
+However for our numerical experiments we compute on the space $\Omega=[-8,8]\times[-1,1]$.
 Which by enforcing the boundarys so that they match the analytic soltuion it gives us the following boundary condionts:
 \begin{align*}
     u(x,y,t) &= \hat u(x,y,t) \text{ for $(x,y,t) \in \mathbb{R}\times\{-1,1\}\times\mathbb{R}_+$}\\
@@ -33,6 +34,13 @@ We now procede to write the problem in its weak formulation:
 In these experiments we use the number of calls to the operator as an approximate estimate of compute cost and compare this to the $L_2$ error when compared to the analytic solution \eqref{TravelingWaveSol}.
 We compare the Backward Euler, Arnoldi, Lanczos and Kiops methods over grid sizes: $to be decided$ and with time step $\tau=tobedecided$.
 
-
 The boundary condition are enforced such that they match the analytic solution.
+
+\subsection{Results}
+
+Bellow we show the error with respect to the number of calls to the operator $N$ which are needed both for computing $DN$ via the matrix free method described above as well as $R$.
+
+
+First ovbserve as expected that when are larger krylov subspace is used that more calls to the operator are provided.
+
 
