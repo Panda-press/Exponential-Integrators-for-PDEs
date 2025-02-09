@@ -118,11 +118,12 @@ class Tester():
     def run(self, tau, stepper, initial_condition, start_time, end_time):
         # Runs for a given stepper
         current_step = initial_condition.copy()
-        time = start_time
-        while time < end_time - tau/2:
+        time.value = start_time
+        while time.value < end_time - tau/2:
+            sourceTime.value = time.value
             stepper.N.model.sourceTime = time
             stepper(target=current_step, tau = tau)
-            time += tau
+            time.value+= tau
         countN = stepper.countN
         stepper.countN = 0
         return current_step, countN
