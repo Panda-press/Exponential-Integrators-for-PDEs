@@ -386,14 +386,14 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         self.res.as_numpy[:] += self.c * V2@self.phi_k(-H2*self.c, 1)*beta2
 
         try: # If model has no sourceTime then model is not time dependant so can safly ignore
-            temp = self.N.model.sourceTime
+            temp = self.N.model.sourceTime.value
             self.N.model.sourceTime += self.c * tau
             self.linearize(self.res)
         except:
             pass
         R2 = self.evalN(self.res.as_numpy[:]) - self.A@self.res.as_numpy[:]
         try:
-            self.N.model.sourceTime = temp
+            self.N.model.sourceTime.value = temp
             self.linearize(target)
         except:
             pass
@@ -495,7 +495,7 @@ if __name__ == "__main__":
         gridView.hierarchicalGrid.globalRefine(level)
         #tau *= 0.25**level
 
-    outputName = lambda n: f"{baseName}_{level}{sys.argv[1]}_{factor}_{n}_{sysargs.krylovsize[0]}.png"
+    outputName = lambda n: f"{baseName}_{level}_{factor}_{n}_{sysargs.krylovsize[0]}.png"
 
     # initial condition
     u_h = space.interpolate(u0, name='u_h')
