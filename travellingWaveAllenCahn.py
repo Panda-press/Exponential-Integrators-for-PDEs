@@ -20,11 +20,13 @@ def test3(gridView, alpha=0.25):
     exact = lambda t: as_vector([exp((-x_val/sqrt(2)+(0.5-alpha)*t))/(1+exp((-x_val/sqrt(2)+(0.5-alpha)*t)))])
     #dtExact = lambda t: -(1/2 - alpha) * as_vector([exact(t)]) * (as_vector([1]) - exact(t)) 
           
-    rboundary = DirichletBC(space, [exact(sourceTime)[0]], x_val - 8 > -1e-1000)
-    lboundary = DirichletBC(space, [exact(sourceTime)[0]], x_val + 8 < 1e-1000)
+    #rboundary = DirichletBC(space, [exact(sourceTime)[0]], x_val - 8 > -1e-1000)
+    #lboundary = DirichletBC(space, [exact(sourceTime)[0]], x_val + 8 < 1e-1000)
+    
+    boundary = lambda t: dot(dot(grad(exact(t)[0]),n),v[0])*ds
     potential = dot(u[0]-alpha,1-u[0]) * dot(u,v) * dx
     a = inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a - potential, 8, tauFE, exact(0), exact, [rboundary, lboundary]
+    return a - potential - boundary(sourceTime), 8, tauFE, exact(0), exact, [None]#[rboundary, lboundary]
 
