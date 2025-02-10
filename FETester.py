@@ -155,7 +155,7 @@ if __name__ == "__main__":
         else:
             tau0 = 2.5e-1
             taus = 6
-            grids = [[1024, 8]]
+            grids = [[128, 8], [256, 8], [512, 8]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [16, 32, 64]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
