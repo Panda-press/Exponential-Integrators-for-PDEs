@@ -121,7 +121,6 @@ class Tester():
         time.value = start_time
         while time.value < end_time - tau/2:
             sourceTime.value = time.value
-            stepper.N.model.sourceTime = time
             stepper(target=current_step, tau = tau)
             time.value+= tau
         countN = stepper.countN
@@ -147,17 +146,17 @@ if __name__ == "__main__":
         start_time = 0
         end_time = 8
         if sysargs.debug == True:
-            krylovSizes = [20, 40, 80]
-            tau0 = 2e-0 # Any higher gives numerical issues
-            taus = 1
-            grids = [[60, 10]]
-            exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+            krylovSizes = [32]
+            tau0 = 5e-1 # Any higher gives numerical issues
+            taus = 3
+            grids = [[256, 8]]
+            exp_methods = ["BE", "EXP2LAN"]
         else:
             tau0 = 4e-0
             taus = 10
             grids = [[128, 8], [256, 8], [512, 8]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
-            krylovSizes = [16, 32, 64]
+            krylovSizes = [16, 64]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
         from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn2 import test3 as problem
@@ -182,6 +181,19 @@ if __name__ == "__main__":
         exp_methods = ["EXP1LAN", "EXP2LAN"]
         krylovSizes = [20, 40]
         grids = [[2048, 1024]]
+    elif sysargs.problem=="Test":
+        from test_problem import dimR, time, sourceTime, domain
+        from test_problem import test1 as problem
+        
+        start_time = 0.00
+        end_time = 5
+        tau0 = end_time / 2
+        taus = 4
+        start_time = 0
+        problemName = "TestProblem"
+        exp_methods = ["FE", "EXP1LAN", "EXP2LAN"]
+        krylovSizes = [20, 40]
+        grids = [[8, 8]]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
