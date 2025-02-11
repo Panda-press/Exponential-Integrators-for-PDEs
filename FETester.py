@@ -102,15 +102,16 @@ class Tester():
             temp['exp_v'][0] = 0
         except:
             pass
-        test_stepper_name = test_stepper.name +\
-                            hashlib.sha1( repr(sorted(temp.items())).encode('utf-8') ).hexdigest()
+        test_stepper_name = test_stepper.name
         test_file_name = self.get_test_results_file(tau, test_stepper_name, end_time)
         if not os.path.isfile(test_file_name):
+            print("Running Tests")
             self.test_results, self.test_countN = self.run(tau, test_stepper, self.initial_condition, self.seed_time, end_time)
             with open(test_file_name, 'wb') as file:
                 pickle.dump([self.test_results.as_numpy[:],self.test_countN], file)
         else:
             self.test_results = self.initial_condition.copy()
+            print("Load Data")
             with open(test_file_name, 'rb') as file:
                 self.test_results.as_numpy[:], self.test_countN = pickle.load(file)
         
@@ -152,8 +153,8 @@ if __name__ == "__main__":
             grids = [[256, 8]]
             exp_methods = ["BE", "EXP2LAN"]
         else:
-            tau0 = 4e-0
-            taus = 10
+            tau0 = 0.5e-0
+            taus = 4
             grids = [[128, 8], [256, 8], [512, 8]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
             krylovSizes = [16, 64]
