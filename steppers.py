@@ -24,7 +24,7 @@ from Stable_Lanzcos import LanzcosExp, Lanzcos
 expm_lanzcos = [lambda A,x,m: LanzcosExp(A,x,m),"Lanzcos"]
 from NBLA import NBLAExp
 expm_nbla = [lambda A,x,m: NBLAExp(A,x,m),"NBLA"]
-from Arnoldi import ArnoldiExp 
+from Arnoldi import ArnoldiExp, Arnoldi
 expm_arnoldi = [lambda A,x,m: ArnoldiExp(A,x,m),"Arnoldi"]
 from kiops import KiopsExp
 expm_kiops = [lambda A,x,m: KiopsExp(A,x),"Kiops"]
@@ -62,7 +62,7 @@ class BaseStepper:
     # - define class that wraps an operator 'N' and returns object with same
     #   interface but including M^{-1}
     # - put N on right hand side
-    def __init__(self, N, *, method="explicit", mass="lumped", grid="fixed"):
+    def __init__(self, N, *, method="approx", mass="lumped", grid="fixed"):
         self.N = N
         self.method = method
         self.mass = mass
@@ -325,9 +325,10 @@ class ExponentialStepper(SIStepper):
 
 
 class FristOrderExponentialStepper(ExponentialStepper):
-    def __init__(self, N, exp_v, *, integration='simple', **kwargs):
+    def __init__(self, N, exp_v, krylovMethod, *, integration='simple', **kwargs):
         ExponentialStepper.__init__(self,N,exp_v=exp_v, **kwargs)
         self.name = f"ExpIntFirstOrder({self.method},{exp_v[1]},{self.expv_args})"
+        self.krylovMethod = krylovMethod
         self.integration = integration
 
     def __call__(self, target, tau):
@@ -337,7 +338,7 @@ class FristOrderExponentialStepper(ExponentialStepper):
 
         R = self.evalN(target.as_numpy) - self.A@target.as_numpy[:]
 
-        H, V, beta = Lanzcos(self.A, -R, self.expv_args["m"])
+        H, V, beta = self.krylovMethod(self.A, -R, self.expv_args["m"])
         
         target.as_numpy[:] = self.res.as_numpy[:] + V@self.phi_k(-H, 1)*beta
         
@@ -374,11 +375,11 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         e_1[0] = 1
         #result = self.exp_v(- self.A, target.as_numpy, **self.expv_args) #This subspace can be reused (should fix)
 
-        H1, V1, beta1 = Lanzcos(self.A, target.as_numpy, self.expv_args["m"])
+        H1, V1, beta1 = self.krylovMethod(self.A, target.as_numpy, self.expv_args["m"])
         result = V1@expm_multiply(-H1, e_1) * beta1
 
         R = self.evalN(target.as_numpy[:]) - self.A@target.as_numpy[:]
-        H2, V2, beta2 = Lanzcos(self.A, -R, self.expv_args["m"])
+        H2, V2, beta2 = self.krylovMethod(self.A, -R, self.expv_args["m"])
         result += V2@(self.phi_k(-H2, 1) - 1/self.c * self.phi_k(-H2, 2))*beta2
 
         #self.res.as_numpy[:] = self.exp_v(- self.c * self.A, target.as_numpy, **self.expv_args) #You can reuses the subspace generated above
@@ -398,7 +399,7 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         except:
             pass
 
-        H3, V3, beta3 = Lanzcos(self.A, -R2, self.expv_args["m"])
+        H3, V3, beta3 = self.krylovMethod(self.A, -R2, self.expv_args["m"])
         result += V3 @ (self.phi_k(-H3, 2) * (1 / self.c)) * beta3
 
         target.as_numpy[:] = result
@@ -409,10 +410,12 @@ steppersDict = {"FE": (FEStepper,{}),
                 "SI": (SIStepper,{}),
                 "EXPSCI": (ExponentialStepper, {"exp_v":expm_sci}),
                 "EXPLAN": (ExponentialStepper, {"exp_v":expm_lanzcos}),
-                "EXP1LAN": (FristOrderExponentialStepper, {"exp_v":expm_lanzcos}),
-                "EXP2LAN": (SecondOrderExponentialStepper, {"exp_v":expm_lanzcos}),
+                "EXP1LAN": (FristOrderExponentialStepper, {"exp_v":expm_lanzcos, "krylovMethod":Lanzcos}),
+                "EXP2LAN": (SecondOrderExponentialStepper, {"exp_v":expm_lanzcos, "krylovMethod":Lanzcos}),
                 "EXPNBLA": (ExponentialStepper, {"exp_v":expm_nbla}),
                 "EXPARN": (ExponentialStepper, {"exp_v":expm_arnoldi}),
+                "EXP1ARN": (FristOrderExponentialStepper, {"exp_v":expm_arnoldi, "krylovMethod":Arnoldi}),
+                "EXP2ARN": (SecondOrderExponentialStepper, {"exp_v":expm_arnoldi, "krylovMethod":Arnoldi}),
                 "EXPKIOPS": (ExponentialStepper, {"exp_v":expm_kiops}),
                }
 
