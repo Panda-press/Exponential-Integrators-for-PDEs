@@ -387,14 +387,14 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
         self.res.as_numpy[:] += self.c * V2@self.phi_k(-H2*self.c, 1)*beta2
 
         try: # If model has no sourceTime then model is not time dependant so can safly ignore
-            temp = self.N.model.sourceTime.value
+            temp = self.N.model.sourceTime
             self.N.model.sourceTime += self.c * tau
-            self.linearize(self.res)
+            self.linearize(target)
         except:
             pass
         R2 = self.evalN(self.res.as_numpy[:]) - self.A@self.res.as_numpy[:]
         try:
-            self.N.model.sourceTime.value = temp
+            self.N.model.sourceTime = temp
             self.linearize(target)
         except:
             pass
@@ -461,6 +461,18 @@ if __name__ == "__main__":
         from snowflakes import test1 as problem
         from dune.alugrid import aluConformGrid as leafGridView
         baseName = "Snowflake"
+        order = 1
+        if sysargs.adaptive:
+            kwargs = {"grid": "adaptive"}
+            def adaptGrid(u_h):
+                indicator = dot(grad(u_h[0]),grad(u_h[0]))
+                mark(indicator,1.4,1.2,0,11)
+                adapt(u_h)
+    elif sysargs.problem=="Snowflake3D":
+        from snowflakes3D import dimR, time, sourceTime, domain
+        from snowflakes3D import test1 as problem
+        from dune.alugrid import aluConformGrid as leafGridView
+        baseName = "Snowflake3D"
         order = 1
         if sysargs.adaptive:
             kwargs = {"grid": "adaptive"}
