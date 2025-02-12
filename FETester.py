@@ -188,13 +188,26 @@ if __name__ == "__main__":
         
         start_time = 0.00
         end_time = 5
-        tau0 = end_time / 2
-        taus = 4
+        tau0 = end_time / 1
+        taus = 6
         start_time = 0
         problemName = "TestProblem"
         exp_methods = ["FE", "EXP1LAN", "EXP2LAN"]
-        krylovSizes = [20, 40]
+        krylovSizes = [16, 64]
         grids = [[8, 8]]
+    elif sysargs.problem=="Test2":
+        from test_problem import dimR, time, sourceTime, domain
+        from test_problem import test2 as problem
+        
+        start_time = 0.00
+        end_time = 0.5
+        tau0 = 2**(-5)
+        taus = 4
+        start_time = 0
+        problemName = "TestProblem2"
+        exp_methods = ["FE", "EXP1LAN", "EXP2LAN"]
+        krylovSizes = [1]
+        grids = [[4, 4]]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
