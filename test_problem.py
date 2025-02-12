@@ -21,5 +21,13 @@ def test1(gridView):
     exact = lambda t: as_vector([1/(c-t)])
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return -dot(inner(u,u), v[0])*dx, 5, tauFE, exact(0), exact, [None]
+    return -dot(dot(u,u), v[0])*dx, 5, tauFE, exact(0), exact, [None]
 
+def test2(gridView):
+    end_time = 0.5
+    TauFE = end_time
+
+    c = Constant(1.1, "C")
+    exact = lambda t: as_vector([sin(t) + c])
+
+    return -dot(cos(sourceTime)/u[0] * u[0], v[0])*dx, end_time, TauFE, exact(0), exact, [None]
