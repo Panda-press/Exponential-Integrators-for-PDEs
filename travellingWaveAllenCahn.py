@@ -6,7 +6,7 @@ from dune.fem.function import gridFunction
 dimR = 1
 time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
-domain = [-8, -1], [8, 1], [128, 8]
+domain = [-16, -1], [16, 1], [258, 8]
 
 space = Space(2,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
