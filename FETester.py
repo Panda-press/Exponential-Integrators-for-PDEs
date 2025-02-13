@@ -147,17 +147,17 @@ if __name__ == "__main__":
         start_time = 0
         end_time = 8
         if sysargs.debug == True:
-            krylovSizes = [32]
-            tau0 = 5e-1 # Any higher gives numerical issues
-            taus = 3
+            krylovSizes = [64, 128]
+            tau0 = end_time # Any higher gives numerical issues
+            taus = 6
             grids = [[256, 8]]
-            exp_methods = ["BE", "EXP2LAN"]
+            exp_methods = ["EXP1LAN", "EXP2LAN"]
         else:
-            tau0 = 0.5e-0
+            tau0 = 2.5e-1
             taus = 4
-            grids = [[128, 8], [256, 8], [512, 8]]
+            grids = [[1024, 8]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
-            krylovSizes = [16, 64]
+            krylovSizes = [16, 32]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
         from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn2 import test3 as problem
