@@ -164,10 +164,10 @@ if __name__ == "__main__":
         problemName = "Travelling Wave2"
         start_time = 0
         end_time = 3*1.414*0.05/5
-        tau0 = end_time / 4
-        taus = 7
-        krylovSizes = [8, 16, 32, 64]
-        grids = [[128, 8]]
+        tau0 = end_time / 16
+        taus = 5
+        krylovSizes = [16, 32, 64, 128]
+        grids = [[1024, 64]]
         exp_methods = ["EXP1LAN", "EXP2LAN"]
     elif sysargs.problem=="ReactionDiffusion":
         from reaction_diffusion import dimR, time, sourceTime, domain
