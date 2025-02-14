@@ -139,7 +139,7 @@ if __name__ == "__main__":
     parser.add_argument('--debug', help = "Is this just to test the script or to produce results", action='store_true')
     sysargs = parser.parse_args()
 
-    threading.use = max(8,threading.max)
+    threading.use = threading.max
     if sysargs.problem == "TravellingWaveAllenCahn":
         from travellingWaveAllenCahn import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn import test3 as problem
@@ -147,27 +147,27 @@ if __name__ == "__main__":
         start_time = 0
         end_time = 8
         if sysargs.debug == True:
-            krylovSizes = [64, 128]
-            tau0 = end_time # Any higher gives numerical issues
-            taus = 6
-            grids = [[256, 8]]
-            exp_methods = ["EXP1LAN", "EXP2LAN"]
-        else:
-            tau0 = 2.5e-1
-            taus = 4
-            grids = [[1024, 8]]
+            krylovSizes = [64]
+            tau0 = end_time / 16 # Any higher gives numerical issues
+            taus = 1
+            grids = [[512, 8]]
             exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
-            krylovSizes = [16, 32]
+        else:
+            tau0 = end_time / 1
+            taus = 9
+            grids = [[128, 8], [256, 8], [512, 8]]
+            exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+            krylovSizes = [8, 16, 32, 64]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
         from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn2 import test3 as problem
         problemName = "Travelling Wave2"
         start_time = 0
         end_time = 3*1.414*0.05/5
-        tau0 = end_time / 16
-        taus = 1
-        krylovSizes = [20, 40]
-        grids = [[1024, 64]]
+        tau0 = end_time / 4
+        taus = 7
+        krylovSizes = [8, 16, 32, 64]
+        grids = [[128, 8]]
         exp_methods = ["EXP1LAN", "EXP2LAN"]
     elif sysargs.problem=="ReactionDiffusion":
         from reaction_diffusion import dimR, time, sourceTime, domain
@@ -282,7 +282,7 @@ if __name__ == "__main__":
 
     results = pd.DataFrame(results)
     results.columns = ["Method", "Grid Size", "Tau", "Error L2", "Error H1", "Target N Count", "Test N Count"]
-
+    print("plotting")
     # N count vs tau
     for grid_size in results["Grid Size"].unique():
         if "BE" not in exp_methods:
