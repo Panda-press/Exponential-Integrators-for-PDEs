@@ -1,0 +1,36 @@
+\section{Parallelization}
+
+Here we investigate how well the model can be parallelized.
+We will investigate this for both the travelling wave problem as well as for modeling 2D snowflake growth.
+For both, we will investigate how these mehtods scale on different numbers of cores for differnet krylov subspaces and measure timings accordingly.
+These methods will be compared to the backwards euler method.
+
+\subsection{Travelling Wave Allen Cahn}
+
+We will compare the first and second order methods for a variety of gridsizes and krylov subspace sizes.
+The grid sizes to be used are as follows: to be decided and the krylov sizes will be: to be decided.
+
+
+\subsection{2D Snowflake Modeling}
+
+Here we look at how well the krylov methods scale in relation to krylov subsapce size using subspaces of dimention ~.
+The grid complexity is govened by adaptive mesh refinement.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{| c | c c | c c | c c | c c | c c | c c |}
+    \hline
+    Cores & \multicolumn{2}{c|}{BE} & \multicolumn{2}{c|}{EXP1LAN 16} & \multicolumn{2}{c|}{EXP1LAN 32} & \multicolumn{2}{c|}{EXP2LAN 16} & \multicolumn{2}{c|}{EXP2LAN 32} \\
+    \hline
+    & T & CR & T & CR & T & CR \\
+    \hline
+    1  & 0 & 0 & 0 & 0 & 0 & 0 \\
+    2  & 0 & 0 & 0 & 0 & 0 & 0 \\
+    4  & 0 & 0 & 0 & 0 & 0 & 0 \\
+    8  & 0 & 0 & 0 & 0 & 0 & 0 \\
+    16 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    \hline
+    \end{tabular}
+    \caption{Reduced Data Table}
+    \label{tab:reduced_data}
+\end{table}

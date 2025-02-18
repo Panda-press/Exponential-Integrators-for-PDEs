@@ -1,6 +1,8 @@
 \section{Krylov Methods}
 
-Here we introduce Krylov subspace methods.
+For a lower dimention, computing the action of the exponential of a matrix to a vector $e^{H}v$ is computationally straight forward.
+However, when the dimention of the matrix $H$ is large then computing $e^{H}v$ is computationally intensive.
+One solution to this is to use Krylov subspace methods.
 These algorithms take a matrix $A\in \mathbb{R}^{n\times n}$, a vector $v \in \mathbb{R}^n$ and an integer $m$ that determines the number of dimensions of the Krylov subspace used.
 From these algorithms we will get a matrix $H \in \mathbb{R}^{m\times m}$ and another matrix $V \in \mathbb{R}^{n\times m}$ such that $A \approx VHV^T$ and $VV^T = I$.
 From here we get $Av \approx VHV^Tv = VH||v||e_1$.\\
