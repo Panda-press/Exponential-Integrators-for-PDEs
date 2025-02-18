@@ -212,13 +212,13 @@ if __name__ == "__main__":
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
         problemName = "Parabolic Test2"
-        tau0 = 1e-4  # 2e-3,N:32,Tau:0.002: compare m=5->m=10
+        tau0 = 2e-2  # 2e-3,N:32,Tau:0.002: compare m=5->m=10
         taus = 5
         start_time = 0.00
         end_time = 0.02
-        grids = [[10, 10], [30, 30], [60, 60], [120, 10]]
-        krylovSizes = [5, 10, 20]
-        exp_methods = ["EXP1LAN", "EXP2LAN", "EXPKIOPS", "BE"]
+        grids = [[30, 30], [50, 50], [100, 100]]
+        krylovSizes = [8, 16, 32, 64, 128]
+        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
 
     results = []
 

@@ -6,9 +6,9 @@ from dune.fem.function import gridFunction
 dimR = 1
 time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
-domain = [-16, -1], [16, 1], [512, 8]
+domain = [-8, -1, -1], [8, 1, 1], [128, 8, 8]
 
-space = Space(2,dimRange=dimR)
+space = Space(3,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
 
 
@@ -28,5 +28,5 @@ def test3(gridView, alpha=0.25):
     a = inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a - potential - boundary, 8, tauFE, exact(0), exact, [None]#[rboundary, lboundary]
+    return a - potential - boundary(sourceTime), 8, tauFE, exact(0), exact, [None]#[rboundary, lboundary]
 

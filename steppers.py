@@ -29,7 +29,7 @@ expm_arnoldi = [lambda A,x,m: ArnoldiExp(A,x,m),"Arnoldi"]
 from kiops import KiopsExp
 expm_kiops = [lambda A,x,m: KiopsExp(A,x),"Kiops"]
 
-from dune.grid import cartesianDomain
+from dune.grid import cartesianDomain, OutputType
 from dune.alugrid import aluCubeGrid as leafGridView
 from dune.fem.space import lagrange
 from dune.fem import integrate, threading, globalRefine, mark, adapt, loadBalance
@@ -62,7 +62,7 @@ class BaseStepper:
     # - define class that wraps an operator 'N' and returns object with same
     #   interface but including M^{-1}
     # - put N on right hand side
-    def __init__(self, N, *, method="approx", mass="lumped", grid="fixed"):
+    def __init__(self, N, *, method="", mass="lumped", grid="fixed"):
         self.N = N
         self.method = method
         self.mass = mass
@@ -440,6 +440,11 @@ if __name__ == "__main__":
         from travellingWaveAllenCahn import test3 as problem
         baseName = "TravellingWaveAllenCahn"
         order = 1
+    elif sysargs.problem=="TravellingWaveAllenCahn3D":
+        from travellingWaveAllenCahn3D import dimR, time, sourceTime, domain
+        from travellingWaveAllenCahn3D import test3 as problem
+        baseName = "TravellingWaveAllenCahn3D"
+        order = 1
     elif sysargs.problem=="TravellingWaveAllenCahn2":
         from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn2 import test3 as problem
@@ -533,9 +538,11 @@ if __name__ == "__main__":
         for i in range(10):
             adaptGrid(u_h)
             u_h.interpolate(u0)
-
-    u_h.plot(block=False)
-    plt.savefig(outputName(fileCount))
+    try:
+        u_h.plot(block=False)
+        plt.savefig(outputName(fileCount))
+    except:
+        gridView.writeVTK(outputName(fileCount), pointdata=[u_h[0]], outputType=OutputType.appendedraw)
     fileCount += 1
     if exact is not None:
         printResult(time.value,u_h-exact(time),stepper.countN)
@@ -560,8 +567,11 @@ if __name__ == "__main__":
             if exact is not None:
                 printResult(time.value,u_h-exact(time),stepper.countN)
             run += [(stepper.countN,linIter)]
-            u_h[0].plot(block=False)
-            plt.savefig(outputName(fileCount))
+            try:
+                u_h[0].plot(block=False)
+                plt.savefig(outputName(fileCount))
+            except:
+                gridView.writeVTK(outputName(fileCount), pointdata=[u_h[0]], outputType=OutputType.appendedraw)
             plotTime += nextTime
             fileCount += 1
 

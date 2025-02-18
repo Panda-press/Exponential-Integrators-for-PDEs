@@ -8,7 +8,7 @@ time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
 rhx = -0.5
 lhx = 2.5
-domain = [rhx, 0], [lhx, 1/8], [1024, 8]
+domain = [rhx, 0], [lhx, 1/8], [128, 8]
 
 space = Space(2,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
