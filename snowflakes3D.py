@@ -20,7 +20,7 @@ space = Space(3,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
 
 u_initial = Constant(0.7, "u_0")
-r = sqrt(x[0]**2 + x[1]**2) 
+r = sqrt(x[0]**2 + x[1]**2 ) 
 initial = as_vector( [conditional(r>Constant(30), Constant(-1), conditional(abs(x[2]) > Constant(10), Constant(-1), 1)), u_initial] )
 initial = as_vector( [1-2/(1+exp(8-r)), u_initial])
 
@@ -69,7 +69,7 @@ def test1(gridView):
         epsilonxy  * (6 * ygp / (xgp * xgp + ygp * ygp + eps)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
         + epsilonz * (2 * xgp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(safe_gradPhi0**2 + safe_gradPhi1**2), safe_gradPhi2)))
 ,
-        epsilonxy  * (6 * xgp / (xgp * xgp + ygp * ygp + eps)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        epsilonxy  * (6 * xgp / (xgp * xgp + ygp * ygp + eps)) * (-sin(pi/6 * 6 * atan_2(gradPhi[0], safe_gradPhi1)))
         + epsilonz * (2 * ygp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
           epsilonz * (-2 * sqrt(xgp * xgp + ygp * ygp) / (inner(gradPhi, gradPhi) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
