@@ -582,8 +582,11 @@ if __name__ == "__main__":
     gridView.writeVTK(baseName, pointdata={"u_h": u_h}, subsampling=2)
     plt.savefig(outputName(fileCount))
     fileCount += 1
-    u_h = space.interpolate(exact(T), name='u_h')
-    u_h.plot(block=False)
-    plt.savefig(outputName("Solution"))
+    try:
+        u_h = space.interpolate(exact(T), name='u_h')
+        u_h.plot(block=False)
+        plt.savefig(outputName("Solution"))
+    except:
+        pass
 
     
