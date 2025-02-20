@@ -20,7 +20,7 @@ space = Space(3,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
 
 u_initial = Constant(0.7, "u_0")
-r = sqrt(x[0]**2 + x[1]**2 ) 
+r = sqrt(x[0]**2 + x[1]**2 + x[2]**2) 
 initial = as_vector( [conditional(r>Constant(30), Constant(-1), conditional(abs(x[2]) > Constant(10), Constant(-1), 1)), u_initial] )
 initial = as_vector( [1-2/(1+exp(8-r)), u_initial])
 
