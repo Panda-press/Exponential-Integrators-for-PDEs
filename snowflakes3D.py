@@ -116,6 +116,6 @@ def test1(gridView):
         
         form = (dtPhi(v[0]) + dtU) * dx
 
-    return -form, 50, 0.01, initial, None, [None]
+    return -form, 100, 0.01, initial, None, [None]
 
     
