@@ -62,7 +62,7 @@ class BaseStepper:
     # - define class that wraps an operator 'N' and returns object with same
     #   interface but including M^{-1}
     # - put N on right hand side
-    def __init__(self, N, *, method="", mass="lumped", grid="fixed"):
+    def __init__(self, N, *, method="approx", mass="lumped", grid="fixed"):
         self.N = N
         self.method = method
         self.mass = mass
@@ -543,6 +543,7 @@ if __name__ == "__main__":
         plt.savefig(outputName(fileCount))
     except:
         gridView.writeVTK(outputName(fileCount), pointdata=[u_h[0]], outputType=OutputType.appendedraw)
+        gridView.writeVTK(outputName(fileCount) + "T", pointdata=[u_h[1]], outputType=OutputType.appendedraw)
     fileCount += 1
     if exact is not None:
         printResult(time.value,u_h-exact(time),stepper.countN)
@@ -572,6 +573,7 @@ if __name__ == "__main__":
                 plt.savefig(outputName(fileCount))
             except:
                 gridView.writeVTK(outputName(fileCount), pointdata=[u_h[0]], outputType=OutputType.appendedraw)
+                gridView.writeVTK(outputName(fileCount) + "T", pointdata=[u_h[1]], outputType=OutputType.appendedraw)
             plotTime += nextTime
             fileCount += 1
 
