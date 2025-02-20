@@ -18,7 +18,7 @@ domain = [-width, -width, -depth], [width, width, depth], [25, 25, 4]  # Use a g
 
 space = Space(3,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
-
+print(space)
 u_initial = Constant(0.7, "u_0")
 r = sqrt(x[0]**2 + x[1]**2 + x[2]**2) 
 initial = as_vector( [conditional(r>Constant(30), Constant(-1), conditional(abs(x[2]) > Constant(10), Constant(-1), 1)), u_initial] )
@@ -63,13 +63,13 @@ def test1(gridView):
     safe_bottom1 = conditional(bottom1 < 100, 100, conditional(bottom1 > -100, -100, bottom1))
     safe_zsqrtx2y2 = max_value(abs(safe_gradPhi2 * sqrt(safe_gradPhi0**2 + safe_gradPhi1**2)), eps) * sign(safe_gradPhi2)
 
-    A = 1 + epsilonxy * cos(6 * atan_2(ygp, safe_gradPhi0)) + epsilonz * cos(2 * atan2(sqrt(xgp**2 + ygp**2), safe_gradPhi2))
+    A = 1 + epsilonxy * cos(6 * atan_2(ygp, safe_gradPhi0)) + epsilonz * cos(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2))
 
     dAdGP = as_vector([
         epsilonxy  * (6 * ygp / (xgp * xgp + ygp * ygp + eps)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
         + epsilonz * (2 * xgp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(safe_gradPhi0**2 + safe_gradPhi1**2), safe_gradPhi2)))
 ,
-        epsilonxy  * (6 * xgp / (xgp * xgp + ygp * ygp + eps)) * (-sin(pi/6 * 6 * atan_2(gradPhi[0], safe_gradPhi1)))
+        epsilonxy  * (6 * xgp / (xgp * xgp + ygp * ygp + eps)) * (-sin(pi/6 + 6 * atan_2(gradPhi[0], safe_gradPhi1)))
         + epsilonz * (2 * ygp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
           epsilonz * (-2 * sqrt(xgp * xgp + ygp * ygp) / (inner(gradPhi, gradPhi) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
@@ -116,6 +116,6 @@ def test1(gridView):
         
         form = (dtPhi(v[0]) + dtU) * dx
 
-    return -form, 100, 0.01, initial, None, [None]
+    return -form, 100, 0.01, initial, None, A*A
 
     
