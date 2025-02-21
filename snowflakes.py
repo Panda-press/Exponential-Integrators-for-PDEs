@@ -60,5 +60,5 @@ a_alt = (1/tau * (dtheta
 
 
 def test1(gridView):
-    return -a_im, 0.1, 5e-4, initial, None, [None]
+    return -a_im, 0.1, 5e-4, initial, None, None
 

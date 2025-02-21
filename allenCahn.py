@@ -41,6 +41,6 @@ def test2(gridView):
     def u0(x):
         return 1.8*np.random.rand(1)[0]-0.9
     np.random.seed(100)
-    return a, 24, tauFE, u0, None, [None]
+    return a, 24, tauFE, u0, None, None
 
 

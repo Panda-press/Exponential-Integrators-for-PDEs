@@ -23,7 +23,7 @@ def paraTest0(gridView):
     xExact = as_vector([ cos(freq*x[0]) ])
     exact = lambda t: exp(-freq**2*t) * xExact
     dtExact = lambda t: -freq**2*exp(-freq**2*t) * xExact
-    return model(exact,dtExact, lambda u: as_vector([0])), 0.5, tauFE, exact(time), exact, [None]
+    return model(exact,dtExact, lambda u: as_vector([0])), 0.5, tauFE, exact(time), exact, None
 
 def paraTest1(gridView):
     tauFE = 7e-5 # check if this is correct
@@ -31,7 +31,7 @@ def paraTest1(gridView):
     xExact = as_vector([ cos(freq*x[0]) ])
     exact = lambda t: exp(-freq**2*t) * xExact
     dtExact = lambda t: -freq**2*exp(-freq**2*t) * xExact
-    return model(exact,dtExact, lambda u: (1+dot(u,u))*u), 0.5, tauFE, exact(0), exact, [None]
+    return model(exact,dtExact, lambda u: (1+dot(u,u))*u), 0.5, tauFE, exact(0), exact, None
 
 def paraTest2(gridView):
     tauFE = 7e-5 # check if this is correct
@@ -39,4 +39,4 @@ def paraTest2(gridView):
     xExact = as_vector([ cos(freq*x[0]) ])
     exact = lambda t: cos(freq**2*t) * xExact
     dtExact = lambda t: -freq**2*sin(freq**2*t) * xExact
-    return model(exact,dtExact, lambda u: (1+dot(u,u))*u), 0.5, tauFE, exact(time), exact, [None]
+    return model(exact,dtExact, lambda u: (1+dot(u,u))*u), 0.5, tauFE, exact(time), exact, None

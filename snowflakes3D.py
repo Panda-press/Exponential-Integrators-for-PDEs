@@ -18,7 +18,7 @@ domain = [-width, -width, -depth], [width, width, depth], [25, 25, 4]  # Use a g
 
 space = Space(3,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
-print(space)
+
 u_initial = Constant(0.7, "u_0")
 r = sqrt(x[0]**2 + x[1]**2 + x[2]**2) 
 initial = as_vector( [conditional(r>Constant(30), Constant(-1), conditional(abs(x[2]) > Constant(10), Constant(-1), 1)), u_initial] )
@@ -65,6 +65,11 @@ def test1(gridView):
 
     A = 1 + epsilonxy * cos(6 * atan_2(ygp, safe_gradPhi0)) + epsilonz * cos(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2))
 
+    massA = lambda u: (1 + epsilonxy * cos(6*atan_2(grad(u[0])[1], conditional(abs(grad(u[0])[0])>0, grad(u[0])[0] + eps, grad(u[0])[0] - eps)))
+                        + epsilonz * cos(2 * atan_2(sqrt(grad(u[0])[0]**2 + grad(u[0])[1]**2 + eps), conditional(abs(grad(u[0])[2])>0, grad(u[0])[2] + eps, grad(u[0])[2] - eps))))**2
+    #There is no reason for this epsilon in the sqrt but if I don't have it the code doesn't work
+
+
     dAdGP = as_vector([
         epsilonxy  * (6 * ygp / (xgp * xgp + ygp * ygp + eps)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
         + epsilonz * (2 * xgp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(safe_gradPhi0**2 + safe_gradPhi1**2), safe_gradPhi2)))
@@ -89,22 +94,31 @@ def test1(gridView):
 #     ]])
     
 
-    if False:
-                
-        dtPhi = 1/(A*A)*(-fDash + Lambda * b * gDash * u_
-                        +0.5*div(GammaMatrix * (inner(gradPhi, gradPhi) * dAdGP + A*A*GammaMatrix*gradPhi)))
+    if True:
 
-        dtPhi = (1/(A*A))*(-fDash + Lambda * gDash * u_
-                        +0.5 * (2 * dot(div(GammaMatrix * gradPhi) * gradPhi, 2 * A * dAdGP)
-                                + inner(gradPhi, gradPhi) * 2 * dot(grad(GammaMatrix * gradPhi) * dAdGP, dAdGP)
-                                + A * div(GammaMatrix * dAdGP)
-                                + 2 * A * inner((grad(GammaMatrix * gradPhi) * dAdGP), (GammaMatrix * gradPhi))
-                                + A*A * div(GammaMatrix * GammaMatrix * gradPhi))
-                                )
+        AAdtPhi = lambda v_:  (v_ * (-fDash + Lambda * gDash * u_)
+                - dot(GammaMatrix * (grad(v_)), inner(gradPhi, gradPhi) * 2 * A * dAdGP + A * A * GammaMatrix * gradPhi)
+                )
 
-        dtU = (D * div(GammaMatrix * q * GammaMatrix * grad(u_)) - 0.5 * Lsat * b * dtPhi)
+
+        AAdtU = (A * A * D * dot(q * GammaMatrix * grad(u_), GammaMatrix * grad(v[1])) - 0.5 * Lsat * b * AAdtPhi(v[1]))
         
-        form = (dtPhi * v[0] + dtU * v[1])*dx
+        form = (AAdtPhi(v[0]) + AAdtU) * dx
+                
+        # dtPhi = 1/(A*A)*(-fDash + Lambda * b * gDash * u_
+        #                 +0.5*div(GammaMatrix * (inner(gradPhi, gradPhi) * dAdGP + A*A*GammaMatrix*gradPhi)))
+
+        # dtPhi = (1/(A*A))*(-fDash + Lambda * gDash * u_
+        #                 +0.5 * (2 * dot(div(GammaMatrix * gradPhi) * gradPhi, 2 * A * dAdGP)
+        #                         + inner(gradPhi, gradPhi) * 2 * dot(grad(GammaMatrix * gradPhi) * dAdGP, dAdGP)
+        #                         + A * div(GammaMatrix * dAdGP)
+        #                         + 2 * A * inner((grad(GammaMatrix * gradPhi) * dAdGP), (GammaMatrix * gradPhi))
+        #                         + A*A * div(GammaMatrix * GammaMatrix * gradPhi))
+        #                         )
+
+        # dtU = (D * div(GammaMatrix * q * GammaMatrix * grad(u_)) - 0.5 * Lsat * b * dtPhi)
+        
+        # form = (dtPhi * v[0] + dtU * v[1])*dx
 
     else:
         dtPhi = lambda v_:  (v_/(A*A) * (-fDash + Lambda * gDash * u_)
@@ -116,6 +130,8 @@ def test1(gridView):
         
         form = (dtPhi(v[0]) + dtU) * dx
 
-    return -form, 100, 0.01, initial, None, A*A
+        massA = None
+
+    return -form, 100, 0.01, initial, None, massA
 
     

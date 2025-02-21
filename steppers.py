@@ -7,6 +7,7 @@
 # %%
 import sys
 import argparse
+import time as tm
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -62,7 +63,7 @@ class BaseStepper:
     # - define class that wraps an operator 'N' and returns object with same
     #   interface but including M^{-1}
     # - put N on right hand side
-    def __init__(self, N, *, method="approx", mass="lumped", grid="fixed"):
+    def __init__(self, N, *, method="approx", mass="lumped", grid="fixed", massWeight=None):
         self.N = N
         self.method = method
         self.mass = mass
@@ -71,6 +72,13 @@ class BaseStepper:
         self.un = self.spc.zero.copy()  # previous time step
         self.res = self.un.copy()       # residual
         self.shape = (self.spc.size,self.spc.size)
+
+        if massWeight == None:
+            self.massWeight = lambda u: 1
+            self.hasMassWeigth = False
+        else:
+            self.massWeight = massWeight
+            self.hasMassWeigth = True
 
         self.getMass()
 
@@ -100,7 +108,9 @@ class BaseStepper:
             # u^{n+1} = u^n - dt M^{-1}N(u^n)
             # bug: u,v = TrialFunction(N.domainSpace), TestFunction(N.rangeSpace)
             u,v = TrialFunction(self.N.domainSpace.as_ufl()), TestFunction(self.N.rangeSpace.as_ufl())
-            M = galerkin(dot(u,v)*dx).linear().as_numpy
+            
+            M = galerkin(self.massWeight(u) * dot(u,v)*dx).linear().as_numpy
+            print(M)
             if self.mass == 'lumped':
                 Mdiag = M.sum(axis=1) # sum up the entries onto the diagonal
                 self.Minv = diags( 1/Mdiag.A1, shape=(np.shape(Mdiag)[0], np.shape(Mdiag)[0]) )
@@ -109,7 +119,7 @@ class BaseStepper:
     def setup(self,un,tau):
         self.un.assign(un)
         self.tau = tau
-        if self.grid != "fixed":
+        if self.grid != "fixed" or self.hasMassWeigth:
             self.getMass()
         if not "expl" in self.method:
             self.linearize(self.un)
@@ -498,7 +508,8 @@ if __name__ == "__main__":
     gridView = view( leafGridView(cartesianDomain(*domain)) )
     space = lagrange(gridView, order=order, dimRange=dimR)
 
-    model, T, tauFE, u0, exact, diriBC = problem(gridView)
+    model, T, tauFE, u0, exact, massWeight = problem(gridView)
+    kwargs["massWeight"] = massWeight
 
     stepperFct, args = steppersDict[sysargs.stepper]
     if "exp_v" in args.keys():
@@ -521,7 +532,7 @@ if __name__ == "__main__":
     u_h = space.interpolate(u0, name='u_h')
 
     # stepper
-    op = galerkin([model, *diriBC], domainSpace=space, rangeSpace=space)
+    op = galerkin([model], domainSpace=space, rangeSpace=space)
     stepper = stepperFct(N=op,**args,**kwargs)
 
     # time loop
@@ -548,6 +559,7 @@ if __name__ == "__main__":
     if exact is not None:
         printResult(time.value,u_h-exact(time),stepper.countN)
 
+    computeTime = 0
     while time.value < T - tau/2:
         print(time.value)
         # this actually depends probably on the method we use, i.e., BE would
@@ -555,7 +567,9 @@ if __name__ == "__main__":
         sourceTime.value = time.value
         if sysargs.adaptive:
             adaptGrid(u_h)
+        computeTime -= tm.time()
         info = stepper(target=u_h, tau=tau)
+        computeTime += tm.time()
         assert not np.isnan(u_h.as_numpy).any()
         time.value += tau
         totalIter += info["iterations"]
@@ -563,7 +577,7 @@ if __name__ == "__main__":
         n += 1
         
         if time.value >= plotTime - tau/2:
-            print(f"[{fileCount}]: time step {n}, time {time.value}, N {stepper.countN}, iterations {info}",
+            print(f"[{fileCount}]: time step {n}, time {time.value}, N {stepper.countN}, iterations {info}, compute time {computeTime}",
                     flush=True)
             if exact is not None:
                 printResult(time.value,u_h-exact(time),stepper.countN)
@@ -577,7 +591,7 @@ if __name__ == "__main__":
             plotTime += nextTime
             fileCount += 1
 
-    print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}")
+    print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}, compute time {computeTime}")
     try:
         u_h.plot(gridLines=None, block=False)
         gridView.writeVTK(baseName, pointdata={"u_h": u_h}, subsampling=2)
