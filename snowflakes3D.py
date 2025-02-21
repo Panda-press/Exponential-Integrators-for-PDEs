@@ -94,7 +94,7 @@ def test1(gridView):
 #     ]])
     
 
-    if True:
+    if False:
 
         AAdtPhi = lambda v_:  (v_ * (-fDash + Lambda * gDash * u_)
                 - dot(GammaMatrix * (grad(v_)), inner(gradPhi, gradPhi) * 2 * A * dAdGP + A * A * GammaMatrix * gradPhi)
