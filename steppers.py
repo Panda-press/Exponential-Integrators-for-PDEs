@@ -109,7 +109,8 @@ class BaseStepper:
             # bug: u,v = TrialFunction(N.domainSpace), TestFunction(N.rangeSpace)
             u,v = TrialFunction(self.N.domainSpace.as_ufl()), TestFunction(self.N.rangeSpace.as_ufl())
             
-            M = galerkin(self.massWeight(u) * dot(u,v)*dx).linear().as_numpy
+            M = galerkin(self.massWeight(self.un) * dot(u,v)*dx).linear().as_numpy
+
             if self.mass == 'lumped':
                 Mdiag = M.sum(axis=1) # sum up the entries onto the diagonal
                 self.Minv = diags( 1/Mdiag.A1, shape=(np.shape(Mdiag)[0], np.shape(Mdiag)[0]) )
