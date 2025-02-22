@@ -132,6 +132,6 @@ def test1(gridView):
 
         massA = None
 
-    return -form, 100, 1, initial, None, massA
+    return -form, 100, 0.1, initial, None, massA
 
     
