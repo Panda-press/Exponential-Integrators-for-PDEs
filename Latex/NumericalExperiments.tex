@@ -1,38 +1,41 @@
 \section{Numerical Experiments}
 
-In this section we run numerical experiments compairing the backward euler methods to Kyrlov methods for computing solutions to Allen Cahn equation with a traveling wave solution\cite{YukitakaFukao2004} given by:
+In this section we run numerical experiments compairing the backward Euler method to krylov methods for computing solutions to a PDE.
+Specifically we will investigate the initial boundary value problem for the Allen Cahn equation on a strip with a traveling wave solution\cite{YukitakaFukao2004} given by:
 
 \begin{align}
-    \hat u(x,y,t)=\frac{e^{\frac{x-ct}{\sqrt2}}}{1+e^{\frac{x-ct}{\sqrt2}}} \label{TravelingWaveSol}
+    \hat u(x,y,t)&=\frac{e^{\frac{x-ct}{\sqrt2}}}{1+e^{\frac{x-ct}{\sqrt2}}} \label{TravelingWaveSol}\\
+    \text{where } c &= \frac{\sqrt{2}}{4}
 \end{align}
 and where the problem is defined as follows:
 \begin{align*}
-    u_t&=\Delta u+u(u-\frac14)(1-u)\\
+    u_t&=\Delta u+u(u-\frac14)(1-u) \text{ on $\Omega \times [0, 8]$}\\
     \text{with } \Omega &= \mathbb{R}\times[-1,1]\\
-    u(x,y,t) &= \hat u(x,y,t) \text{ for $(x,y,t) \in \mathbb{R}\times\{-1,1\}\times\mathbb{R}_+$}\\
-    u_0 &= \hat u(x,y,0)\\
+    \nabla u \cdot \hat n &= g \text{ for $g = \nabla \hat u \cdot \hat n$}\\
+    u_0(x, y) &= \hat u(x,y, 0)\\
 \end{align*}
 However for our numerical experiments we compute on the space $\Omega=[-16,16]\times[-1,1]$.
-We will use Neumann boundary on the left and right sides of the domain based on the exact solution given above and use a neumann boundary of $0$ along the top and bottom.
-We give the PDE problem bellow and then write it in weak form.
+Where $u$ is the solution, we write it in weak form.
 \begin{align*}
     \dot u&=\Delta u+u(u-\frac14)(1-u)\\
-    \int_{\Omega} \dot u v &=\int_{\Omega} \Delta uv+u(u-\frac14)(1-u)v\\
+    \int_{\Omega} \dot u v &=\int_{\Omega} \Delta uv+u(u-\frac14)(1-u)v \text{ for a smooth function $v \in C^{\infty}(\overline{\Omega})$}\\
     \int_{\Omega} \dot u v &=\int_{\Omega} u(u-\frac14)(1-u)v - \nabla u \cdot \nabla v + \int_{\partial\Omega}  v\hat n \cdot \nabla u\\
-    \text{subsituting in } u_h(t,x,y) &= \sum_i u_i(t) v_i(x,y)\\
-    \text{we get } \int_{\Omega} \dot u_i v_i v_j &=\int_{\Omega} u_iv_i(u_iv_i-\frac14)(1-u_iv_i)v_j - \nabla (u_iv_i) \cdot \nabla v_j + \int_{\partial\Omega}  v_j\hat n \cdot \nabla \hat u_iv_i\\
-    u_i\int_{\Omega}v_iv_j &= -u_i\int_{\Omega}\nabla v_i \cdot \nabla v_j + \int_{\Omega}R(u_h)v_j\\
+    \text{subsituting in } u_h(t,x,y) &= \sum_i u_i(t) v_i(x,y) \text{ where $(v_i)$ are the test functions we obtain:}\\
+    \text{we get } \sum_i\int_{\Omega} \dot u_i v_i v_j &=\sum_i(\int_{\Omega} u_iv_i(u_iv_i-\frac14)(1-u_iv_i)v_j - \int_{\Omega}\nabla (u_iv_i) \cdot \nabla v_j + \int_{\partial\Omega}  v_j\hat n \cdot \nabla \hat u_iv_i)\\
+    \sum_iu_i\int_{\Omega}v_iv_j &= -u_i\sum_i(\int_{\Omega}\nabla v_i \cdot \nabla v_j + \int_{\Omega}R(u_h)v_j)\\
     \text{where we have } R(u)&=u(u-\frac14)(1-u) + \int_{\partial\Omega}  \hat n \cdot \nabla \hat  u\\
-    \intertext{writing in matrix form gives}
-    M\dot u_h &= DN(u_h) + R(u_h)\\
+    \intertext{The above is true for all $i=0,1,2,...,n$. Writing in matrix vector form gives}
+    M \underline{\dot u} &= DN(\underline{u})\underline{u} + R(\underline{u})\\
+    \text{where } M_{i,j} &= \int_{\Omega}v_iv_jdx
 \end{align*}
+In the tests, we will investigate the relation between step size, $L_2$ error given by $||\hat u - \underline{u}||_{L_2}$ and call to the operator $N$ which will be a crude approximation to the computational cost.
+We compare the Backward Euler, First and Second order expoenntial methods over grid sizes: $128 \times 8$ and $256 \times 8$ and with time step $\tau=8,4,2,1,0.5,0.25,0.125,0.0625,0.03125$.
 
-In the tests, we will investigate the relation between step size, $L_2$ error and call to the operator $N$ which will be a crude approximation to the computational cost.
-We compare the Backward Euler, First and Second order expoenntial methods over grid sizes: $1024,$ $2048$ and with time step $\tau=8,4,2,1,0.5,0.25,0.125,0.0625,0.03125$.
-
-\subsection{Results}
+\subsection{experimental Results}
 
 Bellow we show the $L_2$ error with respect to the time step $\tau$.
+Where in the legend EXP1LAN 16 denotes the first order method with Krylov size 16, likewise for EXP2LAN and the second order method.
+BE denotes the backwards Euler method.
 
 \begin{figure}[H]
     \centering
@@ -49,7 +52,10 @@ Bellow we show the $L_2$ error with respect to the time step $\tau$.
     \end{minipage}\hfill
 \end{figure}
 
-We notice that when a smaller krylov subspace is used that the expoenntial methods only start to converge for a sufficiently small tau.
+First see that all of the methods tested converge, tending towards the discritisation error.
+The discritisation error is smaller on the more detailed grid.
+The Krylov methods converge faster than the backwards Euler method.
+We notice that when a smaller Krylov subspace is used that the expoenntial methods only start to converge for a sufficiently small tau.
 Likewise when these methods start to converge we observe that the perform simillarly to the methods using a larger subspace, however they will require fewer operator calls.
 This suggests that for sufficient small time steps a shallower subspace may suffice.
 Likewise for the converse that larger timesteps require a deeper krylov subspace.
@@ -97,9 +103,8 @@ Here we present the experimental orders of convergence.
     \label{tab:reduced_data}
 \end{table}
 
-    
-
 
 We observe that the rate of convergence for the second order method was inline with what has been shown analytic\cite{Huang2022} at a rate of $2$.
 The first order method converges with a rate of 2 despite an expectation of a rate of $1$\cite{Huang2022}.
+The exponential methods stop converging as they reach the discritisation error.
 The backwards euler converges at the rate expceted of 1.
