@@ -493,7 +493,7 @@ if __name__ == "__main__":
             kwargs = {"grid": "adaptive"}
             def adaptGrid(u_h):
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))
-                mark(indicator,0.12,0.1,0,5)
+                mark(indicator,0.12,0.1,3,5, markNeighbors = True)
                 adapt(u_h)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
