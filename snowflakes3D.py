@@ -14,7 +14,7 @@ time = Constant(0,"time")
 sourceTime = Constant(0,"sourceTime")
 width = 200
 depth = 25
-domain = [-width, -width, -depth], [width, width, depth], [25, 25, 4]  # Use a grid refinement of at least two when applying the inital condition
+domain = [-width, -width, -depth], [width, width, depth], [8, 8, 1]  
 
 space = Space(3,dimRange=dimR)
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
@@ -104,6 +104,6 @@ def test1(gridView):
 
         massA = None
 
-    return -form, 10, 0.05, initial, None, massA
+    return -form, 100, 0.005, initial, None, massA
 
     
