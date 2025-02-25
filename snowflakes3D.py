@@ -88,7 +88,7 @@ def test1(gridView):
                 )
 
 
-        AAdtU = (A * A * D * dot(q * GammaMatrix * grad(u_), GammaMatrix * grad(v[1])) - 0.5 * Lsat * b * AAdtPhi(v[1]))
+        AAdtU = (- A * A * D * dot(q * GammaMatrix * grad(u_), GammaMatrix * grad(v[1])) - 0.5 * Lsat * b * AAdtPhi(v[1]))
         
         form = (AAdtPhi(v[0]) + AAdtU) * dx
 
