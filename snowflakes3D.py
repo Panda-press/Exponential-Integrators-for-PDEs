@@ -25,7 +25,8 @@ r = sqrt(x[0]**2 + x[1]**2 + x[2]**2)
 initial = as_vector( [1-2/(1+exp(8-r)), u_initial])
 
 def test1(gridView):
-    eps = Constant(1e-5, "eps")
+    eps = Constant(1e-2, "eps")
+    maxVal = Constant(1000, "max")
 
     Gamma = Constant(0.5, "Gamma")
     epsilonz = Constant(0.3, "Epsilonz")
@@ -33,7 +34,7 @@ def test1(gridView):
 
     GammaVector = as_vector([1, 1, Gamma])
     GammaMatrix = as_matrix([[1, 0, 0], [0, 1, 0], [0, 0, Gamma]])
-    epsilonxy = Constant(0.1, "Epsilonxy")
+    epsilonxy = Constant(0.2, "Epsilonxy")
     Lambda = Constant(3.0, "Lambda") #Wrong value but isn't numerically unstable unlike 3.0
     D = Constant(0.6267*Lambda.value, "D")
     phi = u[0]
@@ -67,14 +68,14 @@ def test1(gridView):
 
 
     dAdGP = as_vector([
-        epsilonxy  * (6 * ygp / (xgp * xgp + ygp * ygp + eps)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
-        + epsilonz * (2 * xgp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
+        epsilonxy  * (6 * ygp * inner(gradPhi, gradPhi) / ((xgp * xgp + ygp * ygp) + eps)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        + epsilonz * (2 * xgp * inner(gradPhi, gradPhi) * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
-        #epsilonxy  * (6 * xgp / (xgp * xgp + ygp * ygp + eps)) * (-sin(pi/6 + 6 * atan_2(gradPhi[0], safe_gradPhi1)))
-        epsilonxy  * (6 * ygp * ygp / (safe_bottom)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
-        + epsilonz * (2 * ygp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
+        epsilonxy  * (6 * xgp * inner(gradPhi, gradPhi) / (xgp * xgp + ygp * ygp + eps)) * (-sin(pi/6 + 6 * atan_2(gradPhi[0], safe_gradPhi1)))
+        #epsilonxy  * (6 * ygp * ygp / (safe_bottom)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        + epsilonz * (2 * ygp * zgp * inner(gradPhi, gradPhi) / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
-          epsilonz * (-2 * sqrt(xgp * xgp + ygp * ygp) / (inner(gradPhi, gradPhi) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
+         epsilonz * (-2 * sqrt(xgp * xgp + ygp * ygp) * inner(gradPhi, gradPhi) / (inner(gradPhi, gradPhi) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
     ])  
 
     if True:
@@ -90,7 +91,7 @@ def test1(gridView):
 
     else:
         dtPhi = lambda v_:  (v_/(A*A) * (-fDash + Lambda * gDash * u_)
-                - dot(GammaMatrix * (grad(v_)/(2*A) - v_*(GammaMatrix * grad(gradPhi))*dAdGP/(A*A)), inner(gradPhi, gradPhi) * 2 * dAdGP + A * GammaMatrix * gradPhi)
+                - dot(GammaMatrix * (grad(v_)/(2*A) - v_*(GammaMatrix * grad(gradPhi))*dAdGP/(A*A)), 2 * dAdGP + A * GammaMatrix * gradPhi)
                 )
 
 
@@ -100,6 +101,6 @@ def test1(gridView):
 
         massA = None
 
-    return -form, 10, 0.01, initial, None, massA
+    return -form, 0.1, 0.01, initial, None, massA
 
     
