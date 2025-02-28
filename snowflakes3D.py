@@ -25,8 +25,8 @@ r = sqrt(x[0]**2 + x[1]**2 + x[2]**2)
 initial = as_vector( [1-2/(1+exp(8-r)), u_initial])
 
 def test1(gridView):
-    eps = Constant(1e-2, "eps")
-    maxVal = Constant(1000, "max")
+    eps = Constant(1e-5, "eps")
+    maxVal = Constant(0.1, "max")
 
     Gamma = Constant(0.5, "Gamma")
     epsilonz = Constant(0.3, "Epsilonz")
@@ -68,14 +68,14 @@ def test1(gridView):
 
 
     dAdGP = as_vector([
-        epsilonxy  * (6 * ygp * inner(gradPhi, gradPhi) / ((xgp * xgp + ygp * ygp) + eps)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
-        + epsilonz * (2 * xgp * inner(gradPhi, gradPhi) * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
+        epsilonxy  * 6 * max_value(min_value((ygp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        + epsilonz * (2 * xgp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
-        epsilonxy  * (6 * xgp * inner(gradPhi, gradPhi) / (xgp * xgp + ygp * ygp + eps)) * (-sin(pi/6 + 6 * atan_2(gradPhi[0], safe_gradPhi1)))
+        epsilonxy  * 6 * max_value(min_value((xgp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(pi/6 + 6 * atan_2(gradPhi[0], safe_gradPhi1)))
         #epsilonxy  * (6 * ygp * ygp / (safe_bottom)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
-        + epsilonz * (2 * ygp * zgp * inner(gradPhi, gradPhi) / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
+        + epsilonz * (2 * ygp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
-         epsilonz * (-2 * sqrt(xgp * xgp + ygp * ygp) * inner(gradPhi, gradPhi) / (inner(gradPhi, gradPhi) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
+         epsilonz * (-2 * sqrt(xgp * xgp + ygp * ygp) / (inner(gradPhi, gradPhi) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
     ])  
 
     if True:
@@ -101,6 +101,6 @@ def test1(gridView):
 
         massA = None
 
-    return -form, 100, 0.01, initial, None, massA
+    return -form, 0.2, 0.01, initial, None, massA
 
     
