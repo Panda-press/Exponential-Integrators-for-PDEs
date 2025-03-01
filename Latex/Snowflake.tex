@@ -4,27 +4,11 @@ We will use an adaptive grid and compaire the first and second order exponential
 We will also compare the limitations of these methods for differnt krylov sizes.
 \subsection{Formulation of problem}
 
-We condider the problem on a domain $\Omega = \mathbb{R}_+ \times [4, 8] \times [4, 8]$.
+We condider the problem on a domain $\Omega = \times [4, 8] \times [4, 8]$.
 The equaitions govening this phase boundary problem are as follows.
 \begin{align*}
     \tau \frac{\partial \phi}{\partial t} &= \nabla \cdot D\nabla\phi +  \phi(1-\phi)m(\phi,T)\\
-    \frac{\partial T}{\partial t} &= D_T \nabla ^2T + \frac{\partial \phi}{\partial t}\\
-    \intertext{Substituting in $\frac{\partial \phi}{\partial t}$ into the second equation and rewriting in weak form gives the following}
-    \int \frac{\partial \phi}{\partial t} v_{\phi} &=  \frac 1{\tau}\int \phi(1-\phi)m(\phi,T)v_{\phi} - D \nabla \phi \cdot \nabla v_{\phi}\\
-    \int \frac{\partial T}{\partial t} v_T &= \int \frac 1{\tau}(\phi(1-\phi)m(\phi,T)v_T - \nabla v_T \cdot D \nabla \phi) - D_T \nabla v_T \cdot \nabla T
-\end{align*}
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{Snowflakes/EXP1LAN/Snowflake_2--problem_1.0_0_16.png} % Change filename to your image
-    \caption{Initial condition}
-    \label{fig:initial}
-\end{figure}
-With an initial condition (figure \ref{fig:initial}) of: 
-\begin{align*}
-    \phi(0,x,y) &= \begin{cases} 
-      1 & (x - 6)^2 + (y - 6)^2 \leq 0.3 \\
-      0 & \text{otherwise} \end{cases}\\
-    T(0,x,y) &= -0.5 \text{  for  } (0,x,y)\in \Omega
+    \frac{\partial T}{\partial t} &= D_T \nabla ^2T + \frac{\partial \phi}{\partial t}
 \end{align*}
 
 Where we have that
@@ -46,6 +30,26 @@ and with the following constants
     D_T = 2.25 & \alpha = 0.015 & \tau = 3\cdot 10^{-4} & \kappa_1 &= 0.9\\
     \kappa_2 = 20 & c = 0.02 & N = 6 & \theta = \frac{\pi}8
     \end{matrix}
+\end{align*}
+
+Substituting in $\frac{\partial \phi}{\partial t}$ into the second equation and rewriting in weak form gives the following
+\begin{align*}
+    \int \frac{\partial \phi}{\partial t} v_{\phi}dx &=  \frac 1{\tau}\int \phi(1-\phi)m(\phi,T)v_{\phi} - D \nabla \phi \cdot \nabla v_{\phi}dx\\
+    \int \frac{\partial T}{\partial t} v_T dx &= \int \frac 1{\tau}(\phi(1-\phi)m(\phi,T)v_T - \nabla v_T \cdot D \nabla \phi) - D_T \nabla v_Tdx \cdot \nabla T
+\end{align*}
+Where we use homogeneus Neumann boundary condtions.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Snowflakes/EXP1LAN/Snowflake_2--problem_1.0_0_16.png} % Change filename to your image
+    \caption{Initial condition}
+    \label{fig:initial}
+\end{figure}
+With an initial condition (figure \ref{fig:initial}) of: 
+\begin{align*}
+    \phi(0,x,y) &= \begin{cases} 
+      1 & (x - 6)^2 + (y - 6)^2 \leq 0.3 \\
+      0 & \text{otherwise} \end{cases}\\
+    T(0,x,y) &= -0.5 \text{  for  } (0,x,y)\in \Omega
 \end{align*}
 
 \subsection{Numerical Solutions}
@@ -87,7 +91,7 @@ suggesting that setting the dimention of the krylov space to $16$ is sufficient 
 
 \subsection{Limitations}
 Now we compare the limitations of the first and second order exponential methods when the dimention of the krylov space is smaller that for what we saw above.
-We compare it for krylov sizes of $8$ and $12$.
+We compare it for krylov sizes of $8$ and $10$.
 
 \begin{figure}[H]
     \centering
