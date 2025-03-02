@@ -25,8 +25,9 @@ r = sqrt(x[0]**2 + x[1]**2 + x[2]**2)
 initial = as_vector( [1-2/(1+exp(8-r)), u_initial])
 
 def test1(gridView):
-    eps = Constant(1e-5, "eps")
-    maxVal = Constant(0.1, "max")
+    eps = Constant(1e-1, "eps")
+    epsatan = Constant(1e-5, "eps_atan")
+    maxVal = Constant(100, "max")
 
     Gamma = Constant(0.5, "Gamma")
     epsilonz = Constant(0.3, "Epsilonz")
@@ -55,15 +56,15 @@ def test1(gridView):
 
     q = 1 - phi
 
-    safe_gradPhi0 = conditional(xgp>0, xgp + eps, xgp - eps)  # Keeps sign but ensures |n0| >= eps
-    safe_gradPhi1 = conditional(ygp>0, ygp + eps, ygp - eps)
-    safe_gradPhi2 = conditional(zgp>0, zgp + eps, zgp - eps)  # Same for n2
+    safe_gradPhi0 = conditional(xgp>0, xgp + eps, xgp - epsatan)  # Keeps sign but ensures |n0| >= eps
+    safe_gradPhi1 = conditional(ygp>0, ygp + eps, ygp - epsatan)
+    safe_gradPhi2 = conditional(zgp>0, zgp + eps, zgp - epsatan)  # Same for n2
     safe_bottom = conditional(xgp**3 + xgp*ygp**2>0, xgp**3 + xgp*ygp**2 + eps, xgp**3 + xgp*ygp**2 - eps)
 
     A = 1 + epsilonxy * cos(6 * atan_2(ygp, safe_gradPhi0)) + epsilonz * cos(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2))
 
-    massA = lambda u: (1 + epsilonxy * cos(6*atan_2(grad(u[0])[1], conditional(abs(grad(u[0])[0])>0, grad(u[0])[0] + eps, grad(u[0])[0] - eps)))
-                        + epsilonz * cos(2 * atan_2(sqrt(grad(u[0])[0]**2 + grad(u[0])[1]**2 + eps), conditional(abs(grad(u[0])[2])>0, grad(u[0])[2] + eps, grad(u[0])[2] - eps))))**2
+    massA = lambda u: (1 + epsilonxy * cos(6*atan_2(grad(u[0])[1], conditional(abs(grad(u[0])[0])>0, grad(u[0])[0] + epsatan, grad(u[0])[0] - epsatan)))
+                        + epsilonz * cos(2 * atan_2(sqrt(grad(u[0])[0]**2 + grad(u[0])[1]**2 + epsatan), conditional(abs(grad(u[0])[2])>0, grad(u[0])[2] + epsatan, grad(u[0])[2] - epsatan))))**2
     #There is no reason for this epsilon in the sqrt but if I don't have it the code doesn't work
 
 
@@ -71,8 +72,8 @@ def test1(gridView):
         epsilonxy  * 6 * max_value(min_value((ygp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
         + epsilonz * (2 * xgp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
-        epsilonxy  * 6 * max_value(min_value((xgp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(pi/6 + 6 * atan_2(gradPhi[0], safe_gradPhi1)))
-        #epsilonxy  * (6 * ygp * ygp / (safe_bottom)) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        epsilonxy  * 6 * max_value(min_value((xgp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(0/6 + 6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        #epsilonxy  * 6 * max_value(min_value(ygp * ygp / (safe_bottom), maxVal), -maxVal) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
         + epsilonz * (2 * ygp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
          epsilonz * (-2 * sqrt(xgp * xgp + ygp * ygp) / (inner(gradPhi, gradPhi) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
