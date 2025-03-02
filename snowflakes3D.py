@@ -25,17 +25,18 @@ r = sqrt(x[0]**2 + x[1]**2 + x[2]**2)
 initial = as_vector( [1-2/(1+exp(8-r)), u_initial])
 
 def test1(gridView):
-    eps = Constant(1e-1, "eps")
+    eps = Constant(1e-2, "eps")
     epsatan = Constant(1e-5, "eps_atan")
-    maxVal = Constant(100, "max")
+    maxVal = Constant(10000, "max")
+    offset = Constant(1, "offset")
 
     Gamma = Constant(0.5, "Gamma")
+    epsilonxy = Constant(0.2, "Epsilonxy")
     epsilonz = Constant(0.3, "Epsilonz")
-    Lsat = Constant(1.0, "L_sat")
+    Lsat = Constant(1.8, "L_sat")
 
     GammaVector = as_vector([1, 1, Gamma])
     GammaMatrix = as_matrix([[1, 0, 0], [0, 1, 0], [0, 0, Gamma]])
-    epsilonxy = Constant(0.2, "Epsilonxy")
     Lambda = Constant(3.0, "Lambda") #Wrong value but isn't numerically unstable unlike 3.0
     D = Constant(0.6267*Lambda.value, "D")
     phi = u[0]
@@ -56,23 +57,26 @@ def test1(gridView):
 
     q = 1 - phi
 
-    safe_gradPhi0 = conditional(xgp>0, xgp + eps, xgp - epsatan)  # Keeps sign but ensures |n0| >= eps
-    safe_gradPhi1 = conditional(ygp>0, ygp + eps, ygp - epsatan)
-    safe_gradPhi2 = conditional(zgp>0, zgp + eps, zgp - epsatan)  # Same for n2
+    safe_gradPhi0 = conditional(xgp>0, xgp + epsatan, xgp - epsatan)  # Keeps sign but ensures |n0| >= eps
+    safe_gradPhi1 = conditional(ygp>0, ygp + epsatan, ygp - epsatan)
+    safe_gradPhi2 = conditional(zgp>0, zgp + epsatan, zgp - epsatan)  # Same for n2
     safe_bottom = conditional(xgp**3 + xgp*ygp**2>0, xgp**3 + xgp*ygp**2 + eps, xgp**3 + xgp*ygp**2 - eps)
 
-    A = 1 + epsilonxy * cos(6 * atan_2(ygp, safe_gradPhi0)) + epsilonz * cos(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2))
+    A = 1 + epsilonxy * cos(offset + 6 * atan_2(ygp, safe_gradPhi0)) + epsilonz * cos(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2))
 
-    massA = lambda u: (1 + epsilonxy * cos(6*atan_2(grad(u[0])[1], conditional(abs(grad(u[0])[0])>0, grad(u[0])[0] + epsatan, grad(u[0])[0] - epsatan)))
+    massA = lambda u: (1 + epsilonxy * cos(offset + 6*atan_2(grad(u[0])[1], conditional(abs(grad(u[0])[0])>0, grad(u[0])[0] + epsatan, grad(u[0])[0] - epsatan)))
                         + epsilonz * cos(2 * atan_2(sqrt(grad(u[0])[0]**2 + grad(u[0])[1]**2 + epsatan), conditional(abs(grad(u[0])[2])>0, grad(u[0])[2] + epsatan, grad(u[0])[2] - epsatan))))**2
     #There is no reason for this epsilon in the sqrt but if I don't have it the code doesn't work
 
 
     dAdGP = as_vector([
-        epsilonxy  * 6 * max_value(min_value((ygp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        epsilonxy  * 6 * ((ygp) / ((xgp * xgp + ygp * ygp) + eps)) * (-sin(offset + 6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        #epsilonxy  * 6 * max_value(min_value((ygp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
         + epsilonz * (2 * xgp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
-        epsilonxy  * 6 * max_value(min_value((xgp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(0/6 + 6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        #epsilonxy  * 6 * ((xgp) / ((xgp * xgp + ygp * ygp) + eps)) * (-sin(offset + 6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        #epsilonxy  * 6 * (ygp * ygp / (safe_bottom)) * (-sin(offset + 6 * atan_2(gradPhi[1], safe_gradPhi0)))
+        #epsilonxy  * 6 * max_value(min_value((xgp) / ((xgp * xgp + ygp * ygp) + eps), maxVal), -maxVal) * (-sin(pi/6 + 6 * atan_2(gradPhi[1], safe_gradPhi0)))
         #epsilonxy  * 6 * max_value(min_value(ygp * ygp / (safe_bottom), maxVal), -maxVal) * (-sin(6 * atan_2(gradPhi[1], safe_gradPhi0)))
         + epsilonz * (2 * ygp * zgp / (inner(gradPhi, gradPhi) * sqrt(xgp * xgp + ygp * ygp) + eps)) * (-sin(2 * atan_2(sqrt(xgp**2 + ygp**2), safe_gradPhi2)))
 ,
@@ -102,6 +106,6 @@ def test1(gridView):
 
         massA = None
 
-    return -form, 100, 0.01, initial, None, massA
+    return -form, 10, 0.01, initial, None, massA
 
     

@@ -486,16 +486,16 @@ if __name__ == "__main__":
     elif sysargs.problem=="Snowflake3D":
         from snowflakes3D import dimR, time, sourceTime, domain
         from snowflakes3D import test1 as problem
-        #from dune.alugrid import aluConformGrid as leafGridView
-        from dune.alugrid import aluCubeGrid as leafGridView
+        from dune.alugrid import aluConformGrid as leafGridView
+        #from dune.alugrid import aluCubeGrid as leafGridView
         baseName = "Snowflake3D"
         order = 1
         if sysargs.adaptive:
             kwargs = {"grid": "adaptive"}
             def adaptGrid(u_h):
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))
-                #mark(indicator,0.1,0.01,0,18, markNeighbors = True)
-                mark(indicator,0.03,0.03,0,7, markNeighbors = False)
+                mark(indicator,0.01,0.001,0,17, markNeighbors = False)
+                #mark(indicator,0.03,0.03,0,7, markNeighbors = False)
                 adapt(u_h)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
@@ -548,7 +548,7 @@ if __name__ == "__main__":
 
     
     if sysargs.adaptive:
-        for i in range(10):
+        for i in range(20):
             print("adapting")
             adaptGrid(u_h)
             u_h.interpolate(u0)
