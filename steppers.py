@@ -439,7 +439,7 @@ if __name__ == "__main__":
     parser.add_argument('--adaptive', help = "Is an adaptive grid begin used", action='store_true')
     sysargs = parser.parse_args()
 
-    threading.use = max(8,threading.max)
+    threading.use = threading.max
 
     def adaptGrid(u_h):
         return
@@ -495,21 +495,21 @@ if __name__ == "__main__":
             def adaptGrid(u_h):
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))
                 mark(indicator,0.01,0.001,0,17, markNeighbors = False)
-                #mark(indicator,0.03,0.03,0,7, markNeighbors = False)
+                #mark(indicator,0.01,0.001,0,7, markNeighbors = False)
                 adapt(u_h)
     elif sysargs.problem=="Crystal3D":
         from Crystal3D import dimR, time, sourceTime, domain
         from Crystal3D import test1 as problem
-        from dune.alugrid import aluConformGrid as leafGridView
-        #from dune.alugrid import aluCubeGrid as leafGridView
+        #from dune.alugrid import aluConformGrid as leafGridView
+        from dune.alugrid import aluCubeGrid as leafGridView
         baseName = "Crystal3D"
         order = 1
         if sysargs.adaptive:
             kwargs = {"grid": "adaptive"}
             def adaptGrid(u_h):
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))
-                mark(indicator,0.001,0.001,0,20, markNeighbors = False)
-                #mark(indicator,0.03,0.03,0,7, markNeighbors = False)
+                #mark(indicator,0.001,0.001,0,21, markNeighbors = False)
+                mark(indicator,0.0001,0.0001,0,7, markNeighbors = False)
                 adapt(u_h)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
