@@ -61,9 +61,9 @@ def test1(gridView):
     A = Ai(gradu[0]) + Ai(gradu[1]) + Ai(gradu[2])
 
     dAdGP = as_vector([
-        gradu[0]*((epsilon+1)/Ai(gradu[0]) + epsilon/Ai(gradu[1]) + epsilon/Ai(gradu[2])),
-        gradu[1]*((epsilon+1)/Ai(gradu[1]) + epsilon/Ai(gradu[0]) + epsilon/Ai(gradu[2])),
-        gradu[2]*((epsilon+1)/Ai(gradu[2]) + epsilon/Ai(gradu[0]) + epsilon/Ai(gradu[1]))
+        gradu[0]*((epsilon**2+1)/Ai(gradu[0]) + epsilon**2/Ai(gradu[1]) + epsilon**2/Ai(gradu[2])),
+        gradu[1]*((epsilon**2+1)/Ai(gradu[1]) + epsilon**2/Ai(gradu[0]) + epsilon**2/Ai(gradu[2])),
+        gradu[2]*((epsilon**2+1)/Ai(gradu[2]) + epsilon**2/Ai(gradu[0]) + epsilon**2/Ai(gradu[1]))
     ])
 
     omegaDash = u[0]*(1-2*u[0]**3)
