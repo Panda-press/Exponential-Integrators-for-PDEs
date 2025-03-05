@@ -72,7 +72,7 @@ def test1(gridView):
 
     dthedt = lambda test: -(inner(grad(test), A * dAdGP) + omegaDash/(delta**2) + gDash*(mu0-u[1])*Deltac/(Lambda*delta**2))
 
-    dmudt = - (a * D * inner(grad(v[1]), grad(u[1])) - a * Deltac * gDash * dthedt(v[1]))
+    dmudt = - (a * D * inner(grad(v[1]), grad(u[1])) + a * Deltac * gDash * dthedt(v[1]))
 
     return -(dmudt + dthedt(v[0])) * dx, 100, 0.1, initial, None, None
 
