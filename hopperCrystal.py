@@ -27,7 +27,6 @@ def test1(gridView):
 
     DL = Constant(1/12, "DL")
     muinf = Constant(0.04, "muinf")
-    alpha = Constant(0.5, "alpha")
 
     cL = Constant(0.9, "c_l")
     cS = Constant(0.5, "c_s")
@@ -35,11 +34,12 @@ def test1(gridView):
     a = Constant(4, "a")
     DS = 1e-4 * DL
     Rc = Constant(10, "Rc")
-    R0 = Constant(40, "R0")
+    R0 = Constant(20, "R0")
     delta = Constant(2, "delta")
     epsilon = Constant(0.02, "epsilon")
+    alpha = 1 + (muinf - mu0)/(a*(cL-cS))
     cBar = alpha*cS + (1-alpha)*cL
-    a = (mu0 - muinf)/(cBar - cS)
+    #a = (mu0 - muinf)/(cBar - cS)
 
     
     u_0 = Constant(0, "u_0")
@@ -52,6 +52,7 @@ def test1(gridView):
     D = u[0]*DL + (1-u[0])*DS
     Deltac = cL - cS
     Lambda = 3 * Rc * Deltac**2/delta
+    Lambda = Deltac**2
 
     gradu = grad(u[0])
 
@@ -70,10 +71,10 @@ def test1(gridView):
 
     gDash = 6*u[0] - 6*u[0]**2
 
-    dthedt = lambda test: -(inner(grad(test), A * dAdGP) + omegaDash/(delta**2) + gDash*(mu0-u[1])*Deltac/(Lambda*delta**2))
+    dthedt = lambda test: (inner(grad(test), A * dAdGP) - test * omegaDash/(delta**2) - test * gDash*(mu0-u[1])*Deltac/(Lambda*delta**2))
 
-    dmudt = - (a * D * inner(grad(v[1]), grad(u[1])) + a * Deltac * gDash * dthedt(v[1]))
+    dmudt = (a * D * inner(grad(v[1]), grad(u[1])) - a * Deltac * gDash * dthedt(v[1]))
 
-    return -(dmudt + dthedt(v[0])) * dx, 100, 0.1, initial, None, None
+    return (dmudt + dthedt(v[0])) * dx, 100, 0.1, initial, None, None
 
     
