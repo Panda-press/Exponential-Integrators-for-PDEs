@@ -21,7 +21,7 @@ x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space),
 
 
 def test1(gridView):
-    tol = Constant(1e-5, "tol")
+    tol = Constant(1e-10, "tol")
     maxVal = Constant(10000, "max")
     offset = Constant(1, "offset")
 
@@ -72,10 +72,10 @@ def test1(gridView):
 
     gDash = 6*u[0] - 6*u[0]**2
 
-    dthedt = lambda test: (Constant(1) * inner(A * dAdGP, grad(test)) - test * omegaDash/(delta**2) - test * gDash*(mu0-u[1])*Deltac/(Lambda*delta**2))
+    dthedt = lambda test: (inner(A * dAdGP, grad(test)) - test * omegaDash/(delta**2) - test * gDash*(mu0-u[1])*Deltac/(Lambda*delta**2))
 
     dmudt = (a * D * inner(grad(v[1]), grad(u[1])) - a * Deltac * gDash * dthedt(v[1]))
 
-    return (dmudt + dthedt(v[0])) * dx, 100, 0.01, initial, None, None
+    return (dmudt + dthedt(v[0])) * dx, 10, 0.1, initial, None, None
 
     
