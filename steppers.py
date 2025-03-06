@@ -584,8 +584,7 @@ if __name__ == "__main__":
         u_h[1].plot(block=False)
         plt.savefig(outputName(fileCount))
     except:
-        gridView.writeVTK(outputName(fileCount), pointdata=[u_h[0]], outputType=OutputType.appendedraw)
-        gridView.writeVTK(outputName(fileCount) + "T", pointdata=[u_h[1]], outputType=OutputType.appendedraw)
+        gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
     fileCount += 1
     if exact is not None:
         printResult(time.value,u_h-exact(time),stepper.countN)
@@ -617,15 +616,14 @@ if __name__ == "__main__":
                 u_h[0].plot(block=False)
                 plt.savefig(outputName(fileCount))
             except:
-                gridView.writeVTK(outputName(fileCount), pointdata=[u_h[0]], outputType=OutputType.appendedraw)
-                gridView.writeVTK(outputName(fileCount) + "T", pointdata=[u_h[1]], outputType=OutputType.appendedraw)
+                gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
             plotTime += nextTime
             fileCount += 1
 
     print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}, compute time {computeTime}")
     try:
         u_h.plot(gridLines=None, block=False)
-        gridView.writeVTK(baseName, pointdata={"u_h": u_h}, subsampling=2)
+        gridView.writeVTK(baseName, pointdata=[*u_h], subsampling=2)
         plt.savefig(outputName(fileCount))
         fileCount += 1
         u_h = space.interpolate(exact(T), name='u_h')
