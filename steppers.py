@@ -440,6 +440,8 @@ if __name__ == "__main__":
     sysargs = parser.parse_args()
 
     threading.use = threading.max
+    print(f"Threads: {threading.use}")
+
 
     def adaptGrid(u_h):
         return
@@ -542,6 +544,8 @@ if __name__ == "__main__":
     kwargs["massWeight"] = massWeight
 
     stepperFct, args = steppersDict[sysargs.stepper]
+    print(f"Stepper: {sysargs.stepper}")
+
     if "exp_v" in args.keys():
         m = int(sysargs.krylovsize[0])
         args["expv_args"] = {"m":m}
@@ -569,7 +573,6 @@ if __name__ == "__main__":
     n = 0
     totalIter, linIter = 0, 0
     run = []
-
     plotTime = T/10
     nextTime = plotTime
     fileCount = 0
