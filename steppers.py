@@ -439,6 +439,11 @@ if __name__ == "__main__":
     parser.add_argument('--adaptive', help = "Is an adaptive grid begin used", action='store_true')
     sysargs = parser.parse_args()
 
+    from functools import partial
+    from dune.common import comm
+    # print can be used as before but will only produce output on rank 0
+    print = partial(print, flush=True) if comm.rank == 0 else lambda *args, **kwargs: None
+
     threading.use = threading.max
     print(f"Threads: {threading.use}")
 
@@ -485,6 +490,7 @@ if __name__ == "__main__":
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))
                 mark(indicator,1.4,1.2,0,11)
                 adapt(u_h)
+                loadBalance(u_h) 
     elif sysargs.problem=="Snowflake3D":
         from snowflakes3D import dimR, time, sourceTime, domain
         from snowflakes3D import test1 as problem
@@ -598,9 +604,9 @@ if __name__ == "__main__":
         # this actually depends probably on the method we use, i.e., BE would
         # be + tau and the others without
         sourceTime.value = time.value
+        computeTime -= tm.time()
         if sysargs.adaptive:
             adaptGrid(u_h)
-        computeTime -= tm.time()
         info = stepper(target=u_h, tau=tau)
         computeTime += tm.time()
         assert not np.isnan(u_h.as_numpy).any()
