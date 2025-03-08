@@ -514,16 +514,16 @@ if __name__ == "__main__":
     elif sysargs.problem=="HopperCrystal3D":
         from hopperCrystal import dimR, time, sourceTime, domain
         from hopperCrystal import test1 as problem
-        #from dune.alugrid import aluConformGrid as leafGridView
+        from dune.alugrid import aluConformGrid as leafGridView
         from dune.alugrid import aluCubeGrid as leafGridView
         baseName = "HopperCrystal3D"
         order = 1
         if sysargs.adaptive:
             kwargs = {"grid": "adaptive"}
             def adaptGrid(u_h):
-                indicator = dot(grad(u_h[0]),grad(u_h[0]))
-                #mark(indicator,0.001,0.001,0,21, markNeighbors = False)
-                mark(indicator,0.0001,0.0001,0,6, markNeighbors = True)
+                indicator = dot(grad(u_h[0]),grad(u_h[0]))# + dot(grad(u_h[1]),grad(u_h[1]))
+                #mark(indicator,0.001,0.001,0,19, markNeighbors = False)
+                mark(indicator,0.0001,0.0001,0,7, markNeighbors = True)
                 adapt(u_h)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
@@ -581,7 +581,7 @@ if __name__ == "__main__":
             adaptGrid(u_h)
             u_h.interpolate(u0)
     try:
-        u_h[1].plot(block=False)
+        u_h[0].plot(block=False)
         plt.savefig(outputName(fileCount))
     except:
         gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
@@ -631,5 +631,4 @@ if __name__ == "__main__":
         plt.savefig(outputName("Solution"))
     except:
         pass
-
     
