@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import sys
 from ufl import *
 from dune.ufl import Space, Constant
-from dune.fem import integrate, threading
+from dune.fem import integrate, threading, mark, adapt, loadBalance
 from dune.fem.function import gridFunction
 from dune.fem.space import lagrange
 from dune.grid import cartesianDomain
@@ -16,6 +16,7 @@ from dune.fem.operator import galerkin
 from dune.alugrid import aluCubeGrid as leafGridView
 from dune.fem.view import adaptiveLeafGridView as view
 from steppers import BEStepper, steppersDict
+
 
 results_folder = "FETests"
 # results_folder = "FETests2009"
@@ -30,8 +31,9 @@ class Tester():
                  target_tau = 1e-4,
                  setup_stepper = BEStepper,
                  exact = None,
-                 **stepper_args):
-
+                 gridAdaptFunc = lambda u_h: None,
+                 stepper_args = {}):
+        print(stepper_args)
         self.op = op
         self.N = self.op.domainSpace.gridView.size(0)
         self.initial_condition = initial_condition
@@ -121,9 +123,11 @@ class Tester():
         current_step = initial_condition.copy()
         time.value = start_time
         while time.value < end_time - tau/2:
+            print(time.value)
             sourceTime.value = time.value
             stepper(target=current_step, tau = tau)
             time.value+= tau
+            adaptGrid(current_step)
         countN = stepper.countN
         stepper.countN = 0
         return current_step, countN
@@ -140,6 +144,8 @@ if __name__ == "__main__":
     sysargs = parser.parse_args()
 
     threading.use = threading.max
+    adaptGrid = lambda gridView: None
+    stepper_args = {}
     if sysargs.problem == "TravellingWaveAllenCahn":
         from travellingWaveAllenCahn import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn import test3 as problem
@@ -169,6 +175,25 @@ if __name__ == "__main__":
         krylovSizes = [16, 32, 64, 128]
         grids = [[1024, 64]]
         exp_methods = ["EXP1LAN", "EXP2LAN"]
+    elif sysargs.problem=="Snowflake":
+        from snowflakes import dimR, time, sourceTime, domain
+        from snowflakes import test1 as problem
+        from dune.alugrid import aluConformGrid as leafGridView
+        problemName = "Snowflake"
+        grids = [[6, 6]]
+        start_time = 0
+        end_time = 0.1
+        tau0 = 5e-4
+        taus = 4
+        krylovSizes = [8,10,12,14,16]
+        exp_methods = ["EXP1LAN", "EXP2LAN"]
+        order = 1
+        stepper_args["grid"] = "adaptive"
+        def adaptGrid(u_h):
+            indicator = dot(grad(u_h[0]),grad(u_h[0]))
+            mark(indicator,1.4,1.2,0,11)
+            adapt(u_h)
+            loadBalance(u_h) 
     elif sysargs.problem=="ReactionDiffusion":
         from reaction_diffusion import dimR, time, sourceTime, domain
         from reaction_diffusion import test1 as problem
@@ -251,17 +276,20 @@ if __name__ == "__main__":
                     space = lagrange(gridView, order=1, dimRange=dimR)
 
                     model, T, tauFE, u0, exact, diriBC = problem(gridView)
-                    op = galerkin([model, *diriBC], domainSpace=space, rangeSpace=space)
+                    op = galerkin([model], domainSpace=space, rangeSpace=space)
 
                     u_h = space.interpolate(u0, name='u_h')
 
+                    for _ in range(0, 10):
+                        adaptGrid(u_h)
+                        u_h.interpolate(u0)
 
-                    tester = Tester(u_h, op, problemName, start_time, exact=exact)
+                    tester = Tester(u_h, op, problemName, start_time, exact=exact, gridAdaptFunc = adaptGrid, stepper_args=stepper_args)
                     
                     tester.produce_results(tau, exp_stepper, args, end_time)
 
-                    #tester.test_results.plot()
-                    #tester.target.plot()
+                    tester.test_results.plot()
+                    tester.target.plot()
                     error = tester.test_results - tester.target
                     ref = [ np.sqrt(r) for r in
                             integrate([tester.target**2,
