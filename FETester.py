@@ -178,9 +178,9 @@ if __name__ == "__main__":
     elif sysargs.problem=="Snowflake":
         from snowflakes import dimR, time, sourceTime, domain
         from snowflakes import test1 as problem
-        from dune.alugrid import aluConformGrid as leafGridView
+        from dune.alugrid import aluCubeGrid as leafGridView
         problemName = "Snowflake"
-        grids = [[6, 6]]
+        grids = [[256, 256]]
         start_time = 0
         end_time = 0.1
         tau0 = 5e-4
@@ -188,12 +188,6 @@ if __name__ == "__main__":
         krylovSizes = [8,10,12,14,16]
         exp_methods = ["EXP1LAN", "EXP2LAN"]
         order = 1
-        stepper_args["grid"] = "adaptive"
-        def adaptGrid(u_h):
-            indicator = dot(grad(u_h[0]),grad(u_h[0]))
-            mark(indicator,1.4,1.2,0,11)
-            adapt(u_h)
-            loadBalance(u_h) 
     elif sysargs.problem=="ReactionDiffusion":
         from reaction_diffusion import dimR, time, sourceTime, domain
         from reaction_diffusion import test1 as problem
