@@ -85,8 +85,7 @@ class BaseStepper:
         # time step to use
         self.tau = None
 
-        if self.method == "exact":
-            self.Nprime = self.N.linear()
+        self.Nprime = self.N.linear()
 
         self.I = identity(self.shape[0])
         self.tmp = self.un.copy()
@@ -121,6 +120,8 @@ class BaseStepper:
         self.tau = tau
         if self.grid != "fixed" or self.hasMassWeigth:
             self.getMass()
+            if "expl" in self.method:
+                self.Nprime = self.N.linear()
         if not "expl" in self.method:
             self.linearize(self.un)
 
@@ -144,6 +145,7 @@ class BaseStepper:
             # assert False # we are not considering 'exact' at the moment
             self.N.jacobian(u,self.Nprime)
             self.A = self.tau * self.Minv @ self.Nprime.as_numpy
+            self.I = identity(np.shape(self.A)[0])
             self.D = self.A + self.I
 
     def test(self,u):
@@ -335,7 +337,7 @@ class ExponentialStepper(SIStepper):
 
 
 class FristOrderExponentialStepper(ExponentialStepper):
-    def __init__(self, N, exp_v, krylovMethod, *, integration='simple', **kwargs):
+    def __init__(self, N, exp_v, krylovMethod, *, method = "exact", integration='simple', **kwargs):
         ExponentialStepper.__init__(self,N,exp_v=exp_v, **kwargs)
         self.name = f"ExpIntFirstOrder({self.method},{exp_v[1]},{self.expv_args})"
         self.krylovMethod = krylovMethod
@@ -537,13 +539,32 @@ if __name__ == "__main__":
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
         baseName = "Parabolic Test2"
+        order = 1    
+    elif sysargs.problem=="DoubleSlit":
+        from dune.alugrid import aluConformGrid as leafGridView
+
+        from DoubleSlit import dimR, time, sourceTime, domain
+        from DoubleSlit import test2 as problem
+        baseName = "DoubleSlit"
         order = 1
+        #domain = [[0,0],[1,1],[100,1]]
+        if sysargs.adaptive:
+            kwargs = {"grid": "adaptive"}
+            def adaptGrid(u_h):
+                indicator = dot(grad(u_h[0]),grad(u_h[0])) + dot(grad(u_h[1]),grad(u_h[1]))
+                #mark(indicator,0.001,0.001,0,19, markNeighbors = False)
+                mark(indicator,0.01,0.01,0,6, markNeighbors = True)
+                adapt(u_h)
     else:
         print("No Valid Problem Provided")
         quit()
 
     # ## Setup grid, space, and operator
-    gridView = view( leafGridView(cartesianDomain(*domain)) )
+    try:
+        gridView = view( leafGridView(cartesianDomain(*domain)) )
+    except:
+        gridView = view( leafGridView(domain, dimgrid=2 ) )
+
     space = lagrange(gridView, order=order, dimRange=dimR)
 
     model, T, tauFE, u0, exact, massWeight = problem(gridView)
@@ -572,7 +593,7 @@ if __name__ == "__main__":
     u_h = space.interpolate(u0, name='u_h')
 
     # stepper
-    op = galerkin([model], domainSpace=space, rangeSpace=space)
+    op = galerkin(model, domainSpace=space, rangeSpace=space)
     stepper = stepperFct(N=op,**args,**kwargs)
 
     # time loop
@@ -622,7 +643,7 @@ if __name__ == "__main__":
                 printResult(time.value,u_h-exact(time),stepper.countN)
             run += [(stepper.countN,linIter)]
             try:
-                u_h[0].plot(block=False)
+                u_h[0].plot(gridLines=None, block=False)
                 plt.savefig(outputName(fileCount))
             except:
                 gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
