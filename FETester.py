@@ -175,6 +175,17 @@ if __name__ == "__main__":
         krylovSizes = [16, 32, 64, 128]
         grids = [[1024, 64]]
         exp_methods = ["EXP1LAN", "EXP2LAN"]
+    elif sysargs.problem == "AllenCahn":
+        from allenCahn import dimR, time, sourceTime, domain
+        from allenCahn import test2 as problem
+        problemName = "AllenCahn"
+        start_time = 0
+        end_time = 24
+        tau0 = 1
+        taus = 5
+        krylovSizes = [4, 8, 16, 32]
+        grids = [[60, 60]]
+        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
     elif sysargs.problem=="Snowflake":
         from snowflakes import dimR, time, sourceTime, domain
         from snowflakes import test1 as problem
