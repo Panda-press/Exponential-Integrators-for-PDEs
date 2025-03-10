@@ -337,7 +337,7 @@ class ExponentialStepper(SIStepper):
 
 
 class FristOrderExponentialStepper(ExponentialStepper):
-    def __init__(self, N, exp_v, krylovMethod, *, method = "exact", integration='simple', **kwargs):
+    def __init__(self, N, exp_v, krylovMethod, *, method = "approx", integration='simple', **kwargs):
         ExponentialStepper.__init__(self,N,exp_v=exp_v, **kwargs)
         self.name = f"ExpIntFirstOrder({self.method},{exp_v[1]},{self.expv_args})"
         self.krylovMethod = krylovMethod
