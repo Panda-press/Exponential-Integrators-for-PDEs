@@ -293,8 +293,8 @@ if __name__ == "__main__":
                     
                     tester.produce_results(tau, exp_stepper, args, end_time)
 
-                    tester.test_results.plot()
-                    tester.target.plot()
+                    #tester.test_results.plot()
+                    #tester.target.plot()
                     error = tester.test_results - tester.target
                     ref = [ np.sqrt(r) for r in
                             integrate([tester.target**2,
