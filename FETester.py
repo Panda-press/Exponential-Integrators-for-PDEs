@@ -182,7 +182,7 @@ if __name__ == "__main__":
         start_time = 0
         end_time = 24
         tau0 = 1
-        taus = 5
+        taus = 8
         krylovSizes = [4, 8, 16, 32]
         grids = [[60, 60]]
         exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
