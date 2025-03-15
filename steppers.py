@@ -120,8 +120,6 @@ class BaseStepper:
         self.tau = tau
         if self.grid != "fixed" or self.hasMassWeigth:
             self.getMass()
-            if "expl" in self.method:
-                self.Nprime = self.N.linear()
         if not "expl" in self.method:
             self.linearize(self.un)
 
@@ -136,13 +134,13 @@ class BaseStepper:
     # e.g. BE: u^{n+1} + tau M^{-1}N[u^{n+1}] = u^n
     # lineaaized around u^n_k: (I + tau M^{-1}DN[u^n_k])u = u^n
     def linearize(self,u):
-        assert not self.method == "expl"
         if self.method == "approx":
             self.A = aslinearoperator(self.Aapprox(self, u))
             self.D = aslinearoperator(self.Dapprox(self, u))
             # self.test(u)
         else:
             # assert False # we are not considering 'exact' at the moment
+            self.Nprime = self.N.linear()
             self.N.jacobian(u,self.Nprime)
             self.A = self.tau * self.Minv @ self.Nprime.as_numpy
             self.I = identity(np.shape(self.A)[0])
@@ -338,7 +336,7 @@ class ExponentialStepper(SIStepper):
 
 class FristOrderExponentialStepper(ExponentialStepper):
     def __init__(self, N, exp_v, krylovMethod, *, method = "approx", integration='simple', **kwargs):
-        ExponentialStepper.__init__(self,N,exp_v=exp_v, **kwargs)
+        ExponentialStepper.__init__(self,N,exp_v=exp_v, method = method, **kwargs)
         self.name = f"ExpIntFirstOrder({self.method},{exp_v[1]},{self.expv_args})"
         self.krylovMethod = krylovMethod
         self.integration = integration
@@ -469,6 +467,16 @@ if __name__ == "__main__":
         from travellingWaveAllenCahn2 import test3 as problem
         baseName = "TravellingWaveAllenCahn2"
         order = 1
+    elif sysargs.problem=="AllenCahn":
+        from allenCahn import dimR, time, sourceTime, domain
+        from allenCahn import test2 as problem
+        baseName = "AllenCahn"
+        order = 1
+    elif sysargs.problem=="CahnHilliard":
+        from cahnHilliard import dimR, time, sourceTime, domain
+        from cahnHilliard import test2 as problem
+        baseName = "CahnHilliard"
+        order = 1
     elif sysargs.problem=="Test":
         from test_problem import dimR, time, sourceTime
         from test_problem import test1 as problem
@@ -531,9 +539,9 @@ if __name__ == "__main__":
         if sysargs.adaptive:
             kwargs = {"grid": "adaptive"}
             def adaptGrid(u_h):
-                indicator = dot(grad(u_h[0]),grad(u_h[0]))# + dot(grad(u_h[1]),grad(u_h[1]))
-                #mark(indicator,0.001,0.001,0,19, markNeighbors = False)
-                mark(indicator,0.0001,0.0001,0,7, markNeighbors = True)
+                indicator = dot(grad(u_h[0]),grad(u_h[0]))# + u_h[0] * dot(grad(u_h[1]),grad(u_h[1]))
+                #mark(indicator,0.001,0.001,0,17, markNeighbors = False)
+                mark(indicator,0.0001,0.0001,0,7, markNeighbors = False)
                 adapt(u_h)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
