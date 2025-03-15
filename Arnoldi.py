@@ -6,22 +6,21 @@ import scipy.sparse
 from scipy.sparse.linalg import expm, expm_multiply
 
 def Arnoldi(A, v_1, m):
-    m += 1
     v = np.zeros((np.shape(v_1)[-1], m + 1))
     v[:,0] = v_1/np.linalg.norm(v_1)    
     h = lil_array((m + 1, m))
-    for j in range(0,m):
-        w = A @ v[:,j]
+    for j in range(1,m+1):
+        w = A @ v[:,j-1]
         for i in range(0,j):
-            h[i,j] = np.dot(w, v[:,i])
-            w -= h[i,j]*v[:,i]
-            
-        h[j+1,j] = norm(w)
-        if h[j+1,j] < 1e-10:
-            break
-        v[:,j+1] = w/h[j+1,j]
+            h[i,j-1] = np.dot(w, v[:,i])
+            w -= h[i,j-1]*v[:,i]
+        h[j,j-1] = norm(w)
+    #    if h[j+1,j] < 1e-10:
+    #        break
+        v[:,j] = w/h[j,j-1]
 
-    return csc_matrix(h[0:j,0:j]), csc_matrix(v[:,0:j]), norm(v_1)
+    # return csc_matrix(h[0:j,0:j]), csc_matrix(v[:,0:j]), norm(v_1)
+    return csc_matrix(h[0:m,0:m]), csc_matrix(v[:,0:m]), norm(v_1)
 
 def ArnoldiExp(A, v_1, m):
     H, V, beta = Arnoldi(A, v_1, m)
