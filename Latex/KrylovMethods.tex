@@ -1,10 +1,11 @@
 \section{Krylov Methods}
-
-For a lower dimention, computing the action of the exponential of a matrix to a vector $e^{H}v$ is computationally straight forward.
-However, when the dimention of the matrix $H$ is large then computing $e^{H}v$ is computationally intensive.
+When using the above exponential integrators, we need to be able to compute the matrix exponential $e^{A}$ or more precicely the action of the exponential of a matrix to a vector $e^{A}v$
+For a lower dimention, computing $e^{A}v$ is computationally cheap.
+However, when the dimention of the matrix $A$ is large then computing $e^{A}v$ is computationally intensive.
 One solution to this is to use Krylov subspace methods.
 These algorithms take a matrix $A\in \mathbb{R}^{n\times n}$, a vector $v \in \mathbb{R}^n$ and an integer $m$ that determines the number of dimensions of the Krylov subspace used.
 From these algorithms we will get a matrix $H \in \mathbb{R}^{m\times m}$ and another matrix $V \in \mathbb{R}^{n\times m}$ such that $A \approx VHV^T$ and $VV^T = I$.
+Where the matrix $V$ consists of basis vectors of the Krylov subspace $span(v, Av, ..., A^{m-1}v)$.
 From here we get $Av \approx VHV^Tv = VH||v||e_1$.\\
 We can apply this to $e^A$ as follows:
 \begin{align*}
@@ -19,10 +20,12 @@ e^Av &= (\sum^{\infty}_{i=0}\frac{VH^iV^T}{i!})v \\
 &= Ve^H||v||e_1
 \end{align*}
 
-Here we give the algorithms for the 2 Krylov subspace methods.
-We begin with the Arnoldi algorithm.
+\subsection{Algorithms}
+We now state the two Krylov subspace methods that we will be investigating, the Arnoldi and Lanczos algorithms.
+Following this we will investigating the benifits and drawbacks of each algorithm.
 
-
+\subsubsection{Arnoldi}
+Below we present the Arnoldi algorithm.
 \begin{algorithm}[H]
 \caption{Arnoldi \cite{Fan2018}} %find better citation
 \begin{algorithmic}
@@ -39,7 +42,9 @@ We begin with the Arnoldi algorithm.
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-Here V is given by $v_1,...,v_m$ and H is give by $h_1,...,h_m$.\\
+Here $V$ is given by $v_1,...,v_m$ and $H$ is give by $h_1,...,h_m$.\\
+
+\subsubsection{Lanczos}
 The algorithm below is the Lanczos algorithm and it requires a symmetric matrix. \cite{Moler2003}
 \begin{algorithm}[H]
 \caption{Lanczos \cite{OJALVO1970}}
@@ -56,7 +61,10 @@ The algorithm below is the Lanczos algorithm and it requires a symmetric matrix.
 \end{algorithmic}
 \end{algorithm}
 Here $V$ is given by ${v_1,...,v_m}$ and $H$ is tridiagonal with the leading diagonal being $\alpha_1, ..., \alpha_m$ and the upper and lower diagonals being $\beta_2,...,\beta_m$.
-
+\subsubsection{Benifits and Drawbacks}
+The main difference of the above algorithm is that the Lanczos algorithm requires $A$ to be a symetric matrix, whereas the Arnoldi algorithm does not have this requirement.
+While this does allow the Arnoldi algorithm to have more broad applications then the Lanczos method, it does have a drawback as the Lanczos algorithm is faster than the Arnoldi algorithm.
+As a result it is neccessary to carefully select which method to use based on the problem that we are working on.
 \subsection{Matrix Free Methods}
 The computation, storage and hence use of an explicitly computed $DN(u_h(t))$ can be very demanding.
 As we only need $DN(u_h(t))u_h(t)$ we can avoid needing to assemble $DN(u_h(t))$ using the following approximations:
