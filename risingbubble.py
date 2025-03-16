@@ -60,10 +60,12 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from dune.grid import structuredGrid
-from dune.fem.space import dglagrange, finiteVolume
+from dune.fem.space import dglagrange, finiteVolume, lagrange
+from dune.fem import mark, adapt
 from dune.femdg import femDGModels, femDGOperator, advectionNumericalFlux
 from dune.femdg.rk import femdgStepper
 from steppers import steppersDict
+from ufl import dot, grad
 
 if __name__ == "__main__":
     stepperFct, args = steppersDict[sys.argv[1]]
@@ -77,7 +79,7 @@ if __name__ == "__main__":
     # default name for model
     Model = RisingBubble(2)
     gridView = structuredGrid( *Model.domain )
-    gridView.hierarchicalGrid.globalRefine(3)
+    gridView.hierarchicalGrid.globalRefine(2)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
     # space = dglagrange(gridView,dimRange=Model.dimRange,order=3,pointType="lobatto")
@@ -112,7 +114,16 @@ if __name__ == "__main__":
     plotTime = 1
     nextTime = 1
 
-    u_h.plot(gridLines=None, block=False)
+    # def adaptGrid(u_h):
+    #     indicator = dot(grad(u_h[0]),grad(u_h[0]))# + u_h[0] * dot(grad(u_h[1]),grad(u_h[1]))
+    #     #mark(indicator,0.001,0.001,0,17, markNeighbors = False)
+    #     mark(indicator,0.0001,0.0001,0,7, markNeighbors = False)
+    #     adapt(u_h)
+    # for i in range(20):
+    #     print("adapting")
+    #     adaptGrid(u_h)
+    #     u_h.interpolate(Model.U0)
+    u_h.plot(block=False)
     plt.savefig(outputName(fileCount))
     fileCount += 1
     lastNcalls = op.info()[0]
@@ -125,7 +136,7 @@ if __name__ == "__main__":
 
         assert not np.isnan(u_h.as_numpy).any()
         n += 1
-        if True: # t>plotTime:
+        if t>plotTime:
             minMax = max(abs(u_h.as_numpy))
             print(f"time step {n}, time {t}, tau {tau}, calls {op.info()}, lastNcalls {op.info()[0]-lastNcalls}, minMax={minMax}")
             lastNcalls = op.info()[0]
