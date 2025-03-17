@@ -31,7 +31,7 @@ methods = {
     #"Kiops": lambda A, V, m: KiopsExp(A,V)
     #"NBLA": NBLAExp
 }
-m = [i for i in range(1, 64)]
+m = [2**i for i in range(0, 7)]
 n = [2**i for i in range(0, 15)]
 print(n)
 
