@@ -22,7 +22,7 @@ from kiops import KiopsExp
 def GetA(n):
     A = diags([-1,2,-1], [-1,0,1], shape=(n,n))
     A = csc_matrix(A)
-    return A / n**2
+    return A * n**2
 
 methods = {
     "Scipy": lambda A, v, m: expm_multiply(A,v),
@@ -31,8 +31,8 @@ methods = {
     #"Kiops": lambda A, V, m: KiopsExp(A,V)
     #"NBLA": NBLAExp
 }
-m = [i for i in range(1, 32)]
-n = [2**i for i in range(0, 20)]
+m = [i for i in range(1, 64)]
+n = [2**i for i in range(0, 15)]
 print(n)
 
 v = np.random.rand(np.max(n))
