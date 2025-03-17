@@ -65,9 +65,75 @@ Here $V$ is given by ${v_1,...,v_m}$ and $H$ is tridiagonal with the leading dia
 The main difference of the above algorithm is that the Lanczos algorithm requires $A$ to be a symetric matrix, whereas the Arnoldi algorithm does not have this requirement.
 While this does allow the Arnoldi algorithm to have more broad applications then the Lanczos method, it does have a drawback as the Lanczos algorithm is faster than the Arnoldi algorithm.
 As a result it is neccessary to carefully select which method to use based on the problem that we are working on.
+
+\subsection{Numerical Accuracy and Performance}
+We now investigate how these Krylov methods compare to already existing methods for computing the matrix exponential such as those used in SciPy under \verb|scipy.sparse.linalg.expm_multiply|\cite{AlMohy2011}\cite{Higham2010}.
+We will compare timings as well as the required depth of the Krylov subsapce neccessary for accurate computations.
+The matrix $A \in mathbb{R}^{n \times n}$ being used is sparse and tridiagonal with $2n^2$ along the leading diagonal and $-n^2$ along the upper and lower diagonal.
+The scalling with $n^2$ is chosen in order to incorportate how the values will scale for a finer spacial discretisation.
+We use SciPy to compute a reference solution and then compare this to the approximation produced by the Krylov methods.
+The error is the euclidian distance between the reference solution and the approximate solution.
+
+Below, we compare the error to the dimention of the the Krylov subspace $m$.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \caption{$m$ vs error with matrix size TBD}
+        \label{fig:mEKrylov1}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \caption{$m$ vs error with matrix size TBD}
+        \label{fig:mEKrylov2}
+    \end{minipage}\hfill
+\end{figure}
+We observe that 
+
+Here we observe the relation between the computation time and the dimention of the Krylov subsapce $m$.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \caption{$m$ vs computation time with matrix size TBD}
+        \label{fig:mCTKrylov1}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \caption{$m$ vs computation time with matrix size TBD}
+        \label{fig:mCTKrylov2}
+    \end{minipage}\hfill
+\end{figure}
+We observe that 
+
+Now we measure the time required to get below a given error.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \caption{Time to get below an error of}
+        \label{fig:ETKrylov1}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \caption{Time to get below an error of}
+        \label{fig:ETKrylov2}
+    \end{minipage}\hfill
+\end{figure}
+We observe that 
+
+\subsection{Automatic Differentiation}
+Throughout both the Arnoldi and Lanczos algorithms the computation of $DN(u_h(t))v$ form some vector $v$ is required.
+One possible approach to this is to comptute $DN(u_h(t))$ from $N(u_h)$ using automatic differentiation.
+This process is handled by the use of UFL\cite{Alnaes2014} and DUNE\cite{Bastian2021}.
+From here computing $DN(u_h(t))v$ is straight forward.
+
 \subsection{Matrix Free Methods}
 The computation, storage and hence use of an explicitly computed $DN(u_h(t))$ can be very demanding.
-As we only need $DN(u_h(t))u_h(t)$ we can avoid needing to assemble $DN(u_h(t))$ using the following approximations:
+As we only need $DN(u_h(t))v$ we can avoid needing to assemble $DN(u_h(t))$ using the following approximations:
 \begin{align*}
     Au &= DN(u)\\
     &\approx \frac{N(u+\epsilon)-N(u)}{\epsilon}
