@@ -32,7 +32,7 @@ methods = {
     #"NBLA": NBLAExp
 }
 m = [2**i for i in range(0, 7)]
-n = [2**i for i in range(0, 15)]
+n = [2**i for i in range(0, 10)]
 print(n)
 
 v = np.random.rand(np.max(n))
