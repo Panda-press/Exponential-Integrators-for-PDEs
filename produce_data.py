@@ -1,111 +1,98 @@
 import numpy as np
 import pandas as pd
 import time as time
-import pickle as pickle
 from numpy.linalg import norm
 from scipy.sparse.linalg import expm_multiply
 from scipy.sparse import diags, csc_matrix
-import scipy.sparse
 from Arnoldi import ArnoldiExp
 from Stable_Lanzcos import LanzcosExp
-from NBLA import NBLAExp
-from kiops import KiopsExp
+# from NBLA import NBLAExp
+# from kiops import KiopsExp
 
-# Collects data on performance of different methods
-# Independant Variables:
-# $N$ size of the matrix
-# #$M$ size of resultant matrix
-
-# Error
-# Computation time
-
-def GetA(n):
-    A = diags([-1,2,-1], [-1,0,1], shape=(n,n))
+# Create matrix A with given tau
+def GetA(n, tau=1):
+    A = diags([-1, 2, -1], [-1, 0, 1], shape=(n, n))
     A = csc_matrix(A)
-    return A * n**2
+    return -A * tau
 
+# Create initial vector v
+def GetV(n):
+    v = np.sin(np.linspace(0, np.pi, n)) + 1
+    return v/np.linalg.norm(v)
+
+# Define methods to test
 methods = {
-    "Scipy": lambda A, v, m: expm_multiply(A,v),
+    "Scipy": lambda A, v, m: expm_multiply(A, v),
     "Arnoldi": ArnoldiExp,
-    "Lanzcos": LanzcosExp#,
-    #"Kiops": lambda A, V, m: KiopsExp(A,V)
-    #"NBLA": NBLAExp
+    "Lanzcos": LanzcosExp
 }
-m = [2**i for i in range(0, 7)]
-n = [2**i for i in range(0, 10)]
-print(n)
 
-v = np.random.rand(np.max(n))
-method_names = list(methods.keys())
-mlen = len(m)
-nlen = len(n)
-method_names_len = len(methods)
-n_data = np.repeat(n, mlen * method_names_len)
-m_data = np.tile(m, nlen * method_names_len)
-method_names_data = np.tile(method_names, nlen * mlen)
+m = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50]
+m = [2**i for i in range(0, 8)]
+n = [2**i for i in range(0, 16)]
+tau_vals = [10**-i for i in range(0, 3)]
 
+# Create DataFrame for results
+data = pd.DataFrame(columns=["N", "M", "Method", "Tau", "Error", "Computation Time"])
 
+# Loop over all tau values
+for tau in tau_vals:
+    true_values = {}
+    scipy_computing_time = {}
 
-data = pd.DataFrame(columns=["N","M","Method","Error","Computation Time"])
+    for N in n:
+        print(f"Computing true values for N={N}, Tau={tau}")
+        A = GetA(N, tau)
+        V = GetV(N)
+        start = time.time()
+        result = methods["Scipy"](A, V, 1)
+        end = time.time()
+        true_values[N] = result
+        scipy_computing_time[N] = end - start
 
-data["M"] = m_data
-data["N"] = n_data
-data["Method"] = method_names_data
+    # Iterate over all combinations of N, M, and methods
+    for N in n:
+        for M in m:
+            for method_name, method in methods.items():
+                if N < M:
+                    # Skip if M is too large for N
+                    continue
 
-errors = []
-computation_times = []
+                print(f"Method: {method_name}, N={N}, M={M}, Tau={tau}")
+                A = GetA(N, tau)
+                V = GetV(N)
 
+                if method_name == "Scipy":
+                    error = 0.0
+                    comp_time = scipy_computing_time[N]
+                else:
+                    total_time = 0
+                    total_error = 0
+                    count = 10
 
-true_values = []
-scipy_computing_time =[]
-for N in n:
-    print("Computing {0}".format(N))
-    A = GetA(N)
-    V = v[0:N]
-    start = time.time()
-    result = methods["Scipy"](A, V, 1)
-    end = time.time()
-    true_values.append(result)
-    scipy_computing_time.append(end-start)
+                    for _ in range(count):
+                        start = time.time()
+                        result = method(A, V, M)
+                        end = time.time()
+                        total_time += end - start
+                        total_error += norm(result - true_values[N])
 
-for index, row in data.iterrows():
+                    comp_time = total_time / count
+                    error = total_error / count
 
-    if row["N"] < row["M"]:
-        errors.append(None)
-        computation_times.append(None)
-    else:
-        method = methods[row["Method"]]
-        N = row["N"]
-        M = row["M"]
-        print("Method: {2}, N:{0} ,M:{1}".format(N, M, row["Method"]))
-        if (row["Method"] == "Scipy"):
-            errors.append(0.0)
-            computation_times.append(scipy_computing_time[n.index(N)])
-            continue
+                # Add row to data
+                data = pd.concat(
+                    [data, pd.DataFrame({
+                        "N": [N],
+                        "M": [M],
+                        "Method": [method_name],
+                        "Tau": [tau],
+                        "Error": [error],
+                        "Computation Time": [comp_time]
+                    })],
+                    ignore_index=True
+                )
 
-        A = GetA(N)
-        V = v[0:N]
-
-        # Gets an average
-        total_time = 0
-        total_error = 0
-        count = 10
-        for i in range(count):
-            start = time.time()
-            result = method(A, V, M)
-            end = time.time()
-            total_time += end - start
-            total_error += norm(result - true_values[n.index(N)])
-        average_time = total_time/count   
-        average_error = total_error/count  
-        
-        computation_times.append(average_time)
-        errors.append(average_error)
-
-data["Error"] = errors
-data["Computation Time"] = computation_times
-
-data.dropna()
-
-data.to_csv("Experiment_Data.csv")
-
+# Save results to CSV
+data.to_csv("Experiment_Data.csv", index=False)
+print("Experiment completed and saved to Experiment_Data.csv")
