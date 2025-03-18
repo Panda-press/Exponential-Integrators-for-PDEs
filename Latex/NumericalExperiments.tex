@@ -1,7 +1,7 @@
 \section{Numerical Experiments}
 
 \subsection{Travelling Wave Allen Cahn}
-In this section we run numerical experiments compairing the backward Euler method to krylov methods for computing solutions to a PDE.
+In this section we run numerical experiments compairing the backward Euler method to Krylov methods for computing solutions to a PDE.
 Specifically we will investigate the initial boundary value problem for the Allen Cahn equation on a strip with a traveling wave solution\cite{YukitakaFukao2004} given by:
 
 \begin{align}
@@ -13,7 +13,7 @@ and where the problem is defined as follows:
     u_t&=\Delta u+u(u-\frac14)(1-u) \text{ on $\Omega \times [0, 8]$}\\
     \text{with } \Omega &= \mathbb{R}\times[-1,1]\\
     \nabla u \cdot \hat n &= g \text{ for $g = \nabla \hat u \cdot \hat n$}\\
-    u_0(x, y) &= \hat u(x,y, 0)\\
+    u_0(x, y) &= \hat u(x,y, 0)
 \end{align*}
 However for our numerical experiments we compute on the space $\Omega=[-16,16]\times[-1,1]$.
 Where $u$ is the solution, we write it in weak form.
@@ -56,8 +56,8 @@ BE denotes the backwards Euler method.
 First see that all of the methods tested converge, tending towards the discritisation error.
 The discritisation error is smaller on the more detailed grid.
 The Krylov methods converge faster than the backwards Euler method.
-We notice that when a smaller Krylov subspace is used that the expoenntial methods only start to converge for a sufficiently small tau.
-Likewise when these methods start to converge we observe that the perform simillarly to the methods using a larger subspace, however they will require fewer operator calls.
+We notice that when a smaller Krylov subspace is used that the expoenntial methods only start to converge for a sufficiently small $\tau$.
+Likewise when these methods start to converge we observe that they perform simillarly to the methods using a larger subspace, however they will require fewer operator calls.
 This suggests that for sufficient small time steps a shallower subspace may suffice.
 Likewise for the converse that larger timesteps require a deeper krylov subspace.
 
@@ -79,10 +79,10 @@ These operator calls are needed for computing $N$ which is used with the matrix 
     \end{minipage}\hfill
 \end{figure}
 
-We see that as expected that when are larger krylov subspace is used that more calls to the operator are required.
+We see that as expected that when a larger Krylov subspace is used that more calls to the operator are required.
 We also observe that the exponential methods outperform the BE by achieving a lower error with fewer calls to the operator.
 
-Here we present the experimental orders of convergence.
+Here we present the experimental orders of convergence for the grid size 1024.
 
 \begin{table}[H]
     \centering
@@ -132,8 +132,8 @@ We begin by compairing the timestep size $\tau$ to the $L_2$ error for the diffe
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{$\tau$ vs $L_2$ with grid size 2048}
+        \includegraphics[width=1\textwidth]{Graphs/AllenCahn/Tau V L2 Error for AllenCahn with grid size 900.png} % Change filename to your image
+        \caption{$\tau$ vs $L_2$ with grid size 900}
         \label{fig:ACtauE}
     \end{minipage}\hfill
     \centering
@@ -152,21 +152,21 @@ Below as before we present the number of calls to the operator against the error
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{$\tau$ vs $L_2$ with grid size 1024}
+        \includegraphics[width=1\textwidth]{Graphs/AllenCahn/Operator Calls V Error for AllenCahn with grid size 900.png} % Change filename to your image
+        \caption{Operator calls vs $L_2$ with grid size 900}
         \label{fig:plot1}
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
         \includegraphics[width=1\textwidth]{Graphs/AllenCahn/Operator Calls V Error for AllenCahn with grid size 3600.png} % Change filename to your image
-        \caption{$\tau$ vs $L_2$ with grid size 2048}
+        \caption{Operator calls vs $L_2$ with grid size 3600}
         \label{fig:plot2}
     \end{minipage}\hfill
 \end{figure}
 For both methods we see that to achive a lower error requires more calls to the operator.
 We see that in terms of performance the backwards Euler method performs significantly worse in comparison to both of the expoential methods.
 
-Here we present the experimental orders of convergence.
+Here we present the experimental orders of convergence on a grid size of 3600.
 
 \begin{table}[H]
     \centering
@@ -185,8 +185,88 @@ Here we present the experimental orders of convergence.
     1.0482179972577244 & -0.01797864948877803 & -0.01442779444997218 \\
     \hline
     \end{tabular}
-    \caption{Reduced Data Table}
+    \caption{Experimental orders of convergence}
     \label{tab:reduced_data}
 \end{table}
 
 Again we observe first order convergence for the backwards Euler methods and second order convergence for the two exponential integrator methods.
+
+\subsection{Reaction Diffusion}
+
+For both of the above problems the first order exponential method converged with rate 2.
+In order to verify correct implementation, and to be able to compare the backwards Euler method to the first order expoenential method in a "fairer" way we study the following reaction diffusion problem\cite{Huang2022}.
+
+\begin{align*}
+    u_t &= -\frac12\Delta u + \frac12 \pi^2u + \frac12 \pi^2 e^{-\pi^2t}sin(\pi x)sin(\pi y) \text{ } (x,y)\in\Omega t\in\times[0,t_e]\\
+    u(0,x,y) &= (sin(\pi x) - 1)sin(\pi y) \text{ } (x,y)\in \Omega
+\end{align*}
+
+With the following exact solution:
+
+\begin{align*}
+    u(t, x, y) &= e^{-\pi^2t}(sin(\pi x) - 1)sin(\pi y)
+\end{align*}
+
+With homogenous Dirichlet boundary conditions.
+Where $\Omega = (\frac12, \frac52)\times(0,1)$ and our end time is given by $t_e = 0.1$.
+We run our tests on grid sizes of $128\times64$ and $256\times128$ and use times steps sizes of $\tau=\frac{0.1}{2^i}$ for $i = 0,1,...,4$
+
+
+We begin by compairing the timestep size $\tau$ to the $L_2$ error for the different methods.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Graphs/ReactionDiffusion/Tau V L2 Error for ReactionDiffusion with grid size 8192.png} % Change filename to your image
+        \caption{$\tau$ vs $L_2$ with grid size 8192}
+        \label{fig:ACtauE}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Graphs/ReactionDiffusion/Tau V L2 Error for ReactionDiffusion with grid size 32768.png} % Change filename to your image
+        \caption{$\tau$ vs $L_2$ with grid size 32768}
+        \label{fig:ACtauE1024}
+    \end{minipage}\hfill
+\end{figure}
+All methods appear to converge to the spacial discritisation error.
+As above, we observe that the Krylov subspace must be sufficiently deep in order to be accurate.
+In this example we can see that the second order method converges at a faster rate than the first order method as the slop for the second order method is steaper.
+We also see that backwards Euler method has a higher error for a given value of $\tau$ for both methods.
+
+Below as before we present the number of calls to the operator against the error.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Graphs/ReactionDiffusion/Operator Calls V Error for ReactionDiffusion with grid size 8192.png} % Change filename to your image
+        \caption{Operator calls vs $L_2$ with grid size 1024}
+        \label{fig:plot1}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Graphs/ReactionDiffusion/Operator Calls V Error for ReactionDiffusion with grid size 32768.png} % Change filename to your image
+        \caption{Operator calls vs $L_2$ with grid size 2048}
+        \label{fig:plot2}
+    \end{minipage}\hfill
+\end{figure}
+Here we see that for all methods more operator calls are required to produce results with a smaller error.
+The expoenential methods achieved a given error with fewer operator calls that the backwards Euler method.
+The second order methods required fewer operator calls for a given error that the first order method, especially as the number of calls increased.
+
+
+Here we present the experimental orders of convergence.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{| c | c | c |}
+    \hline
+    BE & EXP1LAN 64 & EXP2LAN 64 \\
+    \hline
+    0.7901637433430926 & 1.3717257454910614    & 2.608595189003896 \\
+    0.8767440969959281 & 1.1734740319093697    & 2.3519399751018963 \\
+    0.9320179419151513 & 1.0828183773958644   & 2.229913816965242\\
+    0.963545660578168  & 1.03777329582159   & 1.4358363206568961 \\
+    \hline
+    \end{tabular}
+    \caption{Experimental orders of convergence}
+    \label{tab:reduced_data}
+\end{table}
+
+Now we observe the expected results, with the first order expoenential method converging at rate $1$ and the second order method converging at rate $2$.

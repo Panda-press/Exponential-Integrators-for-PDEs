@@ -66,13 +66,22 @@ The main difference of the above algorithm is that the Lanczos algorithm require
 While this does allow the Arnoldi algorithm to have more broad applications then the Lanczos method, it does have a drawback as the Lanczos algorithm is faster than the Arnoldi algorithm.
 As a result it is neccessary to carefully select which method to use based on the problem that we are working on.
 
+\subsection{Numerical Analysis}
+Here we present a results from Y.SAAD\cite{Saad1992}. Which shows the convergesnce rates for the Arnoldi method.
+
+\begin{theorem}
+    Let A be any square matrix and let \(\rho=||A||_2\) then the error of the approximation of \(e^{\tau A}v\) is such that
+    \[ ||e^{\tau A}v - \beta V_m e^{H_m}e_1||_2 \leq 2\beta \frac{(\tau \rho)^m e^{\tau \rho}}{m!} \]
+\end{theorem}
+From here we see that the approximation gets more accurate for smaller values of $\tau$, as well as for larger values of $m$ given that $\tau \rho\leq1$.
+
 \subsection{Numerical Accuracy and Performance}
 We now investigate how these Krylov methods compare to already existing methods for computing the matrix exponential such as those used in SciPy under \verb|scipy.sparse.linalg.expm_multiply|\cite{AlMohy2011}\cite{Higham2010}.
 We will compare timings as well as the required depth of the Krylov subsapce neccessary for accurate computations.
-The matrix $A \in mathbb{R}^{n \times n}$ being used is sparse and tridiagonal with $2n^2$ along the leading diagonal and $-n^2$ along the upper and lower diagonal.
-The scalling with $n^2$ is chosen in order to incorportate how the values will scale for a finer spacial discretisation.
+The matrix $A \in mathbb{R}^{n \times n}$ being used is sparse and tridiagonal with $2\tau$ along the leading diagonal and $-1\tau$ along the upper and lower diagonal.
 We use SciPy to compute a reference solution and then compare this to the approximation produced by the Krylov methods.
 The error is the euclidian distance between the reference solution and the approximate solution.
+We will compare for a variety of matrix sizes and values of $\tau$
 
 Below, we compare the error to the dimention of the the Krylov subspace $m$.
 \begin{figure}[H]
