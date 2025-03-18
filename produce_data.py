@@ -28,7 +28,7 @@ methods = {
 }
 
 m = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50]
-m = [2**i for i in range(0, 8)]
+m = [i for i in range(0, 64)]
 n = [2**i for i in range(0, 16)]
 tau_vals = [10**-i for i in range(0, 3)]
 
