@@ -122,9 +122,9 @@ if __name__ == "__main__":
     # for i in range(20):
     #     print("adapting")
     #     adaptGrid(u_h)
-    #     u_h.interpolate(Model.U0)
-    u_h.plot(block=False)
-    plt.savefig(outputName(fileCount))
+    #     u_h.interpolate(Model.U0)        
+    gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
+
     fileCount += 1
     lastNcalls = op.info()[0]
 
@@ -140,8 +140,9 @@ if __name__ == "__main__":
             minMax = max(abs(u_h.as_numpy))
             print(f"time step {n}, time {t}, tau {tau}, calls {op.info()}, lastNcalls {op.info()[0]-lastNcalls}, minMax={minMax}")
             lastNcalls = op.info()[0]
-            u_h.plot(gridLines=None, block=False)
-            plt.savefig(outputName(fileCount))
+            # u_h.plot(gridLines=None, block=False)
+            # plt.savefig(outputName(fileCount))
+            gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
             fileCount += 1
             plt.close()
             plotTime += nextTime
