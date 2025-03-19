@@ -30,5 +30,5 @@ def test1(gridView):
     a = 0.5 * inner(grad(u),grad(v))*dx
 
     #return model(exact, dtExact, lambda u: as_vector([0])), 8, tauFE, exact(0), exact
-    return a - b, end_time, tauFE, exact(0), exact, [DirichletBC(space, [0.0])]
+    return [a == b, DirichletBC(space, [0.0])], end_time, tauFE, exact(0), exact, None
 
