@@ -20,8 +20,8 @@ def test2(gridView):
     p = u[1]
     form = (v[0] * (-p) + inner(grad(psi), grad(v[1]))) * dx
     bc   = DirichletBC(space, [None,g], x[0] < 1e-10)
-    initial = [conditional(x[0]<0.3, 0.07*(-cos(10*pi*x[0])-1), 0), conditional(x[0]<0.3, 0.07*(-sin(10*pi*x[0])-1), 0)]
+    initial = [conditional(x[0]<0.1, 0.0*(-cos(10*pi*x[0])-1), 0), conditional(x[0]<0.01, -1/(10 * pi)*(-sin(10*pi*x[0])-1), 0)]
     #initial = [0,0]
-    return [-form,bc], 3, 0.001, initial, None, None
+    return [-form,bc], 3, 0.01, initial, None, None
 
 
