@@ -1,7 +1,7 @@
 \section{Numerical Experiments}
 
 \subsection{Travelling Wave Allen Cahn}
-In this section we run numerical experiments compairing the backward Euler method to Krylov methods for computing solutions to a PDE.
+In this section we run numerical experiments comparing the backward Euler method to Krylov methods for computing solutions to a PDE.
 Specifically we will investigate the initial boundary value problem for the Allen Cahn equation on a strip with a traveling wave solution\cite{YukitakaFukao2004} given by:
 
 \begin{align}
@@ -21,7 +21,7 @@ Where $u$ is the solution, we write it in weak form.
     \dot u&=\Delta u+u(u-\frac14)(1-u)\\
     \int_{\Omega} \dot u v &=\int_{\Omega} \Delta uv+u(u-\frac14)(1-u)v \text{ for a smooth function $v \in C^{\infty}(\overline{\Omega})$}\\
     \int_{\Omega} \dot u v &=\int_{\Omega} u(u-\frac14)(1-u)v - \nabla u \cdot \nabla v + \int_{\partial\Omega}  v\hat n \cdot \nabla u\\
-    \text{subsituting in } u_h(t,x,y) &= \sum_i u_i(t) v_i(x,y) \text{ where $(v_i)$ are the test functions we obtain:}\\
+    \text{substituting in } u_h(t,x,y) &= \sum_i u_i(t) v_i(x,y) \text{ where $(v_i)$ are the test functions we obtain:}\\
     \text{we get } \sum_i\int_{\Omega} \dot u_i v_i v_j &=\sum_i(\int_{\Omega} u_iv_i(u_iv_i-\frac14)(1-u_iv_i)v_j - \int_{\Omega}\nabla (u_iv_i) \cdot \nabla v_j + \int_{\partial\Omega}  v_j\hat n \cdot \nabla \hat u_iv_i)\\
     \sum_iu_i\int_{\Omega}v_iv_j &= -u_i\sum_i(\int_{\Omega}\nabla v_i \cdot \nabla v_j + \int_{\Omega}R(u_h)v_j)\\
     \text{where we have } R(u)&=u(u-\frac14)(1-u) + \int_{\partial\Omega}  \hat n \cdot \nabla \hat  u\\
@@ -53,8 +53,8 @@ BE denotes the backwards Euler method.
     \end{minipage}\hfill
 \end{figure}
 
-First see that all of the methods tested converge, tending towards the discritisation error.
-The discritisation error is smaller on the more detailed grid.
+First see that all of the methods tested converge, tending towards the discretization error.
+The discretization error is smaller on the more detailed grid.
 The Krylov methods converge faster than the backwards Euler method.
 We notice that when a smaller Krylov subspace is used that the expoenntial methods only start to converge for a sufficiently small $\tau$.
 Likewise when these methods start to converge we observe that they perform simillarly to the methods using a larger subspace, however they will require fewer operator calls.
@@ -107,19 +107,19 @@ Here we present the experimental orders of convergence for the grid size 1024.
 
 We observe that the rate of convergence for the second order method was inline with what has been shown analytic\cite{Huang2022} at a rate of $2$.
 The first order method converges with a rate of 2 despite an expectation of a rate of $1$\cite{Huang2022}.
-The exponential methods stop converging as they reach the discritisation error.
-The backwards euler converges at the rate expceted of 1.
+The exponential methods stop converging as they reach the discretization error.
+The backwards euler converges at the rate expected of 1.
 
 \subsection{A 2D Allen Cahn Problem}
 
-We will now look into the two dimentional Allen Cahn Problem given by:
+We will now look into the two dimensional Allen Cahn Problem given by:
 \begin{align*}
     u_t &= -\Delta u + u (u^2-1) \text{ } \Omega=[0,1]\times[0,1]
 \end{align*}
 With Neumann boundary conditions.
 The initial condition is chosen by randomly setting points on the grid from a uniform distribution in the range $-0.9,0.9$.
 The same randomly generated initial condition will be used for each test.
-As we do not have an exact solution, we will use the backwards Euler method with a timestep of $\tau = 10^{-4}$ to genarate a referance solution.
+As we do not have an exact solution, we will use the backwards Euler method with a timestep of $\tau = 10^{-4}$ to genarate a reference solution.
 We will compare the backwards Euler method to the first and second order expoenntial integrator methods described above.
 The tests are run on a $60\times60$ grid with the end time being $t_e=24$.
 The error is computed by calculating the $L_2$ error between the prediction of the chosen stepper and the reference solution. 
@@ -127,7 +127,7 @@ Below we present our results.
 
 \subsubsection{Experimental Results}
 
-We begin by compairing the timestep size $\tau$ to the $L_2$ error for the different methods.
+We begin by comparing the timestep size $\tau$ to the $L_2$ error for the different methods.
 
 \begin{figure}[H]
     \centering
@@ -163,7 +163,7 @@ Below as before we present the number of calls to the operator against the error
         \label{fig:plot2}
     \end{minipage}\hfill
 \end{figure}
-For both methods we see that to achive a lower error requires more calls to the operator.
+For both methods we see that to achieve a lower error requires more calls to the operator.
 We see that in terms of performance the backwards Euler method performs significantly worse in comparison to both of the expoential methods.
 
 Here we present the experimental orders of convergence on a grid size of 3600.
@@ -194,7 +194,7 @@ Again we observe first order convergence for the backwards Euler methods and sec
 \subsection{Reaction Diffusion}
 
 For both of the above problems the first order exponential method converged with rate 2.
-In order to verify correct implementation, and to be able to compare the backwards Euler method to the first order expoenential method in a "fairer" way we study the following reaction diffusion problem\cite{Huang2022}.
+In order to verify correct implementation, and to be able to compare the backwards Euler method to the first order exponential method in a "fairer" way we study the following reaction diffusion problem\cite{Huang2022}.
 
 \begin{align*}
     u_t &= -\frac12\Delta u + \frac12 \pi^2u + \frac12 \pi^2 e^{-\pi^2t}sin(\pi x)sin(\pi y) \text{ } (x,y)\in\Omega t\in\times[0,t_e]\\
@@ -212,7 +212,7 @@ Where $\Omega = (\frac12, \frac52)\times(0,1)$ and our end time is given by $t_e
 We run our tests on grid sizes of $128\times64$ and $256\times128$ and use times steps sizes of $\tau=\frac{0.1}{2^i}$ for $i = 0,1,...,4$
 
 
-We begin by compairing the timestep size $\tau$ to the $L_2$ error for the different methods.
+We begin by comparing the timestep size $\tau$ to the $L_2$ error for the different methods.
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
@@ -227,7 +227,7 @@ We begin by compairing the timestep size $\tau$ to the $L_2$ error for the diffe
         \label{fig:ACtauE1024}
     \end{minipage}\hfill
 \end{figure}
-All methods appear to converge to the spacial discritisation error.
+All methods appear to converge to the spacial discretization error.
 As above, we observe that the Krylov subspace must be sufficiently deep in order to be accurate.
 In this example we can see that the second order method converges at a faster rate than the first order method as the slop for the second order method is steaper.
 We also see that backwards Euler method has a higher error for a given value of $\tau$ for both methods.
@@ -248,7 +248,7 @@ Below as before we present the number of calls to the operator against the error
     \end{minipage}\hfill
 \end{figure}
 Here we see that for all methods more operator calls are required to produce results with a smaller error.
-The expoenential methods achieved a given error with fewer operator calls that the backwards Euler method.
+The exponential methods achieved a given error with fewer operator calls that the backwards Euler method.
 The second order methods required fewer operator calls for a given error that the first order method, especially as the number of calls increased.
 
 
@@ -269,4 +269,4 @@ Here we present the experimental orders of convergence.
     \label{tab:reduced_data}
 \end{table}
 
-Now we observe the expected results, with the first order expoenential method converging at rate $1$ and the second order method converging at rate $2$.
+Now we observe the expected results, with the first order exponential method converging at rate $1$ and the second order method converging at rate $2$.

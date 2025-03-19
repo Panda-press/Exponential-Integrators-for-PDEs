@@ -1,7 +1,7 @@
 \section{Krylov Methods}
-When using the above exponential integrators, we need to be able to compute the matrix exponential $e^{A}$ or more precicely the action of the exponential of a matrix to a vector $e^{A}v$
-For a lower dimention, computing $e^{A}v$ is computationally cheap.
-However, when the dimention of the matrix $A$ is large then computing $e^{A}v$ is computationally intensive.
+When using the above exponential integrators, we need to be able to compute the matrix exponential $e^{A}$ or more precisely the action of the exponential of a matrix to a vector $e^{A}v$
+For a lower dimension, computing $e^{A}v$ is computationally cheap.
+However, when the dimension of the matrix $A$ is large then computing $e^{A}v$ is computationally intensive.
 One solution to this is to use Krylov subspace methods.
 These algorithms take a matrix $A\in \mathbb{R}^{n\times n}$, a vector $v \in \mathbb{R}^n$ and an integer $m$ that determines the number of dimensions of the Krylov subspace used.
 From these algorithms we will get a matrix $H \in \mathbb{R}^{m\times m}$ and another matrix $V \in \mathbb{R}^{n\times m}$ such that $A \approx VHV^T$ and $VV^T = I$.
@@ -22,7 +22,7 @@ e^Av &= (\sum^{\infty}_{i=0}\frac{VH^iV^T}{i!})v \\
 
 \subsection{Algorithms}
 We now state the two Krylov subspace methods that we will be investigating, the Arnoldi and Lanczos algorithms.
-Following this we will investigating the benifits and drawbacks of each algorithm.
+Following this we will investigating the benefits and drawbacks of each algorithm.
 
 \subsubsection{Arnoldi}
 Below we present the Arnoldi algorithm.
@@ -61,13 +61,13 @@ The algorithm below is the Lanczos algorithm and it requires a symmetric matrix.
 \end{algorithmic}
 \end{algorithm}
 Here $V$ is given by ${v_1,...,v_m}$ and $H$ is tridiagonal with the leading diagonal being $\alpha_1, ..., \alpha_m$ and the upper and lower diagonals being $\beta_2,...,\beta_m$.
-\subsubsection{Benifits and Drawbacks}
+\subsubsection{Benefits and Drawbacks}
 The main difference of the above algorithm is that the Lanczos algorithm requires $A$ to be a symetric matrix, whereas the Arnoldi algorithm does not have this requirement.
-While this does allow the Arnoldi algorithm to have more broad applications then the Lanczos method, it does have a drawback as the Lanczos algorithm is faster than the Arnoldi algorithm.
+While this does allow the Arnoldi algorithm to have more broad applications than the Lanczos method, it does have a drawback as the Lanczos algorithm is faster than the Arnoldi algorithm.
 As a result it is neccessary to carefully select which method to use based on the problem that we are working on.
 
 \subsection{Numerical Analysis}
-Here we present a results from Y.SAAD\cite{Saad1992}. Which shows the convergesnce rates for the Arnoldi method.
+Here we present a results from Y.SAAD\cite{Saad1992}. Which shows the convergence rates for the Arnoldi method.
 
 \begin{theorem}
     Let A be any square matrix and let \(\rho=||A||_2\) then the error of the approximation of \(e^{\tau A}v\) is such that
@@ -76,66 +76,69 @@ Here we present a results from Y.SAAD\cite{Saad1992}. Which shows the convergesn
 From here we see that the approximation gets more accurate for smaller values of $\tau$, as well as for larger values of $m$ given that $\tau \rho\leq1$.
 
 \subsection{Numerical Accuracy and Performance}
-We now investigate how these Krylov methods compare to already existing methods for computing the matrix exponential such as those used in SciPy under \verb|scipy.sparse.linalg.expm_multiply|\cite{AlMohy2011}\cite{Higham2010}.
+We now investigate how these Krylov methods compare to already existing methods for computing the matrix exponential such as those used in SciPy under 
+
+\verb|scipy.sparse.linalg.expm_multiply|\cite{AlMohy2011}\cite{Higham2010}.
 We will compare timings as well as the required depth of the Krylov subsapce neccessary for accurate computations.
-The matrix $A \in mathbb{R}^{n \times n}$ being used is sparse and tridiagonal with $2\tau$ along the leading diagonal and $-1\tau$ along the upper and lower diagonal.
+The matrix $A \in \mathbb{R}^{N \times N}$ being used is sparse and tridiagonal with $2\tau$ along the leading diagonal and $-1\tau$ along the upper and lower diagonal.
 We use SciPy to compute a reference solution and then compare this to the approximation produced by the Krylov methods.
 The error is the euclidian distance between the reference solution and the approximate solution.
 We will compare for a variety of matrix sizes and values of $\tau$
 
-Below, we compare the error to the dimention of the the Krylov subspace $m$.
+Below, we compare the error to the dimension of the the Krylov subspace $m$.
+% \begin{figure}[H]
+%     \centering
+%     \begin{minipage}{0.49\textwidth}
+%         \includegraphics[width=1\textwidth]{Graphs/KrylovMethods/M v E Results for N=8192 Tau=0.01.png} % Change filename to your image
+%         \caption{$m$ vs error with matrix size $N=8192$ and $\tau = 0.01$}
+%         \label{fig:mEKrylov1}
+%     \end{minipage}\hfill
+%     \centering
+%     \begin{minipage}{0.49\textwidth}
+%         \includegraphics[width=1\textwidth]{Graphs/KrylovMethods/M v E Results for N=8192 Tau=1.0.png} % Change filename to your image
+%         \caption{$m$ vs error with matrix size $N=8192$ and $\tau = 1$}
+%         \label{fig:mEKrylov2}
+%     \end{minipage}\hfill
+% \end{figure}
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{$m$ vs error with matrix size TBD}
+        \includegraphics[width=1\textwidth]{Graphs/KrylovMethods/M v E Results for N=32768 Tau=0.01.png} % Change filename to your image
+        \caption{$m$ vs error with matrix size $N=32768$ and $\tau = 0.01$}
         \label{fig:mEKrylov1}
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{$m$ vs error with matrix size TBD}
+        \includegraphics[width=1\textwidth]{Graphs/KrylovMethods/M v E Results for N=32768 Tau=1.0.png} % Change filename to your image
+        \caption{$m$ vs error with matrix size $N=32768$ and $\tau = 1$}
         \label{fig:mEKrylov2}
     \end{minipage}\hfill
 \end{figure}
-We observe that 
+We observe that for a sufficiently large Krylov subspace we achieve convergence.
+We also see that for a smaller time step $\tau$ we require a smaller Krylov subspace to achieve convergence.
+This is expected as shown in the theorem above.
 
-Here we observe the relation between the computation time and the dimention of the Krylov subsapce $m$.
+Here we observe the relation between the computation time and the dimension of the Krylov subsapce $m$.
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{$m$ vs computation time with matrix size TBD}
+        \includegraphics[width=1\textwidth]{Graphs/KrylovMethods/M v Comp Time Results for N=8192 Tau=1.0.png} % Change filename to your image
+        \caption{$m$ vs computation time with matrix size 8192}
         \label{fig:mCTKrylov1}
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{$m$ vs computation time with matrix size TBD}
+        \includegraphics[width=1\textwidth]{Graphs/KrylovMethods/M v Comp Time Results for N=32768 Tau=1.0.png} % Change filename to your image
+        \caption{$m$ vs computation time with matrix size 32768}
         \label{fig:mCTKrylov2}
     \end{minipage}\hfill
 \end{figure}
-We observe that 
-
-Now we measure the time required to get below a given error.
-\begin{figure}[H]
-    \centering
-    \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{Time to get below an error of}
-        \label{fig:ETKrylov1}
-    \end{minipage}\hfill
-    \centering
-    \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
-        \caption{Time to get below an error of}
-        \label{fig:ETKrylov2}
-    \end{minipage}\hfill
-\end{figure}
-We observe that 
+We observe that as expected the larger the Krylov subspace, the longer the compute time.
+We also see that the Lanczos method performs faster the the Arnoldi method, again as expected.
+The difference in performance appears to be more pronounced at larger Krylov sizes, with the Arnoldi method growing faster that then Lanczos.
 
 \subsection{Automatic Differentiation}
-Throughout both the Arnoldi and Lanczos algorithms the computation of $DN(u_h(t))v$ form some vector $v$ is required.
+Throughout both the Arnoldi and Lanczos algorithms the computation of $DN(u_h(t))v$ for some vector $v$ is required.
 One possible approach to this is to comptute $DN(u_h(t))$ from $N(u_h)$ using automatic differentiation.
 This process is handled by the use of UFL\cite{Alnaes2014} and DUNE\cite{Bastian2021}.
 From here computing $DN(u_h(t))v$ is straight forward.
