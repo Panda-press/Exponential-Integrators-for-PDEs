@@ -33,7 +33,6 @@ class Tester():
                  exact = None,
                  gridAdaptFunc = lambda u_h: None,
                  stepper_args = {}):
-        print(stepper_args)
         self.op = op
         self.N = self.op.domainSpace.gridView.size(0)
         self.initial_condition = initial_condition
@@ -205,13 +204,13 @@ if __name__ == "__main__":
         
         start_time = 0.00
         end_time = 0.1
-        tau0 = end_time / 16
-        taus = 4
+        tau0 = end_time / 1
+        taus = 5
         start_time = 0
         problemName = "ReactionDiffusion"
-        exp_methods = ["EXP1LAN", "EXP2LAN"]
-        krylovSizes = [20, 40]
-        grids = [[2048, 1024]]
+        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+        krylovSizes = [8, 16, 32, 64]
+        grids = [[128, 64], [256, 128]]
     elif sysargs.problem=="Test":
         from test_problem import dimR, time, sourceTime, domain
         from test_problem import test1 as problem
@@ -240,14 +239,14 @@ if __name__ == "__main__":
         grids = [[4, 4]]
     else:
         from parabolicTest import dimR, time, sourceTime, domain
-        from parabolicTest import paraTest2 as problem
-        problemName = "Parabolic Test2"
+        from parabolicTest import paraTest0 as problem
+        problemName = "Parabolic Test0"
         tau0 = 2e-2  # 2e-3,N:32,Tau:0.002: compare m=5->m=10
         taus = 5
         start_time = 0.00
         end_time = 0.02
-        grids = [[30, 30], [50, 50], [100, 100]]
-        krylovSizes = [8, 16, 32, 64, 128]
+        grids = [[30, 30], [50, 50]]#, [100, 100]]
+        krylovSizes = [8, 16]#, 32, 64, 128]
         exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
 
     results = []
@@ -281,7 +280,7 @@ if __name__ == "__main__":
                     space = lagrange(gridView, order=1, dimRange=dimR)
 
                     model, T, tauFE, u0, exact, diriBC = problem(gridView)
-                    op = galerkin([model], domainSpace=space, rangeSpace=space)
+                    op = galerkin(model, domainSpace=space, rangeSpace=space)
 
                     u_h = space.interpolate(u0, name='u_h')
 
