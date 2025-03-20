@@ -12,10 +12,18 @@
 \usepackage{multirow}
 % My things
 \usepackage[english]{babel}
-\allowdisplaybreaks
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{corollary}{Corollary}[theorem]
-\newtheorem{lemma}[theorem]{Lemma}
+\allowdisplaybreaks\newtheorem{theorem}{Theorem}[section]   % Theorem numbered within sections
+\newtheorem{lemma}[theorem]{Lemma}       % Lemmas share numbering with theorems
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
 
 % You need to set the next two items. 
 % If you title is long, you may need to adjust the spacing in titlepage.tex

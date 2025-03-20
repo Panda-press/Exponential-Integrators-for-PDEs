@@ -1,1 +1,161 @@
 \section{Numerical Analysis}
+
+In this section look into the numerical analysis of the methods above, combined with the Krylov methods.
+We will begin by presenting some already estabilished results for these methods.
+Next we will attempt to extend these results in order to quantify the error produced by when using the Krylov methods for approximating the action of the exponential of a matrix to a vector.
+
+\subsection{Formulation of the Problem}
+Here we state the problem as formulated by \cite{Huang2022}.
+We begin by considering a parabolic PDE with initial conditon of $u_0 \in H^2(\Omega) \cap H^1_0(\Omega)$ of the form:
+\begin{align*}
+    u_t &= D \Delta u + f(t,u) &x\in \Omega, 0 \leq t \leq T\\
+    u(0,x) &= u_0(x) &x\in \Omega\\
+    u(t,x) &= 0 &x\in \partial \Omega, 0 \leq t \leq T
+\end{align*}
+where $T$ is the final time, $\Omega$ is a rectangular domain in $\mathbb{R}^d$, $D\geq 0$, $u(t,x)$ is the unkown function and $f(t,u)$ is a nonlinear term.
+
+The variational form of this problem is to find $u\in L^2(0,T;H^1_0(\Omega))$ and $u_t \in L^2(0,T: L^2(\Omega))$ such that
+\begin{align*}
+    (u_t, v) + a(u, v) &= (f(t,u),v) \forall v \in H^1_0(\Omega), 0\leq t \leq T\\
+    u(0) &= u_0
+\end{align*}
+where $(\cdot,\cdot)$ is the $L^2$ inner product on $\Omega$.
+The bilinear form $a(\cdot,\cdot)$ is given by
+\begin{align*}
+    a(w,v) &= \int_{\Omega} D \nabla w \cdot \nabla v dx, \forall w, v \in H^1_0(\Omega)
+\end{align*}
+and is clearly symetric.
+
+We wil now begin to formulate the finite element space $V_h$ that we will approximate $H^1_0$ with.
+As $\Omega \in \mathbb{R}^d$ is a rectangular domain we can assume that $\bar \Omega := \prod^d_{i=1}[a_i,b_i]$.
+For every $i = 1,...,d$, we can define a uniform partition of $[a_i,b_i]$ with the subinterval size $h_i = \frac{b_i - a_i}{N_i}$,
+to get the nodes $x^j_i = a_i + jh_i, j = 0,...,N_i$ as $a_i = x_i^0 < x_i^1 < ... < x_i^{N_i} = b_i$.
+With this regular partition, we obtain a one-dimensional continuous piecewise linear finite element space for $[a_i,b_i]$ As
+\begin{align*}
+    V^i_{h_i}(a_i,b_i) :&= \{v\in C[a_i,b_i]: v|_{[x^{j-1}_i, x^j_i]}\in\mathbb{P}_1([x_i^{j-1},x_i^j]),1\leq j \leq N_i\} \cap H^1_0(a_i,b_i)\\
+    &=\text{span}\{\theta^1_i(x_i), ... , \theta^{N_i-1}_i(x_i)\} 
+\end{align*}
+where $\theta^j_i(x_i)$ is the $j$-th nodal basis function of $V_h^i(a_i,b_i)$. 
+Now we can write a finite element space for $\Omega$ as follows:
+\begin{align*}
+    V_h :&= V_{h_1}^1(a_1,b_1) \otimes ... \otimes V^d_{h_d}(a_d,b_d)\\
+    &= \text{span}\{\theta_1^{i_1}\cdot \cdot \cdot \theta_d^{i_d}(x_d): 1 \leq i_1 \leq N_1-1,...,1\leq i_d \leq N_d-1\}
+\end{align*}
+We now have that $V_h\subset H^1_0(\Omega)$.
+Let $h=\text{max}_{1\leq i\leq d}h_i$ be the mesh shize of the corresponding uniformly rectangular partition $\mathcal{T}_h$ that generates $V_h$.
+All erorr analysis will assume $h\approx h_i$ for all $i$.
+
+The finite element approximation for the above problem is then to find $u_h \in L^2(0,t:V_h)$ so that:
+\begin{align*}
+    (u_{h,t},v_h) + a(u_h,v_h) &=(f(t,u_h),v_h) \forall v_h \in V_h, 0\leq t \leq T\\
+    u_h(0) &= P_hu_0
+\end{align*}
+where the $L^2$ orthogonal projection operator is given by $P_h:L^2(\Omega) \rightarrow V_h$.
+
+(Need to expand, not quite complete)
+
+Using the projection operator $P_h$ the problem can be rewritten to the equivalent system:
+\begin{align*}
+    u_{h,t} + L_hu_h &= P_hf(t,u_h)\\
+    u_h(0) &= P_hu_0
+\end{align*}
+
+\subsection{Estabilished Results}
+We now state the results given by Huang, et al\cite{Huang2022}.
+Begining with some assumptions:
+
+\begin{assumption}\label{assump:mildgrowth}
+    The function $f(t,\zeta)$ grows mildly with respect to $\zeta$.
+    That is there exists a number $p>0$ for $d=1,2$ or $p\in(0,2]$ for $d=3$ such that:
+    \begin{align*}
+        |\frac{\partial f}{\partial \zeta}| \lesssim 1 + |\zeta|^p. \quad \forall t,\zeta \in \mathbb{R}
+    \end{align*}
+\end{assumption}
+\begin{assumption}\label{assump:smooth}
+    The function $f(t, \zeta)$ is sufficiently smooth with respect to $t$.
+    That is to say that for any given constant $K>0$ the following holds:
+    \begin{align*}
+        \sum_{|\alpha|\leq2}|D^{\alpha}f(t,\zeta)|\lesssim 1, \quad \forall t\in [0,T], \zeta \in[-K,K]
+    \end{align*}
+\end{assumption}
+\begin{assumption}\label{assump:regularity}
+    The exact solution u(t) satisfiies the following regularity conditions:
+    \begin{align*}
+        \text{sup}_{0\leq t \leq T}||u(t)||_{2,\Omega} \lesssim 1,\\
+        \text{sup}_{0\leq t \leq T}||u_t(t)||_{L^\infty(\Omega)} \lesssim 1
+    \end{align*}
+    Where the hidden constant may depend on $T$.
+\end{assumption}
+
+We can now state the theorem that gives the error for the first order exponential integrator scheme.
+\begin{theorem}
+    Suppost the function $f$ satisfies Assumptions \ref{assump:mildgrowth}\ref{assump:smooth}\ref{assump:regularity}.
+    There exists a constant $h_0 > 0$ such that for $h<h_0$, we have that the numerical solution given by:
+    \begin{align*}
+        u_h^{n+1} &= e^{-\tau L_h}u_h^n + \tau \phi_1(-\tau L_h)P_hf(t_n,u_h^n)
+    \end{align*}
+    satisfies the following:
+    \begin{align*}
+        ||u(t_n) - u_h^n||_1 &\lesssim \Delta \tau + h, \forall n =1,...,N_T
+    \end{align*}
+    with a hidden constant that is independatn of $\Delta \tau$ and $h$.
+\end{theorem}
+
+\subsection{Extension to Krylov Methods}
+
+In this section, we will prove the main theorem that ties the error of the first order method to the Krylov methods.
+We begin by stating some lemma that we will need to prove this result.
+We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
+
+\begin{lemma}
+    Suppose that the function $f$ satisfies assumption \ref{assump:mildgrowth}, and the exact solution satisfies \ref{assump:regularity}.
+    Then we have that $f$ is locally-Lipschitz continuous in a strip along the exact, i.e. for some $\epsilon > 0$ we have:
+    \begin{align*}
+        ||f(t,v) - f(t,w)||_0 &\lesssim ||v-w||_1
+    \end{align*}
+    for any $t\in [0,T]$ and $v,w \in V_h$ satisfying
+    \begin{align*}
+        \text{max}\{||v-u(t)||_1,||w-u(t)||_1\}\leq \epsilon
+    \end{align*}
+\end{lemma}
+
+\begin{lemma}
+    Consider a Krylov approximation given by $V^TAV = H$ with respect to a vector $v$.
+    If $A$ is negative semi-definate then so is $H$.
+\end{lemma}
+\begin{proof}
+    \begin{align*}
+        x^T Hx &= x^T V^TAVx\\
+        &= y^tAy \text{ where y = Vx}\\
+        &\leq 0
+    \end{align*}
+\end{proof}
+
+\begin{definition}
+    We let $e_m^A$ denote the Krylov approximation of $e^A$ with respect to some vector $v$.
+\end{definition}
+
+\begin{lemma}
+    We have that $||e_m^A|| \leq m$ when $A$ is negative semi-definate.
+\end{lemma}
+\begin{proof}
+    \begin{align*}
+        ||e_m^A|| &= ||e^{VHV^T}||\\
+        &= ||Ve^HV^T||\\
+        &\leq ||V||_2||e^H||||V^T||_2\\
+        \intertext{we use the fact that $A$ and hence $H$ is negative semi-definate to imply that all of the eigen values $\lambda$ of $H$ are such that $\lambda \leq 0$
+        and hence we have that $||e^H|| \leq ||e^0|| = 1$. From here we see that}
+        &\leq ||V||_2||V^T||_2\\
+        \intertext{we now use the fact that the $m$ collumns of $V$ are orthonormal to get}
+        &= \sqrt{m} \sqrt{m}\\
+        &= m
+    \end{align*}
+\end{proof}
+
+\begin{definition}
+    We write $u_{h,m}^n$ to denote the $n$th step of the exponential integrator method that uses a Krylov subspace of dimention $m$.
+    We have that:
+    \begin{align*}
+        u_{h,m}^n &= e_m^{-\tau L_h} u_{h,m}^{n-1} + \tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^n)
+    \end{align*}
+\end{definition}
