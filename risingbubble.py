@@ -51,7 +51,7 @@ def RisingBubble(dim=2):
 
 
     Model.domain = [0]*dim, [1000]*(dim-1)+[2000], [40]*(dim-1)+[80]
-    Model.endTime = 400 # 1200.
+    Model.endTime = 3000#1200 #400
     Model.name = "RisingBubble"
 
     return BgFixModel(Model, dim)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # default name for model
     Model = RisingBubble(2)
     gridView = structuredGrid( *Model.domain )
-    gridView.hierarchicalGrid.globalRefine(2)
+    gridView.hierarchicalGrid.globalRefine(1)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
     # space = dglagrange(gridView,dimRange=Model.dimRange,order=3,pointType="lobatto")
@@ -93,7 +93,7 @@ if __name__ == "__main__":
                       threading=True,
                       defaultQuadrature=True)
     op = femDGOperator(models, space, **operator_kwargs)
-
+    m = 0
     if len(sys.argv) >= 4:
         if "exp_v" in args.keys():
             m = int(sys.argv[3])
@@ -111,8 +111,8 @@ if __name__ == "__main__":
     t = 0
     n = 0
     fileCount = 0
-    plotTime = 1
-    nextTime = 1
+    plotTime = 100
+    nextTime = plotTime
 
     # def adaptGrid(u_h):
     #     indicator = dot(grad(u_h[0]),grad(u_h[0]))# + u_h[0] * dot(grad(u_h[1]),grad(u_h[1]))
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     fileCount += 1
     lastNcalls = op.info()[0]
-
+    print(f"Stepper: {sys.argv[1]} tau:{cfl} m:{m}")
     while t < Model.endTime:
         op.setTime(t)
         tau = op.localTimeStepEstimate[0]*cfl
