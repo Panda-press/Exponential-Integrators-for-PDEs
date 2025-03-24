@@ -4,10 +4,10 @@
 In this section we run numerical experiments comparing the backward Euler method to Krylov methods for computing solutions to a PDE.
 Specifically we will investigate the initial boundary value problem for the Allen Cahn equation on a strip with a traveling wave solution\cite{YukitakaFukao2004} given by:
 
-\begin{align}
+\begin{align*}
     \hat u(x,y,t)&=\frac{e^{\frac{x-ct}{\sqrt2}}}{1+e^{\frac{x-ct}{\sqrt2}}} \label{TravelingWaveSol}\\
     \text{where } c &= \frac{\sqrt{2}}{4}
-\end{align}
+\end{align*}
 and where the problem is defined as follows:
 \begin{align*}
     u_t&=\Delta u+u(u-\frac14)(1-u) \text{ on $\Omega \times [0, 8]$}\\

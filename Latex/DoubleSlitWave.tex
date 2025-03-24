@@ -1,2 +1,79 @@
 \section{Double Slit Wave Model}
 
+In this section, we look into applying these exponential steppers to the computation of solutions to the wave eqaution.
+We will look into solutions the the double slit wave problem:
+
+\subsection{Formulation of the Problem}
+Where our domain is given by $\Omega$, we write the problem as:
+\begin{align*}
+    \psi_{tt}\psi &= \nabla \psi \quad x \in \Omega 0<t\leq T\\
+    \psi &= \frac{1}{10\pi} sin(10\pi t) x \in S_L
+\end{align*}
+where $T=3$ is our end time for the simulation and $S_L$ denotes the left side of the domain $\Omega$ this will be the source of our waves.
+We can use $\psi_t = -p$ to get the following:
+\begin{align*}
+    \psi_t &= -p\\
+    p_t &= \nabla \psi\\
+    \psi &= \frac{1}{10\pi} sin(10\pi t) x \in S_L
+\end{align*}
+This equation is now compatable with the time steppers that we are using.
+
+\subsection{Numerical Solutions}
+We can now compare backwards euler and the two exponential integrator methods.
+First we show the the domain as well as a solution computed with the backwards Euler method.
+For the backwards Euler a time step of $\tau = 0.01$ was found to be optimal, with larger timesteps causing numerical issues and smaller timesteps requiring excessive computation.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Wave/DoubleSlit_0_1.0_0_64.png} % Change filename to your image
+        \caption{Domain $\Omega$ with grid displayed}
+        \label{fig:second order 16}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-b} % Change filename to your image
+        \caption{Solution at time $T=3$ computed using the backwards euler method}
+        \label{fig:second order 32}
+    \end{minipage}\hfill
+\end{figure}
+
+We now compare this to the first and second order exponential integrator methods.
+Note that due the fact that the linear term given by $DN(u)$ is not symetric we cannot use the Lancoz method for computing our matrix exponential.
+As a result the Arnoldi alorithm for the matrix exponential has been used here exculively.
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Wave/EXP1ARN/DoubleSlit_0_2.0_10_24.png} % Change filename to your image
+        \caption{Solution at time $T=3$ computed Using the first order exponential integrator with timestep $\tau = 0.02$ and a Krylov size of $24$}
+        \label{fig:second order 16}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Wave/EXP2ARN/DoubleSlit_0_2.0_10_24.png} % Change filename to your image
+        \caption{Solution at time $T=3$ cmoputed using the second order exponential integrator with timestep $\tau = 0.02$ and a Krylov size of $24$}
+        \label{fig:second order 32}
+    \end{minipage}\hfill
+\end{figure}
+
+We see that the first and second order exponential methods using the Arnoldi algorithm are capable of producing results equivalent to that of the backwards Euler method.
+
+\subsection{Performance}
+We now observe the performance differences between the methods.
+For this, the number of calls to the operator is again used in order to measure performance.
+We present the methods used and the operator calls in the table below:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{| c | c | c | c |}
+    \hline
+    Method & $\tau$ & Krylov size & Operator Calls\\
+    \hline
+    Backwards Euler & 0.01 & - &  \\
+    First Order Expoenntial & 0.02 & 24 & 7800 \\
+    Second Order Expoenntial & 0.02 & 24 & 12300 \\
+    \hline
+    \end{tabular}
+    \caption{}
+    \label{tab:reduced_data}
+\end{table}
