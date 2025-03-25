@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # default name for model
     Model = RisingBubble(2)
     gridView = structuredGrid( *Model.domain )
-    gridView.hierarchicalGrid.globalRefine(2)
+    gridView.hierarchicalGrid.globalRefine(1)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
     # space = dglagrange(gridView,dimRange=Model.dimRange,order=3,pointType="lobatto")
