@@ -6,7 +6,7 @@ We will look into solutions the the double slit wave problem:
 \subsection{Formulation of the Problem}
 Where our domain is given by $\Omega$, we write the problem as:
 \begin{align*}
-    \psi_{tt}\psi &= \nabla \psi \quad x \in \Omega 0<t\leq T\\
+    \psi_{tt}\psi &= \nabla \psi \quad x \in \Omega, 0<t\leq T\\
     \psi &= \frac{1}{10\pi} sin(10\pi t) x \in S_L
 \end{align*}
 where $T=3$ is our end time for the simulation and $S_L$ denotes the left side of the domain $\Omega$ this will be the source of our waves.
@@ -21,7 +21,7 @@ This equation is now compatable with the time steppers that we are using.
 \subsection{Numerical Solutions}
 We can now compare backwards euler and the two exponential integrator methods.
 First we show the the domain as well as a solution computed with the backwards Euler method.
-For the backwards Euler a time step of $\tau = 0.01$ was found to be optimal, with larger timesteps causing numerical issues and smaller timesteps requiring excessive computation.
+For the backwards Euler a time step of $\tau = 0.001$ was found to be optimal, with larger timesteps causing numerical issues and smaller timesteps requiring excessive computation.
 
 \begin{figure}[H]
     \centering
@@ -32,7 +32,7 @@ For the backwards Euler a time step of $\tau = 0.01$ was found to be optimal, wi
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-b} % Change filename to your image
+        \includegraphics[width=1\textwidth]{Wave/BE/DoubleSlit_0_0.1_10_64.png} % Change filename to your image
         \caption{Solution at time $T=3$ computed using the backwards euler method}
         \label{fig:second order 32}
     \end{minipage}\hfill
@@ -67,17 +67,17 @@ We present the methods used and the operator calls in the table below:
     \centering
     \begin{tabular}{| c | c | c | c |}
     \hline
-    Method & $\tau$ & Krylov size & Operator Calls\\
+    Method & Required $\tau$ & Krylov size & Operator Calls\\
     \hline
-    Backwards Euler & 0.01 & - & 119362 \\
+    Backwards Euler & 0.001 & - & 119362 \\
     First Order Expoenntial & 0.02 & 24 & 7800 \\
     Second Order Expoenntial & 0.02 & 24 & 12300 \\
     \hline
     \end{tabular}
-    \caption{}
+    \caption{Performance of Various Methods}
     \label{tab:reduced_data}
 \end{table}
 
 We observe that Backwards Euler method requires significantly more calls to the operator that both the first and second order exponential methods.
 The second order method requires more calls to the operator than the first order method.
-This suggest that these methods may be 
+This suggest that these methods may be effective for computing solutions to the wave equation.
