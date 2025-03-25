@@ -51,7 +51,7 @@ def RisingBubble(dim=2):
 
 
     Model.domain = [0]*dim, [1000]*(dim-1)+[2000], [40]*(dim-1)+[80]
-    Model.endTime = 3000#1200 #400
+    Model.endTime = 400
     Model.name = "RisingBubble"
 
     return BgFixModel(Model, dim)
@@ -59,8 +59,8 @@ def RisingBubble(dim=2):
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-#from dune.grid import structuredGrid
-from dune.alugrid import aluCubeGrid as leafGridView
+from dune.grid import structuredGrid as leafGridView
+#from dune.alugrid import aluCubeGrid as leafGridView
 from dune.fem.space import dglagrange, finiteVolume, lagrange
 from dune.fem import mark, adapt
 from dune.femdg import femDGModels, femDGOperator, advectionNumericalFlux
