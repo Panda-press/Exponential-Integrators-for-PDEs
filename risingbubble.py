@@ -51,7 +51,7 @@ def RisingBubble(dim=2):
 
 
     Model.domain = [0]*dim, [1000]*(dim-1)+[2000], [40]*(dim-1)+[80]
-    Model.endTime = 400
+    Model.endTime = 3000
     Model.name = "RisingBubble"
 
     return BgFixModel(Model, dim)
@@ -60,9 +60,11 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from dune.grid import structuredGrid as leafGridView
-#from dune.alugrid import aluCubeGrid as leafGridView
+from dune.grid import cartesianDomain
+#from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.space import dglagrange, finiteVolume, lagrange
 from dune.fem import mark, adapt
+from dune.fem.view import adaptiveLeafGridView as view
 from dune.femdg import femDGModels, femDGOperator, advectionNumericalFlux
 from dune.femdg.rk import femdgStepper
 from steppers import steppersDict
@@ -72,18 +74,22 @@ if __name__ == "__main__":
     stepperFct, args = steppersDict[sys.argv[1]]
     if len(sys.argv) >= 3:
         cfl = float(sys.argv[2])
-        outputName = lambda n: f"risingbubble_{sys.argv[1]}{cfl}_{n}.png"
+        outputName = lambda n,m: f"bubble/risingbubble_{sys.argv[1]}{cfl}_{n}_{m}.png"
     else:
         cfl = 0.45
-        outputName = lambda n: f"risingbubble_{sys.argv[1]}default_{n}.png"
+        outputName = lambda n,m: f"bubble/risingbubble_{sys.argv[1]}default_{n}_{m}.png"
 
     # default name for model
     Model = RisingBubble(2)
-    gridView = leafGridView( *Model.domain )
+    try:
+        gridView = leafGridView( *Model.domain )
+    except:
+        print("using grid that suports adaptivity")
+        gridView = view(leafGridView(cartesianDomain(*Model.domain)))
     gridView.hierarchicalGrid.globalRefine(1)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
-    # space = dglagrange(gridView,dimRange=Model.dimRange,order=3,pointType="lobatto")
+    #space = dglagrange(gridView,dimRange=Model.dimRange,order=3,pointType="lobatto")
     u_h = space.interpolate(Model.U0, name="solution")
 
     models = femDGModels(Model,space)
@@ -121,10 +127,11 @@ if __name__ == "__main__":
         mark(indicator,0.0001,0.0001,0,7, markNeighbors = False)
         adapt(u_h)
     for i in range(20):
-        print("adapting")
-        adaptGrid(u_h)
-        u_h.interpolate(Model.U0)        
-    gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
+        continue
+        #print("adapting")
+        #adaptGrid(u_h)
+        #u_h.interpolate(Model.U0)        
+    gridView.writeVTK(outputName(fileCount,m), pointdata=[*u_h])
 
     fileCount += 1
     lastNcalls = op.info()[0]
@@ -143,9 +150,9 @@ if __name__ == "__main__":
             lastNcalls = op.info()[0]
             # u_h.plot(gridLines=None, block=False)
             # plt.savefig(outputName(fileCount))
-            gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
+            gridView.writeVTK(outputName(fileCount,m), pointdata=[*u_h])
             fileCount += 1
             plt.close()
             plotTime += nextTime
 
-    plt.savefig(outputName(fileCount))
+    plt.savefig(outputName(fileCount,m))
