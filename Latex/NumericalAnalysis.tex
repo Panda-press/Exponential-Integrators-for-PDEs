@@ -3,7 +3,7 @@
 In this section look into the numerical analysis of the methods above, combined with the Krylov methods.
 We will begin by presenting some already estabilished results for these methods.
 Next we will attempt to extend these results in order to quantify the error produced by when using the Krylov methods for approximating the action of the exponential of a matrix to a vector.
-
+We will use $x \lesssim y$ to denote $x \leq C y$ for some $C>0$
 \subsection{Formulation of the Problem}
 Here we state the problem as formulated by \cite{Huang2022}.
 We begin by considering a parabolic PDE with initial conditon of $u_0 \in H^2(\Omega) \cap H^1_0(\Omega)$ of the form:
@@ -60,9 +60,9 @@ The following holds:
 \end{align*}
 
 From this, we know:
-\begin{align*}
+\begin{align}
     a(w_h, v_h) \lesssim |w_h|_1|v_h|_1 \lesssim h^{-2} ||w_h||_0||v_h||_0, \quad \forall w_h, v_h \in V_h \label{bilinear}
-\end{align*}
+\end{align}
 where the constants are independant of $h$.
 This shows that $a(\cdot,\cdot)$ is a bounded linear form over $V_h$ with respect to the $L_2$ norm.
 
@@ -116,7 +116,7 @@ We can now state the theorem that gives the error for the first order exponentia
     Suppost the function $f$ satisfies Assumptions \ref{assump:mildgrowth}\ref{assump:smooth}\ref{assump:regularity}.
     There exists a constant $h_0 > 0$ such that for $h<h_0$, we have that the numerical solution given by:
     \begin{align*}
-        u_h^{n+1} &= e^{-\tau L_h}u_h^n + \tau \psi_1(-\tau L_h)P_hf(t_n,u_h^n)
+        u_h^{n+1} &= e^{-\tau L_h}u_h^n + \tau \varphi_1(-\tau L_h)P_hf(t_n,u_h^n)
     \end{align*}
     satisfies the following:
     \begin{align*}
@@ -130,8 +130,8 @@ As well as for the second order exponential integrator scheme.
     Suppost the function $f$ satisfies Assumptions \ref{assump:mildgrowth}\ref{assump:smooth}\ref{assump:regularity} and \ref{assump:regularity2}.
     There exists a constant $h_0 > 0$ such that for $h<h_0$, we have that the numerical solution given by:
     \begin{align*}
-        u_h^{n+1} &= e^{-\tau L_h}u_h^n + \tau (\phi_1(-\tau L_h) - \frac{1}{c}\phi_2(-\tau L_h))P_hf(t_n,u_h^n)\\
-        &+\frac{1}{c}\phi_2(-\tau L_h)P_hf(t_n + c\tau,e^{-c\tau L_h}u_h^n + c\tau\phi_1(-c\tau L_h)P_hf(t_n,u_h^n))
+        u_h^{n+1} &= e^{-\tau L_h}u_h^n + \tau (\varphi_1(-\tau L_h) - \frac{1}{c}\varphi_2(-\tau L_h))P_hf(t_n,u_h^n)\\
+        &+\frac{1}{c}\varphi_2(-\tau L_h)P_hf(t_n + c\tau,e^{-c\tau L_h}u_h^n + c\tau\varphi_1(-c\tau L_h)P_hf(t_n,u_h^n))
     \end{align*}
     satisfies the following:
     \begin{align*}
@@ -203,7 +203,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
     \end{align*}
     Using this along with (\ref{bilinear}) gives
     \begin{align*}
-        0 &\leq \alpha \leq \lambda \lesssim h^{-2} \quad \forall \lambda \in \lambda(L_h)
+        0 &\leq \alpha \leq \lambda \quad \forall \lambda \in \lambda(L_h)
     \end{align*} %You should show it with Rayleigh representation theorem
     by Rayleigh representation theorem, where we have that $\lambda(L_h)$ denotes the set of eigen values of $L_h$.
     From here we see that the eigen values of $-\tau L_h$ are negative and hence $-\tau L_h$ is negative semidefinate.
@@ -230,13 +230,13 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 \begin{proof}
     \begin{align*}
         ||u_{h,m}^n||_1 &= ||e_m^{-\tau L_h}u_{h,m}^{n-1} + \tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1})||_1\\
-        &\leq ||e_m^{-\tau L_h}u_{h,m}^{n-1}|| + ||\tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1})||_1\\
+        &\leq ||e_m^{-\tau L_h}u_{h,m}^{n-1}||_1 + ||\tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1})||_1\\
         %&= ||V_me_m^{H}V_m^Tu_{h,m}^{n-1}|| + ||\tau \int^1_0V_me_m^{H(1-\theta)}V_m^Td\theta P_hf(t, u_{h,m}^{n-1})||_1\\
         \intertext{we now apply lemmas \ref{lemma:LHnegativeSD} and \ref{lemma:leqm} to show that}
-        &\leq m||u_{h,m}^{n-1}|| + \tau m ||P_hf(t_{n-1},u_{h,m}^{n-1})||_1\\
-        \intertext{we have that $||P_hf(t,u)|| \lesssim ||u||+||P_hf(0,0)||$ by Lipschitz continuity of $f$ giving}
-        &\lesssim m||u_{h,m}^{n-1}|| + \tau m (||u_{h,m}^{n-1}|| + ||P_hf(0,0)||)\\
-        &\lesssim (m-\tau m)^n||u_{h,m}^0|| + \tau m ||P_hf(0)||(n + (n -1)\tau m)\\
+        &\leq m||u_{h,m}^{n-1}||_1 + \tau m ||P_hf(t_{n-1},u_{h,m}^{n-1})||_1\\
+        \intertext{we have that $||P_hf(t,u)||_1 \lesssim ||u||_1+||P_hf(0,0)||_1$ by Lipschitz continuity of $f$ giving}
+        &\lesssim m||u_{h,m}^{n-1}||_1 + \tau m (||u_{h,m}^{n-1}||_1 + ||P_hf(0,0)||_1)\\
+        &\lesssim (m-\tau m)^n||u_{h,m}^0||_1 + \tau m ||P_hf(0)||_1(n + (n -1)\tau m)\\
         &\lesssim (m-\tau m)^n + \tau m (n + (n -1)\tau m)\\
         &\lesssim (m-\tau m)^\frac{1}{\tau} + \tau m (\frac{1}{\tau} + (\frac{1}{\tau} -1)\tau m)\\
         &\lesssim (m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m)
@@ -247,35 +247,35 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 \begin{lemma}
     The error between $u_{h,m}^n$ and $u_{h}^n$ is given by:
     \begin{align*}
-        ||u_{h,m}^n - u_{h}^n||_1 \lesssim k(m,\tau, L_h)((m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C)\frac{1-(1+\tau)^{\frac{1}{\tau} + 1}}{\tau}
+        ||u_{h,m}^n - u_{h}^n||_1 \lesssim k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})
     \end{align*}
     where $k(m,\tau,L_h)$ dennotes the error from the Krylov approximation
 \end{lemma}
 \begin{proof}
     \begin{align*}
         ||u_{h,m}^n - u_{h}^n||_1 &= ||e_m^{-\tau L_h}u_{h,m}^{n-1} - e^{-\tau L_h}u_{h}^{n-1}\\
-        & + \tau(\int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1}) - \int^1_0e^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h}^{n-1}))\\
-        &= ||(e_m^{-\tau L_h}-e^{-\tau L_h})u_{h}^{n-1} \\
+        & + \tau(\int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1}) - \int^1_0e^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h}^{n-1}))||_1\\
+        &= ||(e_m^{-\tau L_h}-e^{-\tau L_h})u_{h,m}^{n-1} \\
         & + e^{-\tau L_h}(u_{h,m}^{n-1}-u_{h}^{n-1})\\
         & + \tau(\int^1_0 (e_m^{-\tau L_h(1-\theta)}-e^{-\tau L_h(1-\theta)}) d\theta P_hf(t, u_{h,m}^{n-1})\\
         & + \int^1_0e^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1}- P_hf(t, u_{h}^{n-1})))||_1\\
         \intertext{using Lipschitz continuity of $f$ from lemma \ref{lemma:Lipschitz} and triangle inequality}
-        & \lesssim ||(e_m^{-\tau L_h}-e^{-\tau L_h})u_{h}^{n-1}||_1 \\
+        & \lesssim ||(e_m^{-\tau L_h}-e^{-\tau L_h})u_{h,m}^{n-1}||_1 \\
         & + ||e^{-\tau L_h}(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
         & + \tau||\int^1_0 (e_m^{-\tau L_h(1-\theta)}-e^{-\tau L_h(1-\theta)}) d\theta P_hf(t, u_{h,m}^{n-1})||_1 \\
         & + \tau||\int^1_0e^{-\tau L_h(1-\theta)}d\theta (u_{h,m}^{n-1}- u_{h}^{n-1})||_1 \\
-        & \lesssim ||(e_m^{-\tau L_h}-e^{-\tau L_h})\frac{u_{h,m}^{n-1}}{||u_{h,m}^{n-1}||_1}||||u_{h}^{n-1}||_1 \\
+        & \lesssim ||(e_m^{-\tau L_h}-e^{-\tau L_h})\frac{u_{h,m}^{n-1}}{||u_{h,m}^{n-1}||_1}||_1||u_{h,m}^{n-1}||_1 \\
         & + ||e^{-\tau L_h}||||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
         & + \tau||\int^1_0 (e_m^{-\tau L_h(1-\theta)}-e^{-\tau L_h(1-\theta)}) d\theta \frac{P_hf(t, u_{h,m}^{n-1})}{|| P_hf(t, u_{h,m}^{n-1})||_1}|||| P_hf(t, u_{h,m}^{n-1})||_1 \\
         & + \tau||\int^1_0e^{-\tau L_h(1-\theta)}d\theta|||| (u_{h,m}^{n-1}- u_{h}^{n-1})||_1 \\
-        & \lesssim k(m,\tau, L_h)||u_{h}^{n-1}||_1 \\
+        & \lesssim k(m,\tau, L_h)||u_{h,m}^{n-1}||_1 \\
         & + ||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
         & + \tau k(m,\tau, L_h)|| P_hf(t, u_{h,m}^{n-1})||_1 \\
         & + \tau||(u_{h,m}^{n-1}- u_{h}^{n-1})||_1 \\
-        & \lesssim k(m,\tau, L_h)||u_{h}^{n-1}||_1 \\
+        & \lesssim k(m,\tau, L_h)||u_{h,m}^{n-1}||_1 \\
         & + (1+\tau)||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
-        & + \tau k(m,\tau, L_h)(||u_{h}^{n-1}||_1 + C)\\
-        & \lesssim (1+\tau)k(m,\tau, L_h)(||u_{h}^{n-1}||_1 + C) \\
+        & + \tau k(m,\tau, L_h)(||u_{h,m}^{n-1}||_1 + C)\\
+        & \lesssim (1+\tau)k(m,\tau, L_h)(||u_{h,m}^{n-1}||_1 + C) \\
         & + (1+\tau)||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
         & \lesssim (1+\tau)k(m,\tau, L_h)((m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C) \\
         & + (1+\tau)||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
@@ -297,7 +297,7 @@ We can now prove the main theorem
 \begin{proof}
     \begin{align*}
         ||u(t_n) - u_{h,m}^n||_1 &= ||u(t_n) - u_h^n + u_h^n - u_{h,m}^n||_1\\
-        &\leq ||u(t_n) - u_h^n|| + ||u_h^n - u_{h,m}^n||_1\\
+        &\leq ||u(t_n) - u_h^n||_1 + ||u_h^n - u_{h,m}^n||_1\\
         \intertext{we can now use the previous theorems and lemmas to see that}
         &\leq \tau + h + k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n =1,...,N_T
     \end{align*}
@@ -306,6 +306,7 @@ We can now prove the main theorem
 \begin{corollary}
     Using the above theorem alongsize what we already know about the convergence rates of Krylov subspaces we can observe the following:
     \begin{align*}
-        ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + apply above krylov value(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n = 1,..,N_T
+        ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + 2\beta \frac{(\tau \rho)^m e^{\tau \rho}}{m!}(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n = 1,..,N_T
     \end{align*}
+    where $||L_h|| \lesssim \rho$.
 \end{corollary}
