@@ -59,7 +59,8 @@ def RisingBubble(dim=2):
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from dune.grid import structuredGrid
+#from dune.grid import structuredGrid
+from dune.alugrid import aluCubeGrid as leafGridView
 from dune.fem.space import dglagrange, finiteVolume, lagrange
 from dune.fem import mark, adapt
 from dune.femdg import femDGModels, femDGOperator, advectionNumericalFlux
@@ -78,7 +79,7 @@ if __name__ == "__main__":
 
     # default name for model
     Model = RisingBubble(2)
-    gridView = structuredGrid( *Model.domain )
+    gridView = leafGridView( *Model.domain )
     gridView.hierarchicalGrid.globalRefine(1)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
@@ -114,15 +115,15 @@ if __name__ == "__main__":
     plotTime = 100
     nextTime = plotTime
 
-    # def adaptGrid(u_h):
-    #     indicator = dot(grad(u_h[0]),grad(u_h[0]))# + u_h[0] * dot(grad(u_h[1]),grad(u_h[1]))
-    #     #mark(indicator,0.001,0.001,0,17, markNeighbors = False)
-    #     mark(indicator,0.0001,0.0001,0,7, markNeighbors = False)
-    #     adapt(u_h)
-    # for i in range(20):
-    #     print("adapting")
-    #     adaptGrid(u_h)
-    #     u_h.interpolate(Model.U0)        
+    def adaptGrid(u_h):
+        indicator = dot(grad(u_h[0]),grad(u_h[0]))# + u_h[0] * dot(grad(u_h[1]),grad(u_h[1]))
+        #mark(indicator,0.001,0.001,0,17, markNeighbors = False)
+        mark(indicator,0.0001,0.0001,0,7, markNeighbors = False)
+        adapt(u_h)
+    for i in range(20):
+        print("adapting")
+        adaptGrid(u_h)
+        u_h.interpolate(Model.U0)        
     gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
 
     fileCount += 1
