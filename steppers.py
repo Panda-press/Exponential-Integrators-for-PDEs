@@ -85,7 +85,8 @@ class BaseStepper:
         # time step to use
         self.tau = None
 
-        self.Nprime = self.N.linear()
+        if method != "approx":
+            self.Nprime = self.N.linear()
 
         self.I = identity(self.shape[0])
         self.tmp = self.un.copy()
@@ -93,13 +94,14 @@ class BaseStepper:
         self.linIter = 0
 
     def getMass(self):
+        
         if self.mass == 'identity':
             # This is hack!
             # Issue: the dgoperator is set to be on the right so we need
             # the action of -N. Since this is the only operator corrently
             # using the identity mass matrix we change the sign here
             # NEEDS FIXING
-            self.Minv = -identity(self.shape[0]) 
+            self.Minv = -identity(self.spc.size) 
         else:
             # inverse (lumped) mass matrix (see the explanation given in 'wave.py' tutorial example)
             # u^n v dx = sum_j u^n_j phi_j phi_i dx = M u^n
@@ -109,7 +111,7 @@ class BaseStepper:
             u,v = TrialFunction(self.N.domainSpace.as_ufl()), TestFunction(self.N.rangeSpace.as_ufl())
             
             M = galerkin(self.massWeight(self.un) * dot(u,v)*dx).linear().as_numpy
-
+            
             if self.mass == 'lumped':
                 Mdiag = M.sum(axis=1) # sum up the entries onto the diagonal
                 self.Minv = diags( 1/Mdiag.A1, shape=(np.shape(Mdiag)[0], np.shape(Mdiag)[0]) )
