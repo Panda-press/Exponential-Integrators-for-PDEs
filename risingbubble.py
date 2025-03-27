@@ -91,7 +91,7 @@ if __name__ == "__main__":
     gridView.hierarchicalGrid.globalRefine(3)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
-    #space = dglagrange(gridView,dimRange=Model.dimRange,order=1,pointType="lobatto")
+    #space = dglagrange(gridView,dimRange=Model.dimRange,order=2,pointType="lobatto")
     u_h = space.interpolate(Model.U0, name="solution")
 
     models = femDGModels(Model,space)
@@ -124,10 +124,10 @@ if __name__ == "__main__":
     nextTime = plotTime
 
     def adaptGrid(u_h):
-        indicator = abs(u_h)
+        indicator = sqrt(dot(u_h[0], u_h[0]))
         #indicator = dot(grad(u_h[0]),grad(u_h[0]))
-        mark(indicator,0.00001,0.00001,0,4, markNeighbors = True)
-        #mark(indicator,5e-11,5e-11,0,5, markNeighbors = True)
+        mark(indicator,0.0001,0.00001,1,5, markNeighbors = True)
+        #mark(indicator,5e-10,1e-11,0,5, markNeighbors = True)
         adapt(u_h)
     for i in range(20):
         print("adapting")
@@ -139,6 +139,7 @@ if __name__ == "__main__":
     lastNcalls = op.info()[0]
     print(f"Stepper: {sys.argv[1]} tau:{cfl} m:{m}")
     while t < Model.endTime:
+        print(t)
         adaptGrid(u_h)
         op.setTime(t)
         tau = op.localTimeStepEstimate[0]*cfl
