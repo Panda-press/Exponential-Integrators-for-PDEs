@@ -88,7 +88,7 @@ if __name__ == "__main__":
         print("using grid that suports adaptivity")
         kwargs = {"grid": "adaptive"}
         gridView = view(leafGridView(cartesianDomain(*Model.domain)))
-    gridView.hierarchicalGrid.globalRefine(3)
+    gridView.hierarchicalGrid.globalRefine(5)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
     #space = dglagrange(gridView,dimRange=Model.dimRange,order=2,pointType="lobatto")
@@ -126,9 +126,9 @@ if __name__ == "__main__":
     def adaptGrid(u_h):
         indicator = sqrt(dot(u_h[0], u_h[0]))
         #indicator = dot(grad(u_h[0]),grad(u_h[0]))
-        mark(indicator,0.0001,0.00001,1,5, markNeighbors = True)
+        #mark(indicator,0.0001,0.00001,1,5, markNeighbors = True)
         #mark(indicator,5e-10,1e-11,0,5, markNeighbors = True)
-        adapt(u_h)
+        #adapt(u_h)
     for i in range(20):
         print("adapting")
         adaptGrid(u_h)
