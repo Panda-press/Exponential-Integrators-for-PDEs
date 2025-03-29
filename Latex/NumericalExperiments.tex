@@ -10,31 +10,36 @@ Specifically we will investigate the initial boundary value problem for the Alle
 \end{align*}
 and where the problem is defined as follows:
 \begin{align*}
-    u_t&=\Delta u+u(u-\frac14)(1-u) \text{ on $\Omega \times [0, 8]$}\\
-    \text{with } \Omega &= \mathbb{R}\times[-1,1]\\
-    \nabla u \cdot \hat n &= g \text{ for $g = \nabla \hat u \cdot \hat n$}\\
+    u_t&=\Delta u+u(u-\frac14)(1-u) \text{ $(x,y,t)\in \mathbb{R} \times (-1,1) \times [0, 8]$}\\
     u_0(x, y) &= \hat u(x,y, 0)
 \end{align*}
-However for our numerical experiments we compute on the space $\Omega=[-16,16]\times[-1,1]$.
+With homogenous vonneumann boundaries conditions along the top and bottom of the domain. 
+However for our numerical experiments we compute on the space $\Omega=(-16,16)\times(-1,1)$ and enforce the following vonneumann boundary conditions along the left and right boundaries.
+\begin{align*}
+    \nabla u \cdot \hat n &= g \text{ for $g = \nabla \hat u \cdot \hat n$}
+\end{align*}
 Where $u$ is the solution, we write it in weak form.
 \begin{align*}
     \dot u&=\Delta u+u(u-\frac14)(1-u)\\
     \int_{\Omega} \dot u v &=\int_{\Omega} \Delta uv+u(u-\frac14)(1-u)v \text{ for a smooth function $v \in C^{\infty}(\overline{\Omega})$}\\
-    \int_{\Omega} \dot u v &=\int_{\Omega} u(u-\frac14)(1-u)v - \nabla u \cdot \nabla v + \int_{\partial\Omega}  v\hat n \cdot \nabla u\\
-    \text{substituting in } u_h(t,x,y) &= \sum_i u_i(t) v_i(x,y) \text{ where $(v_i)$ are the test functions we obtain:}\\
+    \int_{\Omega} \dot u v &=\int_{\Omega} u(u-\frac14)(1-u)v - \nabla u \cdot \nabla v + \int_{\partial\Omega}  v\hat n \cdot \nabla \hat u\\
+\end{align*}
+We now introduce our finite element space $V_h$ for a spacial discretization size of $h \in \mathbb{R}$.
+We can now substitute in $u_h(t,x,y) = \sum_i u_i(t) v_i(x,y)$ where $u_i \in \mathbb{R}$ and $v_i \in V_h$ for $i,j = 0,1,...,dim(V_h)$.
+\begin{align*}
     \text{we get } \sum_i\int_{\Omega} \dot u_i v_i v_j &=\sum_i(\int_{\Omega} u_iv_i(u_iv_i-\frac14)(1-u_iv_i)v_j - \int_{\Omega}\nabla (u_iv_i) \cdot \nabla v_j + \int_{\partial\Omega}  v_j\hat n \cdot \nabla \hat u_iv_i)\\
     \sum_iu_i\int_{\Omega}v_iv_j &= -u_i\sum_i(\int_{\Omega}\nabla v_i \cdot \nabla v_j + \int_{\Omega}R(u_h)v_j)\\
     \text{where we have } R(u)&=u(u-\frac14)(1-u) + \int_{\partial\Omega}  \hat n \cdot \nabla \hat  u\\
-    \intertext{The above is true for all $i=0,1,2,...,n$. Writing in matrix vector form gives}
+    \intertext{The above is true for all $i,j$. Writing in matrix vector form gives}
     M \underline{\dot u} &= DN(\underline{u})\underline{u} + R(\underline{u})\\
     \text{where } M_{i,j} &= \int_{\Omega}v_iv_jdx
 \end{align*}
-In the tests, we will investigate the relation between step size, $L_2$ error given by $||\hat u - \underline{u}||_{L_2}$ and call to the operator $N$ which will be a crude approximation to the computational cost.
+In the tests, we will investigate the relation between step size, $L_2$ error given by $||\hat u - u_h||_{L_2}$ and calls to the operator $N$ which will be a crude approximation to the computational cost.
 We compare the Backward Euler, First and Second order expoenntial methods over grid sizes: $128 \times 8$ and $256 \times 8$ and with time step $\tau=8,4,2,1,0.5,0.25,0.125,0.0625,0.03125$.
 
 \subsubsection{Experimental Results}
 
-Bellow we show the $L_2$ error with respect to the time step $\tau$.
+Below we show the $L_2$ error with respect to the time step $\tau$.
 Where in the legend EXP1LAN 16 denotes the first order method with Krylov size 16, likewise for EXP2LAN and the second order method.
 BE denotes the backwards Euler method.
 
@@ -53,13 +58,16 @@ BE denotes the backwards Euler method.
     \end{minipage}\hfill
 \end{figure}
 
-First see that all of the methods tested converge, tending towards the discretization error.
-The discretization error is smaller on the more detailed grid.
-The Krylov methods converge faster than the backwards Euler method.
+First see that all of the methods tested converge, tending towards an apparant mimumum error with the exponential methods leveling out.
+This mimumum error is lower for a finer spacial discretization suggesting that is the result of the spacial discretization.
+The Krylov methods converge faster than the backwards Euler method for a Krylov size equal to or larger than 32 as shown by the steeper graph.
+The performance of the first and second order methods seem simillar both in terms of error and rate of convergence.
 We notice that when a smaller Krylov subspace is used that the expoenntial methods only start to converge for a sufficiently small $\tau$.
 Likewise when these methods start to converge we observe that they perform simillarly to the methods using a larger subspace, however they will require fewer operator calls.
 This suggests that for sufficient small time steps a shallower subspace may suffice.
 Likewise for the converse that larger timesteps require a deeper krylov subspace.
+As a result it is important to look into whether it is more efficient to have a smaller krylov subspace and $\tau$ or a larger space with coresponding larger $\tau$.
+Here we will look into operator calls in order to quantify this difference in performance.
 
 Now we compare the error with the number of calls to the operator.
 These operator calls are needed for computing $N$ which is used with the matrix free methods as described above as well as for computing the non-linear term $R$.
@@ -80,24 +88,26 @@ These operator calls are needed for computing $N$ which is used with the matrix 
 \end{figure}
 
 We see that as expected that when a larger Krylov subspace is used that more calls to the operator are required.
+The backward Euler method appears somewhat eratic, this is due to the internal Newton solver that is being used that does not have a fixed requirement for number of calls to the operator, running untill a given tollerance is reached.
 We also observe that the exponential methods outperform the BE by achieving a lower error with fewer calls to the operator.
+We also see that before the discretization error is reached a Krylov size of 16 give the lower error for a given number of operator calls.
 
 Here we present the experimental orders of convergence for the grid size 1024.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{| c | c | c | c}
+    \begin{tabular}{| c | c | c | c |}
     \hline
-    BE & EXP1LAN 64 & EXP2LAN 64 \\
+    $\tau$ & BE & EXP1LAN 64 & EXP2LAN 64 \\
     \hline
-    1.656175178817219 & 2.5200121901844423 & 2.427488988868435 \\
-    1.159963039219372 & 2.147211103525317 & 2.2448741639287576 \\
-    1.0543798412512431 & 2.1084233436748687 & 2.175268892119002 \\
-    1.0188791686457326 & 2.235535140373336 & 2.176237872787299 \\
-    1.0016513655730614 & 2.2847781778148475 & 0.6355415381730404 \\
-    0.9874831778164389 & -0.3463812590562603 & -0.1610890501147955 \\
-    0.9808216274859436 & -0.2097197508087928 & -0.0545528584432596 \\
-    0.919336864575657 & -0.051644372942987 & -0.01407844052927163 \\
+    4 & 1.6562 & 2.5200 & 2.4275 \\
+    2 & 1.1560 & 2.1472 & 2.2449 \\
+    1 & 1.0544 & 2.1084 & 2.1753 \\
+    0.5 & 1.0189 & 2.2355 & 2.1762 \\
+    0.25 & 1.0017 & 2.2848 & 0.6355 \\
+    0.125 & 0.9875 & -0.3464 & -0.1611 \\
+    0.0625 & 0.9808 & -0.2097 & -0.0546 \\
+    0.03125 & 0.9193 & -0.0516 & -0.0141 \\
     \hline
     \end{tabular}
     \caption{Experimental orders of convergence}
@@ -111,17 +121,17 @@ The exponential methods stop converging as they reach the discretization error.
 The backwards euler converges at the rate expected of 1.
 
 \subsection{A 2D Allen Cahn Problem}
-
-We will now look into the two dimensional Allen Cahn Problem given by:
+The above problem, while done a two dimensional domain is really a one dimensional problem.
+We wish to see how these results carry over to a truly two dimensional problem as a result we will now begin looking into two dimensional Allen Cahn Problem given by:
 \begin{align*}
-    u_t &= -\Delta u + u (u^2-1) \text{ } \Omega=[0,1]\times[0,1]
+    u_t &= -\Delta u + u (u^2-1) \text{ } \Omega=[0,1]\times[0,1], 0\leq t \leq T
 \end{align*}
 With Neumann boundary conditions.
 The initial condition is chosen by randomly setting points on the grid from a uniform distribution in the range $-0.9,0.9$.
 The same randomly generated initial condition will be used for each test.
 As we do not have an exact solution, we will use the backwards Euler method with a timestep of $\tau = 10^{-4}$ to genarate a reference solution.
 We will compare the backwards Euler method to the first and second order expoenntial integrator methods described above.
-The tests are run on a $60\times60$ grid with the end time being $t_e=24$.
+The tests are run on a $60\times60$ grid with the end time being $T=24$.
 The error is computed by calculating the $L_2$ error between the prediction of the chosen stepper and the reference solution. 
 Below we present our results.
 
@@ -144,8 +154,8 @@ We begin by comparing the timestep size $\tau$ to the $L_2$ error for the differ
     \end{minipage}\hfill
 \end{figure}
 
-We observe convergence in both expoential methods for both krylov sizes.
-These methods significantly outperform the backwards Euler method, simillar to the traveling wave Allen Cahn problem given above.
+We observe convergence in both expoential methods for both Krylov sizes.
+These methods significantly outperform the backwards Euler method, similar to the traveling wave Allen Cahn problem given above.
 For this problem a relatively shallow subspace has been used compaired to above and appears to be sufficient.
 
 Below as before we present the number of calls to the operator against the error.
@@ -164,25 +174,25 @@ Below as before we present the number of calls to the operator against the error
     \end{minipage}\hfill
 \end{figure}
 For both methods we see that to achieve a lower error requires more calls to the operator.
-We see that in terms of performance the backwards Euler method performs significantly worse in comparison to both of the expoential methods.
+We see that in terms of performance the backwards Euler method performs significantly worse in comparison to both of the exponential methods.
 
 Here we present the experimental orders of convergence on a grid size of 3600.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{| c | c | c |}
+    \begin{tabular}{| c | c | c | c |}
     \hline
     BE & EXP1LAN 8 & EXP2LAN 8 \\
     \hline
-    0.5336772856567727 & 2.124425468811078    & 1.3416905476319223 \\
-    0.7835756762460372 & 2.905742997002231    & 1.6172444544625373 \\
-    0.3087677833100485 & 2.1667343028183392   & 1.8766417619133886 \\
-    1.504631886802277  & 2.0994616006682154   & 2.034301870712038 \\
-    2.0486348034911237 & 2.13577903687606     & 1.1061518243743675 \\
-    1.237052619854426  & 1.184386408121027    & -0.11660694297267732 \\
-    1.1376542802507796 & -0.09373274955254216 & -0.06785678855256895 \\
-    1.0396362359013922 & -0.06516215516412459 & -0.005698148120031917 \\
-    1.0482179972577244 & -0.01797864948877803 & -0.01442779444997218 \\
+    0.5 & 0.5337 & 2.1244    & 1.3417 \\
+    0.25 & 0.7836 & 2.9057    & 1.6172 \\
+    0.125 & 0.3088 & 2.1667   & 1.8766 \\
+    0.0625 & 1.5046  & 2.0995   & 2.0343 \\
+    0.03125 & 2.0486 & 2.1358     & 1.1062 \\
+    0.015625 & 1.2371  & 1.1844    & -0.1166 \\
+    0.0078125 & 1.1377 & -0.0937 & -0.0679 \\
+    0.00390625 & 1.0396 & -0.0652 & -0.0057 \\
+    0.001953125 & 1.0482 & -0.0180 & -0.0144 \\
     \hline
     \end{tabular}
     \caption{Experimental orders of convergence}
@@ -209,7 +219,7 @@ With the following exact solution:
 
 With homogenous Dirichlet boundary conditions.
 Where $\Omega = (\frac12, \frac52)\times(0,1)$ and our end time is given by $t_e = 0.1$.
-We run our tests on grid sizes of $128\times64$ and $256\times128$ and use times steps sizes of $\tau=\frac{0.1}{2^i}$ for $i = 0,1,...,4$
+We run our tests on grid sizes of $128\times64$ and $256\times128$ and use times steps sizes of $\tau=\frac{0.1}{2^i}$ for $i = 0,1,...,4$.
 
 
 We begin by comparing the timestep size $\tau$ to the $L_2$ error for the different methods.
@@ -249,20 +259,20 @@ Below as before we present the number of calls to the operator against the error
 \end{figure}
 Here we see that for all methods more operator calls are required to produce results with a smaller error.
 The exponential methods achieved a given error with fewer operator calls that the backwards Euler method.
-The second order methods required fewer operator calls for a given error that the first order method, especially as the number of calls increased.
+The second order methods required fewer operator calls for a given error than the first order method, especially as the number of calls increased.
 
 
 Here we present the experimental orders of convergence.
 \begin{table}[H]
     \centering
-    \begin{tabular}{| c | c | c |}
+    \begin{tabular}{| c | c | c | c |}
     \hline
-    BE & EXP1LAN 64 & EXP2LAN 64 \\
+    $\tau$ & BE & EXP1LAN 64 & EXP2LAN 64 \\
     \hline
-    0.7901637433430926 & 1.3717257454910614    & 2.608595189003896 \\
-    0.8767440969959281 & 1.1734740319093697    & 2.3519399751018963 \\
-    0.9320179419151513 & 1.0828183773958644   & 2.229913816965242\\
-    0.963545660578168  & 1.03777329582159   & 1.4358363206568961 \\
+    0.5 & 0.7902 & 1.3717 & 2.6086 \\
+    0.25 & 0.8767 & 1.1735 & 2.3519 \\
+    0.125 & 0.9320 & 1.0828 & 2.2299\\
+    0.0625 & 0.9635  & 1.0378 & 1.4358 \\
     \hline
     \end{tabular}
     \caption{Experimental orders of convergence}

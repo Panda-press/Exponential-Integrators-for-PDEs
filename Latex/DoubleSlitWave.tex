@@ -4,31 +4,38 @@ In this section, we look into applying these exponential steppers to the computa
 We will look into solutions the the double slit wave problem:
 
 \subsection{Formulation of the Problem}
-Where our domain is given by $\Omega$, we write the problem as:
+Where our domain is given by $\Omega$ as seen in figure \cite{fig:waveOmega}, we write the problem as:
 \begin{align*}
-    \psi_{tt}\psi &= \nabla \psi \quad x \in \Omega, 0<t\leq T\\
+    \psi_{tt}\psi &= \nabla \psi \quad x \in \Omega, 0<t\leq T
+    \psi(0,x) = 0 \quad x \in \Omega
+\end{align*}
+where $T=3$ is our end time for the simulation.
+Let $S_L = \{0\} \times [0,1] \subset \mathbb{R}^2$ denotes the left side of the domain $\Omega$, we implement the following Dirichlet condition:
+\begin{align*}
     \psi &= \frac{1}{10\pi} sin(10\pi t) x \in S_L
 \end{align*}
-where $T=3$ is our end time for the simulation and $S_L$ denotes the left side of the domain $\Omega$ this will be the source of our waves.
+where $T=3$ is our end time for the simulation and $S_L = \{0\} \times [0,1] \subset \mathbb{R}^2$ denotes the left side of the domain $\Omega$ this will be the source of our waves.
+The remaining boundaries use homogeniouss Vonneumann boundary conditions.
+Our steppers, both exponential and backwards Euler, require a first order equation with respect to the derivatives of $t$.
+This means that we will need to use a substitution.
 We can use $\psi_t = -p$ to get the following:
 \begin{align*}
     \psi_t &= -p\\
     p_t &= \nabla \psi\\
-    \psi &= \frac{1}{10\pi} sin(10\pi t) x \in S_L
 \end{align*}
 This equation is now compatable with the time steppers that we are using.
 
 \subsection{Numerical Solutions}
 We can now compare backwards euler and the two exponential integrator methods.
 First we show the the domain as well as a solution computed with the backwards Euler method.
-For the backwards Euler a time step of $\tau = 0.001$ was found to be optimal, with larger timesteps causing numerical issues and smaller timesteps requiring excessive computation.
+For the backwards Euler a time step of $\tau = 0.001$ was found to be optimal, with larger timesteps causing numerical issues, resulting in inaccuracy and smaller timesteps requiring excessive computation.
 
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
         \includegraphics[width=1\textwidth]{Wave/DoubleSlit_0_1.0_0_64.png} % Change filename to your image
         \caption{Domain $\Omega$ with grid displayed}
-        \label{fig:second order 16}
+        \label{fig:waveOmega}
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
@@ -40,7 +47,7 @@ For the backwards Euler a time step of $\tau = 0.001$ was found to be optimal, w
 
 We now compare this to the first and second order exponential integrator methods.
 Note that due the fact that the linear term given by $DN(u)$ is not symetric we cannot use the Lancoz method for computing our matrix exponential.
-As a result the Arnoldi alorithm for the matrix exponential has been used here exculively.
+As a result the Arnoldi alorithm for the matrix exponential has been used here exclusively.
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
@@ -70,8 +77,8 @@ We present the methods used and the operator calls in the table below:
     Method & Required $\tau$ & Krylov size & Operator Calls\\
     \hline
     Backwards Euler & 0.001 & - & 119362 \\
-    First Order Expoenntial & 0.02 & 24 & 7800 \\
-    Second Order Expoenntial & 0.02 & 24 & 12300 \\
+    First Order Exponential & 0.02 & 24 & 7800 \\
+    Second Order Exponential & 0.02 & 24 & 12300 \\
     \hline
     \end{tabular}
     \caption{Performance of Various Methods}

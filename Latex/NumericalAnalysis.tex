@@ -3,7 +3,7 @@
 In this section look into the numerical analysis of the methods above, combined with the Krylov methods.
 We will begin by presenting some already estabilished results for these methods.
 Next we will attempt to extend these results in order to quantify the error produced by when using the Krylov methods for approximating the action of the exponential of a matrix to a vector.
-We will use $x \lesssim y$ to denote $x \leq C y$ for some $C>0$
+We will use $x \lesssim y$ to denote $x \leq C y$ for some $C>0$ independant of $x$ and $y$.
 \subsection{Formulation of the Problem}
 Here we state the problem as formulated by \cite{Huang2022}.
 We begin by considering a parabolic PDE with initial conditon of $u_0 \in H^2(\Omega) \cap H^1_0(\Omega)$ of the form:
@@ -56,7 +56,7 @@ This projection is stable with respect to the $L_2$, that is to say that $||P_hu
 The inverse inequality for finite elements (lemma 4.5.3 \cite{Brenner2008}) states that when $V_h \in H^1 \cap H^0$ and $0 < h \leq 1$.
 The following holds:
 \begin{align*}
-    |v|_0 &\lesssim h^{-1} ||v||_1
+    |v|_1 &\lesssim h^{-1} ||v||_0
 \end{align*}
 
 From this, we know:
@@ -66,7 +66,7 @@ From this, we know:
 where the constants are independant of $h$.
 This shows that $a(\cdot,\cdot)$ is a bounded linear form over $V_h$ with respect to the $L_2$ norm.
 
-From here we can apply Riesz representation theorem to deduce that there exists a bounded linear operator $L_h:V_h\rightarrow V_H$ such that
+From here we can apply Riesz representation theorem to deduce that there exists a bounded linear operator $L_h:V_h\rightarrow V_h$ such that
 \begin{align*}
     a(w_h, v_h) &= (L_h w_h, v_h), \quad \forall w_h, v_h \in V_h
 \end{align*}
@@ -137,7 +137,7 @@ As well as for the second order exponential integrator scheme.
     \begin{align*}
         ||u(t_n) - u_h^n||_1 &\lesssim \tau^2 + h, \forall n =1,...,N_T
     \end{align*}
-    with a hidden constant that is independatn of $\tau$ and $h$.
+    with a hidden constant that is independant of $\tau$ and $h$.
 \end{theorem}
 
 \subsection{Extension to Krylov Methods}
@@ -160,7 +160,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 
 \begin{lemma}
     Consider a Krylov approximation given by $V_m^TAV_m = H$ with respect to a vector $v$ of depth $m$.
-    If $A$ is negative semi-definate then so is $H$.
+    If $A$ is negative semi-definite then so is $H$.
 \end{lemma}
 \begin{proof}
     \begin{align*}
@@ -179,20 +179,20 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 \end{lemma}
 \begin{proof}
     \begin{align*}
-        ||e_m^A|| &= ||e^{VHV^T}||\\
-        &= ||V_me^HV_m^T||\\
-        &\leq ||V_m||_2||e^H||||V_m^T||_2\\
+        ||e_m^A||_{op} &= ||e^{VHV^T}||_{op}\\
+        &= ||V_me^HV_m^T||_{op}\\
+        &\leq ||V_m||_{fro}||e^H||_{op}||V_m^T||_{fro}\\
         \intertext{we use the fact that $A$ and hence $H$ is negative semi-definate to imply that all of the eigen values $\lambda$ of $H$ are such that $\lambda \leq 0$
-        and hence we have that $||e^H|| \leq e^0 = 1$. From here we see that}
-        &\leq ||V_m||_2||V_m^T||_2\\
-        \intertext{we now use the fact that the $m$ collumns of $V_m$ are orthonormal to get}
+        and hence we have that $||e^H||_{op} \leq e^0 = 1$. From here we see that}
+        &\leq ||V_m||_{fro}||V_m^T||_{fro}\\
+        \intertext{we now use the fact that the $m$ columns of $V_m$ are orthonormal to get}
         &= \sqrt{m} \sqrt{m}\\
         &= m
     \end{align*}
 \end{proof}
 
 \begin{lemma} \label{lemma:LHnegativeSD}
-    $-\tau L_h$ is negative semidefinate. 
+    $-\tau L_h$ is negative semidefinite. 
     This was briefly shown as part of a lemma previously \cite{Huang2022}, however we formally show it here.
 \end{lemma}    
 \begin{proof}
@@ -206,7 +206,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
         0 &\leq \alpha \leq \lambda \quad \forall \lambda \in \lambda(L_h)
     \end{align*} %You should show it with Rayleigh representation theorem
     by Rayleigh representation theorem, where we have that $\lambda(L_h)$ denotes the set of eigen values of $L_h$.
-    From here we see that the eigen values of $-\tau L_h$ are negative and hence $-\tau L_h$ is negative semidefinate.
+    From here we see that the eigen values of $-\tau L_h$ are negative and hence $-\tau L_h$ is negative semidefinite.
 \end{proof}
 
 \begin{definition}
@@ -215,6 +215,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
     \begin{align*}
         u_{h,m}^n &= e_m^{-\tau L_h} u_{h,m}^{n-1} + \tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1})
     \end{align*}
+    We can associate $L_h$ with a matrix that operates on the bases of $V_h$
 \end{definition}
 
 \begin{lemma}
@@ -224,7 +225,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
     \end{align*}
     and hence
     \begin{align*}
-        ||P_hf(t,u_{h,m}^n)|| \lesssim (m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C
+        ||P_hf(t,u_{h,m}^n)||_1 \lesssim (m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C
     \end{align*}
 \end{lemma}
 \begin{proof}
@@ -236,20 +237,27 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
         &\leq m||u_{h,m}^{n-1}||_1 + \tau m ||P_hf(t_{n-1},u_{h,m}^{n-1})||_1\\
         \intertext{we have that $||P_hf(t,u)||_1 \lesssim ||u||_1+||P_hf(0,0)||_1$ by Lipschitz continuity of $f$ giving}
         &\lesssim m||u_{h,m}^{n-1}||_1 + \tau m (||u_{h,m}^{n-1}||_1 + ||P_hf(0,0)||_1)\\
-        &\lesssim (m-\tau m)^n||u_{h,m}^0||_1 + \tau m ||P_hf(0)||_1(n + (n -1)\tau m)\\
+        &\lesssim (m-\tau m)^n||u_{h,m}^0||_1 + \tau m ||P_hf(0,0)||_1(n + (n -1)\tau m)\\
         &\lesssim (m-\tau m)^n + \tau m (n + (n -1)\tau m)\\
         &\lesssim (m-\tau m)^\frac{1}{\tau} + \tau m (\frac{1}{\tau} + (\frac{1}{\tau} -1)\tau m)\\
         &\lesssim (m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m)
     \end{align*}
     with the bound on $P_hf(t,u_{h,m}^n)$ begin the result of Lipschitz continuity by taking $C=P_hf(t,0)$.
 \end{proof}
-
+\begin{definition}
+    The error from the Krylov subspace approximation is given by $k(m,\tau, A)$.
+    Where we have that:
+    \begin{align*}
+        k(m,\tau, A) &= ||e^{\tau A}v - \beta V_m e^{H_m}e_1||_2
+    \end{align*}
+    Where $V_m$ and $H_m$ are generated by our Krylov methods.
+\end{definition}
 \begin{lemma}
     The error between $u_{h,m}^n$ and $u_{h}^n$ is given by:
     \begin{align*}
         ||u_{h,m}^n - u_{h}^n||_1 \lesssim k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})
     \end{align*}
-    where $k(m,\tau,L_h)$ dennotes the error from the Krylov approximation
+    where $k(m,\tau,L_h)$ denotes the error from the Krylov approximation that is dependant on $m, \tau, L_h$.
 \end{lemma}
 \begin{proof}
     \begin{align*}
@@ -279,7 +287,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
         & + (1+\tau)||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
         & \lesssim (1+\tau)k(m,\tau, L_h)((m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C) \\
         & + (1+\tau)||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
-        & \lesssim \sum^N_{i=1}[(1+\tau)^i]k(m,\tau, L_h)((m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C)\\
+        & \lesssim \sum^n_{i=1}[(1+\tau)^i]k(m,\tau, L_h)((m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C)\\
         & \lesssim k(m,\tau, L_h)(m^\frac{1}{\tau}(1-\tau 1)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m) + C)\frac{1-(1+\tau)^{\frac{1}{\tau} + 1}}{\tau}
         \intertext{we observe that $(1-\tau)^\frac{1}{\tau} \leq 1$, that $m (1 + (1 - \tau)\tau m) \lesssim m$ for $0\leq \tau \leq 1$ and $\frac{1-(1+\tau)^{\frac{1}{\tau} + 1}}{\tau} \lesssim 1 + \frac{1}{\tau}$}
         & \lesssim k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})
@@ -298,7 +306,7 @@ We can now prove the main theorem
     \begin{align*}
         ||u(t_n) - u_{h,m}^n||_1 &= ||u(t_n) - u_h^n + u_h^n - u_{h,m}^n||_1\\
         &\leq ||u(t_n) - u_h^n||_1 + ||u_h^n - u_{h,m}^n||_1\\
-        \intertext{we can now use the previous theorems and lemmas to see that}
+        \intertext{By the triangle inequality. We can now use the previous theorems and lemmas to see that}
         &\leq \tau + h + k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n =1,...,N_T
     \end{align*}
 \end{proof}

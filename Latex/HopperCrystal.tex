@@ -1,0 +1,36 @@
+\section{3D Crystal}
+We now begin looking into the modeling of a 3D Crystal.
+\subsection{Formulation of Problem}
+We employ the phase field model as described by \cite{Bollada2023}.
+\begin{align*}
+    \dot \phi &= \nabla \cdot \frac{\partial}{\partial \nabla \phi}(\frac12 A^2)-\frac{Omega'(\phi)}{\delta^2} - \frac{g'(\phi)(\mu_0-\mu)\Delta c}{\lambda \delta^2}\\
+    \dot \mu &= a\nabla \cdot D \nabla \mu - a \Delta c g'(\phi)\dot \phi\\
+    \phi(0,x) &= \phi_{t=0}\\
+    \mu(0,x) &= \mu_{t=0}
+\end{align*}
+For some initial conditions $\phi_{t=0}$ and $\mu_{t=0}$ and with an anisotropy given by $A$.
+\begin{align*}
+    \phi_{t=0} &= \frac{1}{1+e^{\frac{-\sqrt{x^2 + y^2 + z^2}-R_0}{\delta}}}\\
+    \mu_{t=0} &= \phi_{t=0} - \phi_{t=0}a(\bar c - c_s)
+\end{align*}
+The constants are given by:
+\begin{align*}
+    \begin{matrix}
+    c_L = 0.9 & c_S = 0.5 & \mu_0 = 1 & \mu_{\inf} = 0.04 & a = 4 & D_L= \frac{1}{12} & D_S = 10^{-4}D_L\\
+    \Delta c = c_L - c_S & \lambda = \frac{3R_c\Delta c^2}{\delta} & R_c = 10 & R_0 = 20 & \delta = 2 & \epsilon = 0.02\\
+    \end{matrix}
+\end{align*}
+
+We will observe two different anisotropies.
+The first a "cubic" anisotropy given by:
+\begin{align*}
+    A &= \sum_i \sqrt{\frac{\partial \phi}{\partial x^i}^2 + \epsilon^2(\frac{\partial \phi}{\partial x^1}^2 + \frac{\partial \phi}{\partial x^2}^2 + \frac{\partial \phi}{\partial x^3}^2)}
+\end{align*}
+and an octohedral anisotropy given by \cite{Bollada2015}:
+\begin{align*}
+    A &= A_0 (1 + \bar \epsilon(n^4_x+n^4_y+n^4_z))
+\end{align*}
+where we have that $A_0 =1 -3\epsilon$ and $\bar \epsilon = \frac{4\epsilon}{1-3\epsilon}$.
+
+
+\subsection{Numerical Solutions}
