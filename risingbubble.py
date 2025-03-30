@@ -61,7 +61,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dune.grid import structuredGrid as leafGridView
 from dune.grid import cartesianDomain
-from dune.alugrid import aluCubeGrid as leafGridView
+#from dune.alugrid import aluCubeGrid as leafGridView
 from dune.fem.space import dglagrange, finiteVolume, lagrange
 from dune.fem import mark, adapt
 from dune.fem.view import adaptiveLeafGridView as view
@@ -84,11 +84,12 @@ if __name__ == "__main__":
     kwargs = {}
     try:
         gridView = view(leafGridView( *Model.domain ))
+        kwargs = {"grid":"adaptive"}
     except:
         print("using grid that suports adaptivity")
         kwargs = {"grid": "adaptive"}
         gridView = view(leafGridView(cartesianDomain(*Model.domain)))
-    gridView.hierarchicalGrid.globalRefine(5)
+    gridView.hierarchicalGrid.globalRefine(4)
 
     space = finiteVolume(gridView,dimRange=Model.dimRange)
     #space = dglagrange(gridView,dimRange=Model.dimRange,order=2,pointType="lobatto")
@@ -127,8 +128,8 @@ if __name__ == "__main__":
         indicator = sqrt(dot(u_h[0], u_h[0]))
         #indicator = dot(grad(u_h[0]),grad(u_h[0]))
         #mark(indicator,0.0001,0.00001,1,5, markNeighbors = True)
-        #mark(indicator,5e-10,1e-11,0,5, markNeighbors = True)
-        #adapt(u_h)
+        mark(indicator,5e-10,1e-11,0,4, markNeighbors = True)
+        adapt(u_h)
     for i in range(20):
         print("adapting")
         adaptGrid(u_h)

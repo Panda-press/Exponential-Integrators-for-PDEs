@@ -54,7 +54,7 @@ def test1(gridView):
 
     gradu = grad(u[0])
     
-    if False:
+    if True:
         def Ai(var):
             return sqrt(var**2 + epsilon**2*(gradu[0]**2 + gradu[1]**2 + gradu[2]**2))
 
@@ -88,10 +88,10 @@ def test1(gridView):
 
     gDash = 6*u[0] - 6*u[0]**2
 
-    dthedt = lambda test: (-inner(A * grad(u[0]), grad(test)) - test * omegaDash/(delta**2) - test * gDash*(mu0-u[1])*Deltac/(Lambda*delta**2))
+    dthedt = lambda test: (-inner(A * dAdGP, grad(test)) - test * omegaDash/(delta**2) - test * gDash*(mu0-u[1])*Deltac/(Lambda*delta**2))
 
     dmudt = (- a * D * inner(grad(v[1]), grad(u[1])) - a * Deltac * gDash * dthedt(v[1]))
 
-    return -(dmudt + dthedt(v[0])) * dx, 200, 0.01, initial, None, None
+    return -(dmudt + dthedt(v[0])) * dx, 10, 0.01, initial, None, None
 
     
