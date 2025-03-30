@@ -148,7 +148,7 @@ if __name__ == "__main__":
     if sysargs.problem == "TravellingWaveAllenCahn":
         from travellingWaveAllenCahn import dimR, time, sourceTime, domain
         from travellingWaveAllenCahn import test3 as problem
-        problemName = "Travelling Wave"
+        problemName = "Travelling Wave Allen Cahn"
         start_time = 0
         end_time = 8
         if sysargs.debug == True:
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     elif sysargs.problem == "AllenCahn":
         from allenCahn import dimR, time, sourceTime, domain
         from allenCahn import test2 as problem
-        problemName = "AllenCahn"
+        problemName = "Allen Cahn"
         start_time = 0
         end_time = 24
         tau0 = 1
@@ -207,7 +207,7 @@ if __name__ == "__main__":
         tau0 = end_time / 1
         taus = 5
         start_time = 0
-        problemName = "ReactionDiffusion"
+        problemName = "Reaction Diffusion"
         exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
         krylovSizes = [8, 16, 32, 64]
         grids = [[128, 64], [256, 128]]
