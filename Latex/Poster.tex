@@ -135,7 +135,7 @@
 \item These methods can be computationally demanding as we need to calculate the matrix exponential $e^Av$ which can be expensive
 \item Kyrlov subspace methods have recently gained traction for a way to compute the matrix exponential efficiently\cite{Moler2003}.
 \end{itemize}
-For a discretised PDE: $\dot u = N(u)$ with Forward Euler time-stepping we get: $u^{n+1} = u^n+\tau N(u^n)$ for $\tau < \tau_{FE}$ where $\tau_{FE}$ depends on the specific problem. Using exponential integrators we have $u^{n+1} = e^{DN(u^n)\tau}(u^n + \tau(N(u^n)-DN(u^n)))$ which, for some problems can work for $\tau >> \tau_{FE}$ reducing the number of steps neccessary.
+For a discretised PDE: $\dot u = N(u)$ with Forward Euler time-stepping we get: $u^{n+1} = u^n+\tau N(u^n)$ for $\tau < \tau_{FE}$ where $\tau_{FE}$ depends on the specific problem. Using exponential integrators we have $u^{n+1} = e^{DN(u^n)\tau}(u^n + \tau(N(u^n)-DN(u^n)))$ which, for some problems can work for $\tau >> \tau_{FE}$ reducing the number of steps necessary.
 \columnbreak
 
 \begin{center}

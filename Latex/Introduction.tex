@@ -1,18 +1,32 @@
 \section{Introduction}
 
-Consider a PDE of the following form:
-
+Parabolic PDEs can be used to model a wide array of physical phenomona in enginering and the natural sciences, such as heat flow, reaction diffusion and phase boundary problems.
+Therefore, the development of efficient and accurate methods by which numerical solutions to these PDEs can be computed, is of great importance.
+One possible approach is the use of exponential integrators.
+In order to illustrate these methods, consider briefly the following PDE:
 \begin{align*}
-    \partial_t u = N(u)\\
+    u_t &= \Delta u + f(u)
 \end{align*}
-
-These PDEs of this from are common when looking into Phase boundary problems such as the Allen-Cahn equations. %maybe add a citation
-While for some instances exact solutions to these PDEs exist and are known, in many practical cases however it is often necessary to compute approximate solutions to these PDEs.
-In order to achieve this, we will need to discretise in space yielding an ODE.
-We do this via finite element methods giving:
+By discretizing in space by method of finite elements or finite difference, we can arrive at an ODE of the form.
 \begin{align*}
-    M\frac d{dt} u_h = N_h(u)\\
+    u_{h,t} &= -Au_h + f(u_h)
 \end{align*}
-For a mass matrix $M$ and some $N_h$.
-From here we can apply methods that can solve this ODE in time.
+From here, we notice that we have a linear term $Au_h$ where $A$ is a matrix, $u_h$ is a vector and a non-linear term $f(u_h)$.
+The exact solution to this equation can be written in the form \cite{Hochbruck2010}:
+\begin{align*}
+    u_h(t) &= e^{-At}u_{h}(0) + \int^t_0 e^{-(t-\tau)A}fu_{h}(\tau)d\tau
+\end{align*}
+Exponential integrator methods attempt to approximate the above equation.
+The challenge for these systems is that for large $A$, computing its exponential can be too computationally demanding.
 
+There exist many possible ways to compute approximations to the matrix exponential such as in Moler Et al's Nineteen Dubious Ways to Compute the Exponential of a Matrix\cite{Moler2003}.
+Of most intrest to us are the advancements in Krylov subspace methods such as the Arnoldi and Lanczos algorithms.
+These methods work by projecting the matrix onto a smaller space, the Krylov subspace, where computing the matrix exponential is cheaper before projecting it back up to the full space.
+In this work, we will bring these two areas of exponential integrators and Krylov subspace approximations together, with the objective of finding more efficient and accurate numerical solutions to PDEs.
+
+We will begin by introducing the exponential integrator schemes, followed by the Krylov methods, showing the connection between the two.
+Established analytical results for both Krylov and exponential integrator methods will be stated.
+Following on from this, we provide our own analysis that ties these methods together, showing how the error from the Krylov methods and exponential integrators interact when used in conjunction with one another.
+Experimental results will also be provided, demonstrating performance and accuracy compared to other numerical methods, namely backwards Euler.
+We will then apply these combined methods to phase boundary problems, in order to model dendric cyrstal growth.
+Finally, we will show the application of these methods beyond parabolic PDEs.

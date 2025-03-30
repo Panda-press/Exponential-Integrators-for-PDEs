@@ -103,11 +103,11 @@ We begin with the Arnoldi algorithm.
 \end{algorithmic}
 \end{algorithm}
 Here V is given by $v_1,...,v_m$ and H is give by $h_1,...,h_m$.\\
-The algorithm below is the Lanczos algorithm and it requires a symmetric matrix. \cite{Moler2003}
+The algorithm below is the Lanzcos algorithm and it requires a symmetric matrix. \cite{Moler2003}
 \begin{algorithm}[H]
-\caption{Lanczos \cite{OJALVO1970}}
+\caption{Lanzcos\cite{OJALVO1970}}
 \begin{algorithmic}
-\Procedure{Lanczos}{$A$ symetric$, \hat v_1,m$}
+\Procedure{Lanczos }{$A$ symmetric$, \hat v_1,m$}
 \State $v_0 = 0$
 \For{$i = 1,2,...,m$}	
 \State$\beta_i \gets || \hat v_i ||$
@@ -227,7 +227,7 @@ We set $t_s = 0$ and $t_e = 0.02$ and test with $\tau = 2\times 10^{-4}, 1\times
 For grid sizes, we use $N\times N$ with $N = 10,30,60$.
 
 The metrics we will be comparing are the L2 error given by $\int |u_e - \hat u|$ and the number of calls to the operator $N$ (as we are using a matrix-free method).
-We present the results for the Arnoldi, Lanczos, Kipops\cite{Gaudreault2018} and Backward Euler methods.
+We present the results for the Arnoldi, Lanczos , Kipops\cite{Gaudreault2018} and Backward Euler methods.
 
 \begin{figure}[H]
 	  \includegraphics[width=\linewidth]{FEMethodPlots/Operator Calls V Error for Parabolic Test2 with grid size 100.png}

@@ -1,18 +1,18 @@
 \section{Numerical Analysis}
 
-In this section look into the numerical analysis of the methods above, combined with the Krylov methods.
-We will begin by presenting some already estabilished results for these methods.
-Next we will attempt to extend these results in order to quantify the error produced by when using the Krylov methods for approximating the action of the exponential of a matrix to a vector.
-We will use $x \lesssim y$ to denote $x \leq C y$ for some $C>0$ independant of $x$ and $y$.
+In this section, we will look into the numerical analysis of the exponential integrators above, combined with the Krylov methods.
+We will begin by presenting some already established results for these methods.
+Next, we will attempt to extend these results in order to quantify the error produced when using the Krylov methods for approximating the action of the exponential of a matrix to a vector.
+We will use $x \lesssim y$ to denote $x \leq C y$ for some $C>0$ independent of $x$ and $y$.
 \subsection{Formulation of the Problem}
-Here we state the problem as formulated by \cite{Huang2022}.
-We begin by considering a parabolic PDE with initial conditon of $u_0 \in H^2(\Omega) \cap H^1_0(\Omega)$ of the form:
+Here we state the problem as formulated by Huang Et al.\cite{Huang2022}.
+We begin by considering a parabolic PDE with initial condition of $u_0 \in H^2(\Omega) \cap H^1_0(\Omega)$ of the form:
 \begin{align*}
     u_t &= D \Delta u + f(t,u) &x\in \Omega, 0 \leq t \leq T\\
     u(0,x) &= u_0(x) &x\in \Omega\\
     u(t,x) &= 0 &x\in \partial \Omega, 0 \leq t \leq T
 \end{align*}
-where $T$ is the final time, $\Omega$ is a rectangular domain in $\mathbb{R}^d$, $D\geq 0$, $u(t,x)$ is the unkown function and $f(t,u)$ is a nonlinear term.
+where $T$ is the final time, $\Omega$ is a rectangular domain in $\mathbb{R}^d$, $D\geq 0$, $u(t,x)$ is the unknown function and $f(t,u)$ is a non-linear term.
 
 The variational form of this problem is to find $u\in L^2(0,T;H^1_0(\Omega))$ and $u_t \in L^2(0,T: L^2(\Omega))$ such that
 \begin{align*}
@@ -24,13 +24,14 @@ The bilinear form $a(\cdot,\cdot)$ is given by
 \begin{align*}
     a(w,v) &= \int_{\Omega} D \nabla w \cdot \nabla v dx, \quad \forall w, v \in H^1_0(\Omega)
 \end{align*}
-and is clearly symetric.
+and is clearly symmetric.
 
-We wil now begin to formulate the finite element space $V_h$ that we will approximate $H^1_0$ with.
-As $\Omega \in \mathbb{R}^d$ is a rectangular domain we can assume that $\bar \Omega := \prod^d_{i=1}[a_i,b_i]$.
+We will now begin to formulate the finite element space $V_h$ with which we will approximate $H^1_0$.
+As $\Omega \in \mathbb{R}^d$ is a rectangular domain, we can assume that $\bar \Omega := \prod^d_{i=1}[a_i,b_i]$.
 For every $i = 1,...,d$, we can define a uniform partition of $[a_i,b_i]$ with the subinterval size $h_i = \frac{b_i - a_i}{N_i}$,
 to get the nodes $x^j_i = a_i + jh_i, j = 0,...,N_i$ as $a_i = x_i^0 < x_i^1 < ... < x_i^{N_i} = b_i$.
-With this regular partition, we obtain a one-dimensional continuous piecewise linear finite element space for $[a_i,b_i]$ As
+With this regular partition, we obtain a one-dimensional continuous piecewise linear finite element space for $[a_i,b_i]$.
+As
 \begin{align*}
     V^i_{h_i}(a_i,b_i) :&= \{v\in C[a_i,b_i]: v|_{[x^{j-1}_i, x^j_i]}\in\mathbb{P}_1([x_i^{j-1},x_i^j]),1\leq j \leq N_i\} \cap H^1_0(a_i,b_i)\\
     &=\text{span}\{\theta^1_i(x_i), ... , \theta^{N_i-1}_i(x_i)\} 
@@ -42,8 +43,8 @@ Now we can write a finite element space for $\Omega$ as follows:
     &= \text{span}\{\theta_1^{i_1}\cdot \cdot \cdot \theta_d^{i_d}(x_d): 1 \leq i_1 \leq N_1-1,...,1\leq i_d \leq N_d-1\}
 \end{align*}
 We now have that $V_h\subset H^1_0(\Omega)$.
-Let $h=\text{max}_{1\leq i\leq d}h_i$ be the mesh shize of the corresponding uniformly rectangular partition $\mathcal{T}_h$ that generates $V_h$.
-All erorr analysis will assume $h\approx h_i$ for all $i$.
+Let $h=\text{max}_{1\leq i\leq d}h_i$ be the mesh size of the corresponding uniformly rectangular partition $\mathcal{T}_h$ that generates $V_h$.
+All error analysis will assume $h\approx h_i$ for all $i$.
 
 The finite element approximation for the above problem is then to find $u_h \in L^2(0,t:V_h)$ so that:
 \begin{align*}
@@ -53,8 +54,8 @@ The finite element approximation for the above problem is then to find $u_h \in 
 where the $L^2$ orthogonal projection operator is given by $P_h:L^2(\Omega) \rightarrow V_h$.
 This projection is stable with respect to the $L_2$, that is to say that $||P_hu||_0 \lesssim ||u||_0$ and $||P_hu||_1 \lesssim ||u||_1$.
 
-The inverse inequality for finite elements (lemma 4.5.3 \cite{Brenner2008}) states that when $V_h \in H^1 \cap H^0$ and $0 < h \leq 1$.
-The following holds:
+The inverse inequality for finite elements (lemma 4.5.3 \cite{Brenner2008}) states that when $V_h \in H^1 \cap H^0$ and $0 < h \leq 1$,
+the following holds:
 \begin{align*}
     |v|_1 &\lesssim h^{-1} ||v||_0
 \end{align*}
@@ -63,7 +64,7 @@ From this, we know:
 \begin{align}
     a(w_h, v_h) \lesssim |w_h|_1|v_h|_1 \lesssim h^{-2} ||w_h||_0||v_h||_0, \quad \forall w_h, v_h \in V_h \label{bilinear}
 \end{align}
-where the constants are independant of $h$.
+where the constants are independent of $h$.
 This shows that $a(\cdot,\cdot)$ is a bounded linear form over $V_h$ with respect to the $L_2$ norm.
 
 From here we can apply Riesz representation theorem to deduce that there exists a bounded linear operator $L_h:V_h\rightarrow V_h$ such that
@@ -71,15 +72,15 @@ From here we can apply Riesz representation theorem to deduce that there exists 
     a(w_h, v_h) &= (L_h w_h, v_h), \quad \forall w_h, v_h \in V_h
 \end{align*}
 
-Using the projection operator $P_h$ the problem can be rewritten to the equivalent system:
+Using the projection operator $P_h$, the problem can be rewritten to the equivalent system:
 \begin{align*}
     u_{h,t} + L_hu_h &= P_hf(t,u_h)\\
     u_h(0) &= P_hu_0
 \end{align*}
 
-\subsection{Estabilished Results}
+\subsection{Established Results}
 We now state the results given by Huang, et al\cite{Huang2022}.
-Begining with some assumptions:
+Beginning with some assumptions:
 
 \begin{assumption}\label{assump:mildgrowth}
     The function $f(t,\zeta)$ grows mildly with respect to $\zeta$.
@@ -96,7 +97,7 @@ Begining with some assumptions:
     \end{align*}
 \end{assumption}
 \begin{assumption}\label{assump:regularity}
-    The exact solution u(t) satisfiies the following regularity conditions:
+    The exact solution u(t) satisfies the following regularity conditions:
     \begin{align*}
         \text{sup}_{0\leq t \leq T}||u(t)||_{2,\Omega} \lesssim 1,\\
         \text{sup}_{0\leq t \leq T}||u_t(t)||_{L^\infty(\Omega)} \lesssim 1
@@ -104,17 +105,17 @@ Begining with some assumptions:
     Where the hidden constant may depend on $T$.
 \end{assumption}
 \begin{assumption}\label{assump:regularity2}
-    The exact solution u(t) satisfiies the following regularity conditions:
+    The exact solution u(t) satisfies the following regularity conditions:
     \begin{align*}
         \text{sup}_{0\leq t \leq T}||u_{tt}(t)||_{L^\infty(\Omega)} \lesssim 1
     \end{align*}
-    Where the hidden constant may depend on $T$.
+    where the hidden constant may depend on $T$.
 \end{assumption}
 
 We can now state the theorem that gives the error for the first order exponential integrator scheme.
 \begin{theorem}\label{theorem:standard1}
-    Suppost the function $f$ satisfies Assumptions \ref{assump:mildgrowth}\ref{assump:smooth}\ref{assump:regularity}.
-    There exists a constant $h_0 > 0$ such that for $h<h_0$, we have that the numerical solution given by:
+    Suppose the function $f$ satisfies Assumptions \ref{assump:mildgrowth} \ref{assump:smooth} \ref{assump:regularity}.
+    There exists a constant $h_0 > 0$ such that for $h<h_0$, we have the numerical solution given by:
     \begin{align*}
         u_h^{n+1} &= e^{-\tau L_h}u_h^n + \tau \varphi_1(-\tau L_h)P_hf(t_n,u_h^n)
     \end{align*}
@@ -122,13 +123,13 @@ We can now state the theorem that gives the error for the first order exponentia
     \begin{align*}
         ||u(t_n) - u_h^n||_1 &\lesssim \tau + h, \forall n =1,...,N_T
     \end{align*}
-    with a hidden constant that is independatn of $\tau$ and $h$.
+    with a hidden constant that is independent of $\tau$ and $h$.
 \end{theorem}
 
-As well as for the second order exponential integrator scheme.
+We also present the results for the second order exponential integrator scheme.
 \begin{theorem}\label{theorem:standard2}
-    Suppost the function $f$ satisfies Assumptions \ref{assump:mildgrowth}\ref{assump:smooth}\ref{assump:regularity} and \ref{assump:regularity2}.
-    There exists a constant $h_0 > 0$ such that for $h<h_0$, we have that the numerical solution given by:
+    Suppose the function $f$ satisfies Assumptions \ref{assump:mildgrowth} \ref{assump:smooth} \ref{assump:regularity} and \ref{assump:regularity2}.
+    There exists a constant $h_0 > 0$ such that for $h<h_0$, we have the numerical solution given by:
     \begin{align*}
         u_h^{n+1} &= e^{-\tau L_h}u_h^n + \tau (\varphi_1(-\tau L_h) - \frac{1}{c}\varphi_2(-\tau L_h))P_hf(t_n,u_h^n)\\
         &+\frac{1}{c}\varphi_2(-\tau L_h)P_hf(t_n + c\tau,e^{-c\tau L_h}u_h^n + c\tau\varphi_1(-c\tau L_h)P_hf(t_n,u_h^n))
@@ -137,14 +138,14 @@ As well as for the second order exponential integrator scheme.
     \begin{align*}
         ||u(t_n) - u_h^n||_1 &\lesssim \tau^2 + h, \forall n =1,...,N_T
     \end{align*}
-    with a hidden constant that is independant of $\tau$ and $h$.
+    with a hidden constant that is independent of $\tau$ and $h$.
 \end{theorem}
 
 \subsection{Extension to Krylov Methods}
 
 In this section, we will prove the main theorem that ties the error of the first order method to the Krylov methods.
-We begin by stating some lemma that we will need to prove this result.
-We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
+We begin by stating the lemmas that we will need to prove this result.
+We omit the proof of lemmas already proven by Huang\cite{Huang2022}.
 
 \begin{lemma} \label{lemma:Lipschitz}
     Suppose that the function $f$ satisfies assumption \ref{assump:mildgrowth}, and the exact solution satisfies \ref{assump:regularity}.
@@ -175,14 +176,14 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 \end{definition}
 
 \begin{lemma} \label{lemma:leqm}
-    We have that $||e_m^A|| \leq m$ when $A$ is negative semi-definate.
+    We have that $||e_m^A|| \leq m$ when $A$ is negative semi-definite.
 \end{lemma}
 \begin{proof}
     \begin{align*}
         ||e_m^A||_{op} &= ||e^{VHV^T}||_{op}\\
         &= ||V_me^HV_m^T||_{op}\\
         &\leq ||V_m||_{fro}||e^H||_{op}||V_m^T||_{fro}\\
-        \intertext{we use the fact that $A$ and hence $H$ is negative semi-definate to imply that all of the eigen values $\lambda$ of $H$ are such that $\lambda \leq 0$
+        \intertext{We use the fact that $A$ and hence $H$ is negative semi-definite to imply that all of the eigen values $\lambda$ of $H$ are such that $\lambda \leq 0$
         and hence we have that $||e^H||_{op} \leq e^0 = 1$. From here we see that}
         &\leq ||V_m||_{fro}||V_m^T||_{fro}\\
         \intertext{we now use the fact that the $m$ columns of $V_m$ are orthonormal to get}
@@ -193,10 +194,10 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 
 \begin{lemma} \label{lemma:LHnegativeSD}
     $-\tau L_h$ is negative semidefinite. 
-    This was briefly shown as part of a lemma previously \cite{Huang2022}, however we formally show it here.
+    This was briefly shown as part of a lemma previously by Huang \cite{Huang2022}. However, we formally show it here.
 \end{lemma}    
 \begin{proof}
-    As $a(\cdot,\cdot)$ a symetric bilinear operator, it can be seen that $L_h$ is a linear and symetric operator that acts on $V_h$.
+    As $a(\cdot,\cdot)$ a symmetric bilinear operator, it can be seen that $L_h$ is a linear and symmetric operator that acts on $V_h$.
     We also have by the Poincare inequality that for some $\alpha > 0$:
     \begin{align*}
         \alpha ||v_h||^2_0 \leq a(v_h, v_h), \quad \forall v_h \in V_h
@@ -210,7 +211,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 \end{proof}
 
 \begin{definition}
-    We write $u_{h,m}^n$ to denote the $n$th step of the exponential integrator method that uses a Krylov subspace of dimention $m$.
+    We write $u_{h,m}^n$ to denote the $n$th step of the exponential integrator method that uses a Krylov subspace of dimension $m$.
     We have that:
     \begin{align*}
         u_{h,m}^n &= e_m^{-\tau L_h} u_{h,m}^{n-1} + \tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1})
@@ -219,7 +220,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 \end{definition}
 
 \begin{lemma}
-    We claim that $u_{h,m}^n$ statisfies the following conditon:
+    We claim that $u_{h,m}^n$ satisfies the following condition:
     \begin{align*}
         ||u_{h,m}^n||_1 \lesssim (m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m)
     \end{align*}
@@ -233,7 +234,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
         ||u_{h,m}^n||_1 &= ||e_m^{-\tau L_h}u_{h,m}^{n-1} + \tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1})||_1\\
         &\leq ||e_m^{-\tau L_h}u_{h,m}^{n-1}||_1 + ||\tau \int^1_0e_m^{-\tau L_h(1-\theta)}d\theta P_hf(t, u_{h,m}^{n-1})||_1\\
         %&= ||V_me_m^{H}V_m^Tu_{h,m}^{n-1}|| + ||\tau \int^1_0V_me_m^{H(1-\theta)}V_m^Td\theta P_hf(t, u_{h,m}^{n-1})||_1\\
-        \intertext{we now apply lemmas \ref{lemma:LHnegativeSD} and \ref{lemma:leqm} to show that}
+        \intertext{We now apply lemmas \ref{lemma:LHnegativeSD} and \ref{lemma:leqm} to show that}
         &\leq m||u_{h,m}^{n-1}||_1 + \tau m ||P_hf(t_{n-1},u_{h,m}^{n-1})||_1\\
         \intertext{we have that $||P_hf(t,u)||_1 \lesssim ||u||_1+||P_hf(0,0)||_1$ by Lipschitz continuity of $f$ giving}
         &\lesssim m||u_{h,m}^{n-1}||_1 + \tau m (||u_{h,m}^{n-1}||_1 + ||P_hf(0,0)||_1)\\
@@ -242,7 +243,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
         &\lesssim (m-\tau m)^\frac{1}{\tau} + \tau m (\frac{1}{\tau} + (\frac{1}{\tau} -1)\tau m)\\
         &\lesssim (m-\tau m)^\frac{1}{\tau} + m (1 + (1 - \tau)\tau m)
     \end{align*}
-    with the bound on $P_hf(t,u_{h,m}^n)$ begin the result of Lipschitz continuity by taking $C=P_hf(t,0)$.
+    with the bound on $P_hf(t,u_{h,m}^n)$ being the result of Lipschitz continuity by taking $C=P_hf(t,0)$.
 \end{proof}
 \begin{definition}
     The error from the Krylov subspace approximation is given by $k(m,\tau, A)$.
@@ -296,7 +297,7 @@ We ommit the proof of lemmas already proven by Huang\cite{Huang2022}.
 
 We can now prove the main theorem
 \begin{theorem}
-    Suppost the function $f$ satisfies Assumptions \ref{assump:mildgrowth} \ref{assump:smooth} \ref{assump:regularity}.
+    Suppose the function $f$ satisfies Assumptions \ref{assump:mildgrowth} \ref{assump:smooth} \ref{assump:regularity}.
     There exists a constant $h_0 > 0$ such that for $h<h_0$ we have
     \begin{align*}
         ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n = 1,..,N_T
@@ -306,13 +307,13 @@ We can now prove the main theorem
     \begin{align*}
         ||u(t_n) - u_{h,m}^n||_1 &= ||u(t_n) - u_h^n + u_h^n - u_{h,m}^n||_1\\
         &\leq ||u(t_n) - u_h^n||_1 + ||u_h^n - u_{h,m}^n||_1\\
-        \intertext{By the triangle inequality. We can now use the previous theorems and lemmas to see that}
+        \intertext{by the triangle inequality. We can now use the previous theorems and lemmas to see that}
         &\leq \tau + h + k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n =1,...,N_T
     \end{align*}
 \end{proof}
 
 \begin{corollary}
-    Using the above theorem alongsize what we already know about the convergence rates of Krylov subspaces we can observe the following:
+    Using the above theorem alongside what we already know about the convergence rates of Krylov subspaces we can observe the following:
     \begin{align*}
         ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + 2\beta \frac{(\tau \rho)^m e^{\tau \rho}}{m!}(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n = 1,..,N_T
     \end{align*}
