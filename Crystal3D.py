@@ -29,6 +29,11 @@ def test1(gridView):
     maxVal = Constant(10000, "max")
     offset = Constant(1, "offset")
 
+    @gridFunction(gridView,name="random",order=1)
+    def random(x):
+        return 0.2*np.random.rand(1)[0]-0.1
+    np.random.seed(100)
+
     #Tm = Constant(1, "T_m")
     Tc = Constant(200, "T_c")
     Tm0 = Constant(242, "T_m0")
@@ -85,6 +90,6 @@ def test1(gridView):
 
     dUdt = (alpha_hat * inner(grad(u[1]),grad(v[1])))# + K_hat * dpsidt(v[1]))
 
-    return -(dUdt + dpsidt(v[0])) * dx, 200, 0.1, initial, None, None
+    return -(dUdt + (1+random(x)) * dpsidt(v[0])) * dx, 100, 0.1, initial, None, None
 
     

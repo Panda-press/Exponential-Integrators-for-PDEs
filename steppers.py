@@ -22,7 +22,7 @@ import random
 from scipy.sparse.linalg import expm_multiply
 expm_sci = [lambda A,x,m: expm_multiply(A,x),"Scipy"]
 from Stable_Lanzcos import LanzcosExp, Lanzcos
-expm_lanzcos = [lambda A,x,m: LanzcosExp(A,x,m),"Lanzcos"]
+expm_lanzcos = [lambda A,x,m: LanzcosExp(A,x,m),"Lanczos"]
 from NBLA import NBLAExp
 expm_nbla = [lambda A,x,m: NBLAExp(A,x,m),"NBLA"]
 from Arnoldi import ArnoldiExp, Arnoldi

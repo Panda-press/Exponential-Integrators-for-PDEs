@@ -15,7 +15,8 @@ x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space),
 
 def test2(gridView):
     eps = Constant(0.01,"eps")
-    M = Constant(1, "M")
+    M0 = Constant(0.5, "M0")
+    M = M0*(1-u[0])*(1+u[0])
     Fdash = u[0] * (u[0]**2 - 1)
     a = (- M * inner(grad(u[1]), grad(v[0]))
         + (Fdash * v[1] + eps*eps * inner(grad(u[0]), grad(v[1]))))
@@ -25,6 +26,6 @@ def test2(gridView):
         return 1.8*np.random.rand(1)[0] -0.9
     np.random.seed(100)
 
-    return -a * dx, 1, 0.001, [u0,0], None, None
+    return -a * dx, 0.1, 0.001, [u0,0], None, None
 
 
