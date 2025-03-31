@@ -19,6 +19,8 @@ However, for our numerical experiments we compute on the space $\Omega=(-16,16)\
 \begin{align*}
     \nabla u \cdot \hat n &= g \text{ for $g = \nabla \hat u \cdot \hat n$}
 \end{align*}
+Where $\hat n$ is the unit normal on the boundary.
+
 Where $u$ is the solution, we write it in weak form:
 \begin{align*}
     \dot u&=\Delta u+u(u-\frac14)(1-u)\\
@@ -90,6 +92,7 @@ These operator calls are needed for computing $N$ which is used with the matrix 
 \end{figure}
 
 As expected, when a larger Krylov subspace is used, more calls to the operator are required.
+This can be seen by comapring the first order exponential integrator with Krylov sizes 16 and 32, where both are identical but the latter has been shifted to the right, using double the number of operator calls.
 The backward Euler method appears somewhat erratic.
 This is due to the use of an internal Newton solver which does not have a fixed requirement for number of calls to the operator, instead, running until a given tolerance is reached.
 We also observe that the exponential methods outperform the BE by achieving a lower error with fewer calls to the operator.

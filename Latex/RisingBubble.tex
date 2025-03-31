@@ -2,7 +2,45 @@
 
 Here we will look into computing a rising bubble, in order to investigate how well these solvers work for problems in fluid dynamics.
 \subsection{Formulation of Problem}
-
+The problem is given by the following equations\cite{Bryan2002}:
+\begin{align*}
+    \frac{\partial u_i}{\partial t} &= -\frac{\partial u_i u_j}{\partial x_j} + u_i\frac{\partial u_j}{\partial x_j} - c_p \theta \frac{\partial \pi}{\partial x_i} \\
+    \frac{\partial \pi}{\partial t} &= -\frac{\partial u_j \pi}{\partial x_j} + \pi\frac{\partial u_j}{\partial x_j} - \pi \frac{R}{c_v}\frac{\partial u_j}{\partial x_j} \\
+    \frac{\partial \theta}{\partial t} &= -\frac{\partial u_j \theta}{\partial x_j} + \theta\frac{\partial u_j}{\partial x_j} - \theta (\frac{R}{c_{vml}} - \frac{R}{c_v})\frac{\partial u_j}{\partial x_j}
+\end{align*}
+Where Einstine summing notation is used.
+We use a domain $\Omega = (0,1000) \times (0,2000)$.
+We enforce reflective boundary conditions along the sides of the domain.
+The initial condtions are as follows:
+\begin{align*}
+    u_i &= 0\\
+    \pi(0,x,y) &= \pi_0(x,y)\\
+    \theta &= 0
+\end{align*}
+where
+\[
+    \pi_0(x,y)= 
+\begin{cases}
+    1& \text{if } sqrt{(x-500)^2+(z-520)^2}\leq 50\\
+    e^{ \frac{-(r-50)^2}{100^2}},              & \text{otherwise}
+\end{cases}
+\]
 \subsection{Numerical Solutions}
+We run our simulations on a finite volume mesh.
+The grid is rectangular and of dimension $64\times 128$.
+We use a timestep of $\tau = 1.8$
 
-\subsection{Performance}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \caption{from first order exponential integrator with Krylov size $32$}
+        \label{fig:first order 8 0.5}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{example-image-b} % Change filename to your image
+        \caption{from first order exponential integrator with Krylov size $64$}
+        \label{fig:first order 10 0.5}
+    \end{minipage}\hfill
+\end{figure}

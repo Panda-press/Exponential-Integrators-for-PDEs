@@ -12,21 +12,22 @@ By discretizing in space by method of finite elements or finite difference, we c
     u_{h,t} &= -Au_h + f(u_h)
 \end{align*}
 From here, we notice that we have a linear term $Au_h$ where $A$ is a matrix, $u_h$ is a vector and a non-linear term $f(u_h)$.
-The exact solution to this equation can be written in the form \cite{Hochbruck2010}:
+The exact solution to this equation can be written in the form:
 \begin{align*}
-    u_h(t) &= e^{-At}u_{h}(0) + \int^t_0 e^{-(t-\tau)A}fu_{h}(\tau)d\tau
+    u_h(t) &= e^{-At}u_{h}(0) + \int^t_0 e^{-(t-\tau)A}f(u_{h}(\tau))d\tau
 \end{align*}
+as described by Hochbruck \cite{Hochbruck2010}.
 Exponential integrator methods attempt to approximate the above equation.
 The challenge for these systems is that for large $A$, computing its exponential can be too computationally demanding.
 
 There exist many possible ways to compute approximations to the matrix exponential such as in Moler Et al's Nineteen Dubious Ways to Compute the Exponential of a Matrix\cite{Moler2003}.
-Of most intrest to us are the advancements in Krylov subspace methods such as the Arnoldi and Lanczos algorithms.
+Of most interest to us are the advancements in Krylov subspace methods such as the Arnoldi and Lanczos algorithms\cite{OJALVO1970}.
 These methods work by projecting the matrix onto a smaller space, the Krylov subspace, where computing the matrix exponential is cheaper before projecting it back up to the full space.
 In this work, we will bring these two areas of exponential integrators and Krylov subspace approximations together, with the objective of finding more efficient and accurate numerical solutions to PDEs.
 
 We will begin by introducing the exponential integrator schemes, followed by the Krylov methods, showing the connection between the two.
-Established analytical results for both Krylov and exponential integrator methods will be stated.
+Established analytical results for both Krylov and exponential integrator methods will be stated from the work of Saad, Y. \cite{Saad1992} and Huang Et al. \cite{Huang2022} respectivly.
 Following on from this, we provide our own analysis that ties these methods together, showing how the error from the Krylov methods and exponential integrators interact when used in conjunction with one another.
 Experimental results will also be provided, demonstrating performance and accuracy compared to other numerical methods, namely backwards Euler.
-We will then apply these combined methods to phase boundary problems, in order to model dendric cyrstal growth.
+We will then apply these combined methods to phase boundary problems, in order to model dendritic crystal growth.
 Finally, we will show the application of these methods beyond parabolic PDEs.

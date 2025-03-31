@@ -4,9 +4,9 @@ In this section, we look into applying these exponential methods to the computat
 Specifically, we will look into solutions to the double slit wave problem:
 
 \subsection{Formulation of the Problem}
-Where our domain is given by $\Omega$ as seen in the figure, we write the problem as:
+Where our domain is given by $\Omega$ as seen in figure \ref{fig:waveOmega}, we write the problem as:
 \begin{align*}
-    \psi_{tt}\psi &= \nabla \psi \quad x \in \Omega, 0<t\leq T
+    \psi_{tt} &= \nabla \psi \quad x \in \Omega, 0<t\leq T
     \psi(0,x) = 0 \quad x \in \Omega
 \end{align*}
 where $T=3$ is our end time for the simulation.
@@ -17,19 +17,23 @@ We implement the following Dirichlet boundary condition:
 \end{align*}
 this will be the source of our waves.
 The remaining boundaries use homogeneous Neumann boundary conditions.
-Our methods, both exponential and backwards Euler, require a first order equation with respect to the derivatives of $t$.
+Our methods, both exponential and backwards Euler, in section \ref{section:methods} require a first order equation with respect to the derivatives of $t$.
 This means that we will need to use a substitution.
 We can use $\psi_t = -p$ to get the following:
 \begin{align*}
     \psi_t &= -p\\
     p_t &= \nabla \psi\\
 \end{align*}
+with
+\begin{align*}
+    p(0,x,y) &= 0
+\end{align*}
 This equation is now compatible with the methods that we are using.
 
 \subsection{Numerical Solutions}
 We can now compare backwards Euler and the two exponential integrator methods.
-First, we show the the domain as well as a solution computed with the backwards Euler method.
-For the backwards Euler, a timestep of $\tau = 0.001$ was found to be optimal, with larger timesteps causing numerical issues, leading to inaccuracy and smaller timesteps requiring excessive computation.
+First, we show that the domain as well as a solution computed with the backwards Euler method.
+For the backwards Euler, a timestep of $\tau = 0.001$ was found to be optimal, with larger timesteps causing numerical issues, leading to instability and smaller timesteps requiring excessive computation.
 
 \begin{figure}[H]
     \centering
@@ -88,5 +92,6 @@ We present the methods used and the operator calls in the table below:
 
 We observe that the backwards Euler method requires significantly more calls to the operator than both the first and second order exponential methods.
 The second order method requires more calls to the operator than the first order method.
-This suggest that the the exponential methods may be effective for computing solutions to the wave equation.
+Both exponential methods required a similar timestep size $\tau$.
+This suggests that the the exponential methods may be effective for computing solutions to the wave equation.
 This is significant as it shows the possible application of these methods to problems beyond parabolic PDEs.
