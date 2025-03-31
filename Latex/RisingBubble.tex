@@ -6,41 +6,97 @@ The problem is given by the following equations\cite{Bryan2002}:
 \begin{align*}
     \frac{\partial u_i}{\partial t} &= -\frac{\partial u_i u_j}{\partial x_j} + u_i\frac{\partial u_j}{\partial x_j} - c_p \theta \frac{\partial \pi}{\partial x_i} \\
     \frac{\partial \pi}{\partial t} &= -\frac{\partial u_j \pi}{\partial x_j} + \pi\frac{\partial u_j}{\partial x_j} - \pi \frac{R}{c_v}\frac{\partial u_j}{\partial x_j} \\
-    \frac{\partial \theta}{\partial t} &= -\frac{\partial u_j \theta}{\partial x_j} + \theta\frac{\partial u_j}{\partial x_j} - \theta (\frac{R}{c_{vml}} - \frac{R}{c_v})\frac{\partial u_j}{\partial x_j}
+    \frac{\partial \theta}{\partial t} &= -\frac{\partial u_j \theta}{\partial x_j} + \theta\frac{\partial u_j}{\partial x_j}
 \end{align*}
-Where Einstine summing notation is used.
+Where Einstein summing notation is used.
 We use a domain $\Omega = (0,1000) \times (0,2000)$.
+The constatns are given by:
+\begin{align*}
+    \begin{matrix}
+    c_p = 1005 & c_v = 717.95 \\
+    R = c_p - c_v 
+    \end{matrix}
+\end{align*}
+
 We enforce reflective boundary conditions along the sides of the domain.
 The initial condtions are as follows:
 \begin{align*}
     u_i &= 0\\
-    \pi(0,x,y) &= \pi_0(x,y)\\
+    \pi(0,x,y) &= \pi_0\\
     \theta &= 0
 \end{align*}
-where
-\[
-    \pi_0(x,y)= 
-\begin{cases}
-    1& \text{if } sqrt{(x-500)^2+(z-520)^2}\leq 50\\
-    e^{ \frac{-(r-50)^2}{100^2}},              & \text{otherwise}
-\end{cases}
-\]
+where $\pi_0$ is shown below
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{1\textwidth}
+        \includegraphics[width=1\textwidth]{Bubble/initial.png} % Change filename to your image
+        \caption{Initial Condition of $\pi_0$}
+        \label{fig:first order 8 0.5}
+    \end{minipage}
+\end{figure}
 \subsection{Numerical Solutions}
 We run our simulations on a finite volume mesh.
 The grid is rectangular and of dimension $64\times 128$.
-We use a timestep of $\tau = 1.8$
-
+We use a timestep of $\tau = 1.8$ as this was optimal when used with the backwards Euler method.
+We plot the value of $\pi$ at time $t=4000$.
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \includegraphics[width=1\textwidth]{Bubble/EXP1ARN32.png} % Change filename to your image
         \caption{from first order exponential integrator with Krylov size $32$}
         \label{fig:first order 8 0.5}
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-b} % Change filename to your image
+        \includegraphics[width=1\textwidth]{Bubble/EXP1ARN64.png} % Change filename to your image
         \caption{from first order exponential integrator with Krylov size $64$}
         \label{fig:first order 10 0.5}
     \end{minipage}\hfill
 \end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Bubble/EXP2ARN32.png} % Change filename to your image
+        \caption{from second order exponential integrator with Krylov size $32$}
+        \label{fig:first order 8 0.5}
+    \end{minipage}\hfill
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \includegraphics[width=1\textwidth]{Bubble/EXP2ARN64.png} % Change filename to your image
+        \caption{from second order exponential integrator with Krylov size $64$}
+        \label{fig:first order 10 0.5}
+    \end{minipage}\hfill
+\end{figure}
+For Krylov sizes above $64$ the computed solution didn't change.
+The solution computed with a Krylov size of $64$ was the same as the solution by the backwards Euler method as well as for smaller $\tau$.
+We therefore conclude that this is close to the true solution.
+
+\subsection{Performance}
+We now observe the performance differences between backwards Euler and the exponential integrators.
+The number of calls to the operator is again used in order to measure performance.
+We present the methods used and the operator calls in the table below:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{| c | c | c | c |}
+    \hline
+    Method & Krylov size & Operator Calls\\
+    \hline
+    Backwards Euler & - & 156879 \\
+    First Order Exponential & 32 & 151640 \\
+    First Order Exponential & 64 & 303280 \\
+    Second Order Exponential & 32 & 227460 \\
+    Second Order Exponential & 64 & 454920 \\
+    \hline
+    \end{tabular}
+    \caption{Performance of Various Methods}
+    \label{tab:reduced_data}
+\end{table}
+
+We see that these exponential integrator methods required more operator calls that the backwards Euler method to achieve comparable results for this timestep size.
+
+
+Further studies of these methods could include finding the optimal tau for these methods that minimises the number of operator calls.
+It would also make sense to explore the possible values of $m$ in between 32 and 64 as we would expect to find that these methods converge to the expceted solution for a Krylov size between these two values.
+However, due to time constraints on the project it has not been possible to gather this information.
+
