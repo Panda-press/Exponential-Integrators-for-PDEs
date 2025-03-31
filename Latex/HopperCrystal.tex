@@ -1,9 +1,9 @@
 \section{3D Crystal}
-We now begin looking into the modeling of a 3D Crystal.
+We now investigate the modeling of a 3D crystal.
 \subsection{Formulation of Problem}
 We employ the phase field model as described by \cite{Bollada2023}.
 \begin{align*}
-    \dot \phi &= \nabla \cdot \frac{\partial}{\partial \nabla \phi}(\frac12 A^2)-\frac{Omega'(\phi)}{\delta^2} - \frac{g'(\phi)(\mu_0-\mu)\Delta c}{\lambda \delta^2}\\
+    \dot \phi &= \nabla \cdot \frac{\partial}{\partial \nabla \phi}(\frac12 A^2)-\frac{\Omega'(\phi)}{\delta^2} - \frac{g'(\phi)(\mu_0-\mu)\Delta c}{\lambda \delta^2}\\
     \dot \mu &= a\nabla \cdot D \nabla \mu - a \Delta c g'(\phi)\dot \phi\\
     \phi(0,x) &= \phi_{t=0}\\
     \mu(0,x) &= \mu_{t=0}
@@ -34,37 +34,48 @@ where we have that $A_0 =1 -3\epsilon$ and $\bar \epsilon = \frac{4\epsilon}{1-3
 
 
 \subsection{Numerical Solutions}
-Here we present the numerical solution with the cubic anisotropy at time $t=400$
+For both these methods, we were limited by computing power in order to properly run these simulations with sufficiently small spacial and temporal discretization to yield reasonable results.
+The orginal simulation took 10s of hours on workstation computers.
+Likely due to isses with optimisation and paralelism, we were unable to properly scale to the required size.
+As a result we present solutions only after a smaller number of time steps in order to provide a limited demonstration of these methods working in 3 dimientions and to show the effect of different anisotropies on the formation of crystals.
+Here we present the numerical solution with the cubic anisotropy at time $t=400$.
+For this we use an adaptive grid mesh and $\tau = 0.1$.
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \includegraphics[width=1\textwidth]{Hopper/Square Hopper Crystal EXP1ARN.png} % Change filename to your image
         \caption{from first order exponential integrator with Krylov size $16$}
         \label{fig:first order 8 0.5}
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
         \includegraphics[width=1\textwidth]{example-image-b} % Change filename to your image
-        \caption{from first order exponential integrator with Krylov size $16$}
+        \caption{from second order exponential integrator with Krylov size $16$}
         \label{fig:first order 10 0.5}
     \end{minipage}\hfill
 \end{figure}
 We observe that the cyrstal seed has now formed a cubic shape.
+Had the simulation been able to run for longer with a smaller time size, we would expect the edges and corners to protrude outwards forming a Hopper crystal.
 
 
-Here we present the numerical solution with the octohedral anisotropy at time $t=?$
+Here we present the numerical solution with the octohedral anisotropy at time $t=20$
+For this we use an adaptive grid mesh and $\tau = 0.01$.
 \begin{figure}[H]
     \centering
     \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=1\textwidth]{example-image-a} % Change filename to your image
+        \includegraphics[width=1\textwidth]{Hopper/Oct Hopper EXP1ARN.png} % Change filename to your image
         \caption{from first order exponential integrator with Krylov size $16$}
         \label{fig:first order 8 0.5}
     \end{minipage}\hfill
     \centering
     \begin{minipage}{0.49\textwidth}
         \includegraphics[width=1\textwidth]{example-image-b} % Change filename to your image
-        \caption{from first order exponential integrator with Krylov size $16$}
+        \caption{from second order exponential integrator with Krylov size $16$}
         \label{fig:first order 10 0.5}
     \end{minipage}\hfill
 \end{figure}
-We observe that the cyrstal seed has now formed into the expected shape.
+We observe that the crystal seed has now formed into the expected shape.
+Along the edges and corners of the shape numerical instability can be observed.
+This instability lines up with the width of the spacial discretization.
+We would expect dendrites to pertrude outwards from the corners at later times.
+

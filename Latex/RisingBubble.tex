@@ -1,6 +1,6 @@
 \section{Rising Bubble}
 
-Here we will look into computing a rising bubble, in order to investigate how well these solvers work for problems in fluid dynamics.
+Here we will look into computing a rising bubble, in order to investigate how well these methods work for problems in fluid dynamics.
 \subsection{Formulation of Problem}
 The problem is given by the following equations\cite{Bryan2002}:
 \begin{align*}
@@ -8,9 +8,9 @@ The problem is given by the following equations\cite{Bryan2002}:
     \frac{\partial \pi}{\partial t} &= -\frac{\partial u_j \pi}{\partial x_j} + \pi\frac{\partial u_j}{\partial x_j} - \pi \frac{R}{c_v}\frac{\partial u_j}{\partial x_j} \\
     \frac{\partial \theta}{\partial t} &= -\frac{\partial u_j \theta}{\partial x_j} + \theta\frac{\partial u_j}{\partial x_j}
 \end{align*}
-Where Einstein summing notation is used.
+where Einstein's summing notation is used.
 We use a domain $\Omega = (0,1000) \times (0,2000)$.
-The constatns are given by:
+The constants are given by:
 \begin{align*}
     \begin{matrix}
     c_p = 1005 & c_v = 717.95 \\
@@ -93,10 +93,10 @@ We present the methods used and the operator calls in the table below:
     \label{tab:reduced_data}
 \end{table}
 
-We see that these exponential integrator methods required more operator calls that the backwards Euler method to achieve comparable results for this timestep size.
+We see that these exponential integrator methods required more operator calls than the backwards Euler method to achieve comparable results for this timestep size.
 
 
 Further studies of these methods could include finding the optimal tau for these methods that minimises the number of operator calls.
 It would also make sense to explore the possible values of $m$ in between 32 and 64 as we would expect to find that these methods converge to the expceted solution for a Krylov size between these two values.
-However, due to time constraints on the project it has not been possible to gather this information.
+However, due to time constraints on the project, it has not been possible to gather this information.
 
