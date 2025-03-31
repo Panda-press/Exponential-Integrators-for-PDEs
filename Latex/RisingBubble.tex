@@ -1,6 +1,9 @@
 \section{Rising Bubble}
 
 Here we will look into computing a rising bubble, in order to investigate how well these methods work for problems in the modeling of atmospheric processes.
+This also helps to demonstrate whether these methods can handle advection.
+This problem will be modeled on a finite volume space.
+This will allow us to investigate whether or not the performance improvements are limited to finite element approximations.
 \subsection{Formulation of Problem}
 The problem is given by the following equations\cite{Bryan2002}:
 \begin{align*}
@@ -96,7 +99,8 @@ We present the methods used and the operator calls in the table below:
 We see that these exponential integrator methods required more operator calls than the backwards Euler method to achieve comparable results for this timestep size.
 
 
-Further studies of these methods could include finding the optimal tau for these methods that minimises the number of operator calls.
+Further study could include finding the optimal tau for these methods that minimises the number of operator calls.
 It would also make sense to explore the possible values of $m$ in between 32 and 64 as we would expect to find that these methods converge to the expceted solution for a Krylov size between these two values.
+We would also like to investigate how these methods perform for discontinuous galerkin spaces for the rising bubble problem.
 However, due to time constraints on the project, it has not been possible to gather this information.
 

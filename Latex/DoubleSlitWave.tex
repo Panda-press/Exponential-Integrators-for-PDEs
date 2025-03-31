@@ -1,6 +1,9 @@
 \section{Double Slit Wave Model}
 
 In this section, we look into applying these exponential methods to the computation of solutions to the wave equation.
+While the problem is linear, we will need to rewrite the problem as a system of equations that are first order with respect to time.
+In doing so, the matrix will be antisymmetric.
+This prohibits the use of the Lanczos algorithm, requiring Arnoldi to be used, which is more expensive.
 Specifically, we will look into solutions to the double slit wave problem:
 
 \subsection{Formulation of Problem}

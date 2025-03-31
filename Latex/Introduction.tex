@@ -1,6 +1,6 @@
 \section{Introduction}
 
-Parabolic PDEs can be used to model a wide array of physical phenomona in enginering and the natural sciences, such as heat flow, reaction diffusion and phase boundary problems.
+Parabolic PDEs can be used to model a wide array of physical phenomona in engineering and the natural sciences, such as heat flow, reaction diffusion and phase boundary problems.
 Therefore, the development of efficient and accurate methods by which numerical solutions to these PDEs can be computed, is of great importance.
 One possible approach is the use of exponential integrators.
 In order to illustrate these methods, consider briefly the following PDE:
@@ -23,10 +23,12 @@ The challenge for these systems is that for large $A$, computing its exponential
 There exist many possible ways to compute approximations to the matrix exponential such as in Moler Et al's Nineteen Dubious Ways to Compute the Exponential of a Matrix\cite{Moler2003}.
 Of most interest to us are the advancements in Krylov subspace methods such as the Arnoldi and Lanczos algorithms\cite{OJALVO1970}.
 These methods work by projecting the matrix onto a smaller space, the Krylov subspace, where computing the matrix exponential is cheaper before projecting it back up to the full space.
+Numerical analysis has been developed by Y. Saad \cite{Saad1992}, Hochbruck Et al.\cite{MarlisHochbruck1997} and others, showing that these methods converge quickly when used to compute the exponential of a matrix.
+Work has also been done by I. U. Ojalovo Et al. \cite{OJALVO1970} that has improved the numerical stability of the Lanczos algorithm.
 In this work, we will bring these two areas of exponential integrators and Krylov subspace approximations together, with the objective of finding more efficient and accurate numerical solutions to PDEs.
 
 We will begin by introducing the exponential integrator schemes, followed by the Krylov methods, showing the connection between the two.
-Established analytical results for both Krylov and exponential integrator methods will be stated from the work of Saad, Y. \cite{Saad1992} and Huang Et al. \cite{Huang2022} respectivly.
+Established analytical results for both Krylov and exponential integrator methods will be stated from the work of Saad, Y. \cite{Saad1992} and Huang Et al. \cite{Huang2022} respectively.
 Following on from this, we provide our own analysis that ties these methods together, showing how the error from the Krylov methods and exponential integrators interact when used in conjunction with one another.
 Experimental results will also be provided, demonstrating performance and accuracy compared to other numerical methods, namely backwards Euler.
 We will then apply these combined methods to phase boundary problems, in order to model dendritic crystal growth.
