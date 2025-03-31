@@ -159,7 +159,7 @@ We omit the proof of lemmas already proven by Huang\cite{Huang2022}.
     \end{align*}
 \end{lemma}
 
-\begin{lemma}
+\begin{lemma} \label{lemma:Hnegatvesemidefinite}
     Consider a Krylov approximation given by $V_m^TAV_m = H$ with respect to a vector $v$ of depth $m$.
     If $A$ is negative semi-definite then so is $H$.
 \end{lemma}
@@ -176,20 +176,23 @@ We omit the proof of lemmas already proven by Huang\cite{Huang2022}.
 \end{definition}
 
 \begin{lemma} \label{lemma:leqm}
-    We have that $||e_m^A|| \leq m$ when $A$ is negative semi-definite.
+    We have that $||e_m^A||_1 \leq 1$ when $A$ is negative semi-definite.
 \end{lemma}
 \begin{proof}
-    \begin{align*}
-        ||e_m^A||_{op} &= ||e^{VHV^T}||_{op}\\
-        &= ||V_me^HV_m^T||_{op}\\
-        &\leq ||V_m||_{fro}||e^H||_{op}||V_m^T||_{fro}\\
-        \intertext{We use the fact that $A$ and hence $H$ is negative semi-definite to imply that all of the eigen values $\lambda$ of $H$ are such that $\lambda \leq 0$
-        and hence we have that $||e^H||_{op} \leq e^0 = 1$. From here we see that}
-        &\leq ||V_m||_{fro}||V_m^T||_{fro}\\
-        \intertext{we now use the fact that the $m$ columns of $V_m$ are orthonormal to get}
-        &= \sqrt{m} \sqrt{m}\\
-        &= m
-    \end{align*}
+    If $A$ is negative semi-definite then so is $H$ by lemma \ref{lemma:Hnegatvesemidefinite} and hence so is $VHV^T$.
+    From here we can see that $||e_m^A||_1 \leq 1$
+    Where we consider the matrix $VHV^T$ an operator on the space $V_h$
+    % \begin{align*}
+    %     ||e_m^A||_{op} &= ||e^{VHV^T}||_{op}\\
+    %     &= ||V_me^HV_m^T||_{op}\\
+    %     &\leq ||V_m||_{fro}||e^H||_{op}||V_m^T||_{fro}\\
+    %     \intertext{We use the fact that $A$ and hence $H$ is negative semi-definite to imply that all of the eigen values $\lambda$ of $H$ are such that $\lambda \leq 0$
+    %     and hence we have that $||e^H||_{op} \leq e^0 = 1$. From here we see that}
+    %     &\leq ||V_m||_{fro}||V_m^T||_{fro}\\
+    %     \intertext{we now use the fact that the $m$ columns of $V_m$ are orthonormal to get}
+    %     &= \sqrt{m} \sqrt{m}\\
+    %     &= m
+    % \end{align*}
 \end{proof}
 
 \begin{lemma} \label{lemma:LHnegativeSD}
@@ -317,7 +320,16 @@ We can now prove the main theorem
 \begin{corollary}
     Using the above theorem alongside what we already know about the convergence rates of Krylov subspaces we can observe the following:
     \begin{align*}
-        ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + 2\beta \frac{(\tau \rho)^m e^{\tau \rho}}{m!}(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n = 1,..,N_T
+        ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + 2 \frac{(\tau \rho)^m e^{\tau \rho}}{m!}h(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau}), \forall n = 1,..,N_T
     \end{align*}
     where $||L_h|| \lesssim \rho$.
 \end{corollary}
+\begin{proof}
+    \begin{align*}
+        ||u(t_n) - u_{h,m}^n||_1 &\lesssim \tau + h + k(m,\tau, L_h)(m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})\\
+        &\lesssim \tau + h + (m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})max_{||v||_1=1}||e^{\tau L_h}v - V_m e_m^{L_h}V^T_mv||_1\\
+        &\lesssim \tau + h + (m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})h^{\frac12}max_{||v||_1=1}||e^{\tau L_h}v - V_m e_m^{L_h}V^T_mv||_{fro}\\
+        &\lesssim \tau + h + (m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})h^{\frac12}max_{||v||_1=1}||v||_{fro}||e^{\tau L_h}\frac{v}{||v||_{fro}} - V_m e_m^{L_h}V^T_m\frac{v}{||v||_{fro}}||_{fro}\\
+        &\lesssim \tau + h + (m^\frac{1}{\tau} + m + 1 + \frac{1}{\tau})h \frac{(\tau \rho)^m e^{\tau \rho}}{m!}
+    \end{align*}
+\end{proof}

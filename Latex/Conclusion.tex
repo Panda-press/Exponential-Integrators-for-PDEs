@@ -1,3 +1,14 @@
 \section{Conclusion}
 
-In summary, this has been a very successful project.
+This project has investigated the use of Krylov subspace methods, specifically Arnoldi and Lanczos alongside exponential integrators to provide numerical solutions to PDEs.
+We have been able to demonstrate that this combination of methods can provide accurate solutions to PDEs with reduced computational cost relative to the backwards Euler method.
+We have also begun to develop some error analysis of these methods in order to gain insight into how these Krylov methods affect the rate of convergence.
+These methods show much promise for parabolic PDEs, especially phase boundary problems such as crystal growth.
+
+Throughout this project, the size of the Krylov subspace played an important role in determining the accuracy of these results as well as performance demands.
+Deeper Krylov subspaces yielded lower error, but had the downside of incurring a greater computational cost.
+Further research could focus on how adapting the depth of this Krylov subspace dynamically during run time could improve performance such as with the KIOPS\cite{Gaudreault2018} method.
+
+While much of our work focused on parabolic PDEs, we also showed that these methods may have possible application beyond the scope of parabolic PDEs.
+These methods appeared effective for modeling the wave equation as well as showing potential in the modeling of atmospheric processes.
+Further work could focus on applying these methods to a wider range of problems in order to properly understand the extent of their application.
