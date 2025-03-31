@@ -13,13 +13,13 @@ and where the problem is defined as follows:
     u_t&=\Delta u+u(u-\frac14)(1-u) \text{ $(x,y,t)\in \mathbb{R} \times (-1,1) \times [0, 8]$}\\
     u_0(x, y) &= \hat u(x,y, 0)
 \end{align*}
-With homogeneous Neumann boundary conditions along the top and bottom of the domain.
+with homogeneous Neumann boundary conditions along the top and bottom of the domain.
 
-However, for our numerical experiments we compute on the space $\Omega=(-16,16)\times(-1,1)$ and enforce the following Neumann boundary conditions along the left and right boundaries.
+However, for our numerical experiments we compute on the space $\Omega=(-16,16)\times(-1,1)$ and enforce the following Neumann boundary conditions along the left and right boundaries:
 \begin{align*}
     \nabla u \cdot \hat n &= g \text{ for $g = \nabla \hat u \cdot \hat n$}
 \end{align*}
-Where $\hat n$ is the unit normal on the boundary.
+where $\hat n$ is the unit normal on the boundary.
 
 Where $u$ is the solution, we write it in weak form:
 \begin{align*}
@@ -43,7 +43,7 @@ We compare the backward Euler, first and second order exponential methods over g
 \subsubsection{Experimental Results}
 
 Below, we show the $L_2$ error with respect to the time step $\tau$.
-Where in the legend EXP1LAN 16 denotes the first order method with equipped with the Lanzcos algorithm, Krylov size 16, likewise for EXP2LAN and the second order method.
+Where in the legend EXP1LAN 16 denotes the first order method equipped with the Lanczos algorithm, Krylov size 16, likewise for EXP2LAN and the second order method.
 BE denotes the backwards Euler method.
 
 \begin{figure}[H]
@@ -64,13 +64,13 @@ BE denotes the backwards Euler method.
 Firstly, note that all of the methods tested converge, tending towards an apparent minimum error, with the exponential methods levelling out.
 This minimum error is lower for a finer spacial discretization suggesting that the minimum error is the result of the spacial discretization.
 The Krylov methods converge faster than the backwards Euler method for a Krylov size equal to or larger than 32 as shown by the steeper graph.
-The performance of the first and second order methods seem simillar both in terms of error and rate of convergence.
-We notice that when a smaller Krylov subspace, is used the exponential methods only start to converge for a sufficiently small $\tau$.
+The performance of the first and second order methods seem similar both in terms of error and rate of convergence.
+We notice that, when a smaller Krylov subspace is used, the exponential methods only start to converge for a sufficiently small $\tau$.
 Likewise, when these methods start to converge, we observe that they perform similarly to the methods using a larger subspace.
 However, they will require fewer operator calls.
 This suggests that, for sufficiently small timesteps, a shallower subspace may suffice.
 In contrast, larger timesteps require a deeper Krylov subspace.
-As a result, it is important to look into whether it is more efficient to have a smaller Krylov subspace and $\tau$ or a larger space with corresponding larger $\tau$.
+As a result, it is important to look into whether it is more efficient to have a smaller Krylov subspace and $\tau$ or a larger space with correspondingly larger $\tau$.
 
 Next we will look into operator calls in order to quantify this difference in performance.
 We compare the error with the number of calls to the operator.
@@ -92,8 +92,8 @@ These operator calls are needed for computing $N$ which is used with the matrix 
 \end{figure}
 
 As expected, when a larger Krylov subspace is used, more calls to the operator are required.
-This can be seen by comapring the first order exponential integrator with Krylov sizes 16 and 32, where both are identical but the latter has been shifted to the right, using double the number of operator calls.
-The backward Euler method appears somewhat erratic.
+This can be seen by comparing the first order exponential integrator with Krylov sizes 16 and 32, where both are identical but the latter has been shifted to the right, using double the number of operator calls.
+The backwards Euler method appears somewhat erratic.
 This is due to the use of an internal Newton solver which does not have a fixed requirement for number of calls to the operator, instead, running until a given tolerance is reached.
 We also observe that the exponential methods outperform the BE by achieving a lower error with fewer calls to the operator.
 We also see that before the discretization error is reached, a Krylov size of 16 gives the lowest error for a given number of operator calls.
@@ -161,7 +161,7 @@ We begin by comparing the timestep size $\tau$ to the $L_2$ error for the differ
     \end{minipage}\hfill
 \end{figure}
 
-We observe convergence in error for both expoential methods for both Krylov sizes.
+We observe convergence in error for both exponetial methods for both Krylov sizes.
 These methods significantly outperform the backwards Euler method, similar to the travelling wave Allen Cahn problem given above.
 They reach the discretization error at around $\tau=3\times10^{-2}$ significantly ahead of the backwards Euler method, which will need a timestep size more than ten times smaller to achieve the same error.
 For this problem, a relatively shallow subspace has been used compared to above and appears to be sufficient.
@@ -229,7 +229,7 @@ With the following exact solution:
 \end{align*}
 
 with homogeneous Dirichlet boundary conditions and where $\Omega = (\frac12, \frac52)\times(0,1)$ and our end time is given by $t_e = 0.1$.
-We run our tests on grid sizes of $128\times64$ and $256\times128$ and use times steps sizes of $\tau=\frac{0.1}{2^i}$ for $i = 0,1,...,4$.
+We run our tests on grid sizes of $128\times64$ and $256\times128$ and use timesteps sizes of $\tau=\frac{0.1}{2^i}$ for $i = 0,1,...,4$.
 
 
 We begin by comparing the timestep size $\tau$ to the $L_2$ error for the different methods.
@@ -250,7 +250,7 @@ We begin by comparing the timestep size $\tau$ to the $L_2$ error for the differ
 All methods appear to converge to the spacial discretization error.
 As above, we observe that the Krylov subspace must be sufficiently deep in order to be accurate.
 In this example, we can see that the second order method converges at a faster rate than the first order method as the slope for the second order method is steeper.
-We also see that the backwards Euler method has a higher error for a given value of $\tau$ the both exponential methods, normally around twice that of the first order expoential integrator method.
+We also see that the backwards Euler method has a higher error for a given value of $\tau$ than both exponential methods, normally around twice that of the first order expoential integrator method.
 
 Again, we present the number of calls to the operator against the error.
 \begin{figure}[H]
@@ -269,7 +269,7 @@ Again, we present the number of calls to the operator against the error.
 \end{figure}
 Here we see that for all methods, more operator calls are required to produce results with a smaller error.
 The exponential methods achieved a given error with fewer operator calls than the backwards Euler method.
-The second order methods required fewer operator calls for a given error than the first order method, especially as the number of calls increased.
+The second order method required fewer operator calls for a given error than the first order method, especially as the number of calls increased.
 
 
 Here we present the experimental orders of convergence.
@@ -290,3 +290,8 @@ Here we present the experimental orders of convergence.
 \end{table}
 
 Now we observe the expected results, with the first order exponential method converging at rate $1$ and the second order method converging at rate $2$.
+
+It is not entirely clear why the first order method converged with order 1 for this problem alone.
+This is the only problem we have analysed that has a has non-linear term that is time dependent.
+This may be the cause.
+It should be noted that the Neumann boundary condtions for the travelling wave problem, while technically time dependent, are near homogeneous for the whole run time.

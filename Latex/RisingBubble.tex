@@ -73,6 +73,7 @@ We plot the value of $\pi$ at time $t=4000$.
 For Krylov sizes above $64$ the computed solution didn't change.
 The solution computed with a Krylov size of $64$ was the same as the solution by the backwards Euler method as well as for smaller $\tau$.
 We therefore conclude that this is close to the true solution.
+We also observe no noticeable difference between the first and second order exponential methods for both Krylov sizes.
 
 \subsection{Performance}
 We now observe the performance differences between backwards Euler and the exponential integrators.
@@ -100,7 +101,7 @@ We see that these exponential integrator methods required more operator calls th
 
 
 Further study could include finding the optimal tau for these methods that minimises the number of operator calls.
-It would also make sense to explore the possible values of $m$ in between 32 and 64 as we would expect to find that these methods converge to the expceted solution for a Krylov size between these two values.
+It would also make sense to explore the possible values of $m$ in between 32 and 64 as we would expect to find that these methods converge to the expected solution for a Krylov size between these two values.
 We would also like to investigate how these methods perform for discontinuous galerkin spaces for the rising bubble problem.
 However, due to time constraints on the project, it has not been possible to gather this information.
 

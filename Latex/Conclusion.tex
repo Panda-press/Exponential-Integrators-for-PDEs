@@ -9,6 +9,13 @@ Throughout this project, the size of the Krylov subspace played an important rol
 Deeper Krylov subspaces yielded lower error, but had the downside of incurring a greater computational cost.
 Further research could focus on how adapting the depth of this Krylov subspace dynamically during run time could improve performance such as with the KIOPS\cite{Gaudreault2018} method.
 
+An unexpected convergence rate of order 2 was noticed for the first order method for the two Allen Cahn phase boundary problems, but not for the reaction diffusion equation.
+It is also noticeable that the results for crystal growth (both 2D and 3D), as well as for the rising bubble problem and wave equation were largely the same between the two methods.
+Further research should be conducted in order to determine why the first order method exhibited the convergence rate that it did.
+One reason may be to do with the time dependence of the equation.
+Further investigation could focus on whether this phenomenon occurs for more than just parabolic PDEs, with analytical results being derived accordingly.
+
 While much of our work focused on parabolic PDEs, we also showed that these methods may have possible application beyond the scope of parabolic PDEs.
 These methods appeared effective for modeling the wave equation as well as showing potential in the modeling of atmospheric processes.
 Further work could focus on applying these methods to a wider range of problems in order to properly understand the extent of their application, as well as how these methods apply to other spacial discretizations such as finite volume and finite difference.
+

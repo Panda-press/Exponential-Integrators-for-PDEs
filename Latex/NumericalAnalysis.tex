@@ -4,7 +4,7 @@ In this section, we will look into the numerical analysis of the exponential int
 We will begin by presenting some already established results for these methods.
 Next, we will attempt to extend these results in order to quantify the error produced when using the Krylov methods for approximating the action of the exponential of a matrix to a vector.
 We will use $x \lesssim y$ to denote $x \leq C y$ for some $C>0$ independent of $x$ and $y$.
-We also use $||\cdot||_1$ and $||\cdot||_0$ to denote the $H^1$ and $H^0$ norms respectively.
+We also use $||\cdot||_1$ and $||\cdot||_0$ to denote the $H^1(\Omega)$ and $H^0(\Omega)$ norms respectively.
 \subsection{Formulation of the Problem}
 Here we state the problem as formulated by Huang Et al.\cite{Huang2022}.
 We begin by considering a parabolic PDE with initial condition of $u_0 \in H^2(\Omega) \cap H^1_0(\Omega)$ of the form:
@@ -100,10 +100,10 @@ Beginning with some assumptions:
 \begin{assumption}\label{assump:regularity}
     The exact solution u(t) satisfies the following regularity conditions:
     \begin{align*}
-        \text{sup}_{0\leq t \leq T}||u(t)||_{2,\Omega} \lesssim 1,\\
+        \text{sup}_{0\leq t \leq T}||u(t)||_{L^2(\Omega)} \lesssim 1,\\
         \text{sup}_{0\leq t \leq T}||u_t(t)||_{L^\infty(\Omega)} \lesssim 1
     \end{align*}
-    Where the hidden constant may depend on $T$.
+    where the hidden constant may depend on $T$.
 \end{assumption}
 \begin{assumption}\label{assump:regularity2}
     The exact solution u(t) satisfies the following regularity conditions:
@@ -162,12 +162,17 @@ We omit the proof of lemmas already proven by Huang\cite{Huang2022}.
 
 \begin{lemma} \label{lemma:Hnegatvesemidefinite}
     Consider a Krylov approximation given by $V_m^TAV_m = H$ with respect to a vector $v$ of depth $m$.
-    If $A$ is negative semi-definite then so is $H$.
+    If $A$ is negative semi-definite then so is $H$ and $V_mHV_m^T$.
 \end{lemma}
 \begin{proof}
     \begin{align*}
-        x^T Hx &= x^T V_m^TAV_mx\\
+        x^THx &= x^T V_m^TAV_mx\\
         &= y^tAy \text{ where $y = V_mx$}\\
+        &\leq 0
+    \end{align*}
+    Likewise
+    \begin{align*}
+        x^TV_mHV_m^Tx &= y^THy \text{ where $y=V_m^Tx$}\\
         &\leq 0
     \end{align*}
 \end{proof}
@@ -180,17 +185,17 @@ For a given $u_h \in V_h$ we have $u_h = \sum^n_{i=1}u_i\theta_i$ where $u_i \in
 For much of the remainder of this section, we will associate the matrix $A\in \mathbb{R}^{n\times n}, n=dim(V_h)$ with an operator on $V_h$.
 This operator is given as follows: $Au_h = \sum^n_{i=1}\sum^n_{j=1}A_{i,j}u_j\theta_i$.
 
-Likewise for the converse, for a linear opeartor $L_h$ we have a matrix in $\mathbb{R}^{n\times n}$ with coefficients:
+Likewise for the converse, for a linear operator $L_h$ we have a matrix in $\mathbb{R}^{n\times n}$ with coefficients:
 $(L_h)_{i,j} = P_{\theta_i}(L_h\theta_j)$
 
 \begin{lemma} \label{lemma:leqm}
     We have that $||e_m^A||_{op} \leq 1$ when $A$ is negative semi-definite.
-    The norm $||\cdot||_{op}$ is the operator norm on $H^1$.
+    The norm $||\cdot||_{op}$ is the operator norm for operators on $H^1$.
     We are considering $e_m^A$ an operator on $H_1$
 \end{lemma}
 \begin{proof}
     If $A$ is negative semi-definite then so is $H$ by lemma \ref{lemma:Hnegatvesemidefinite} and hence so is $VHV^T$.
-    From here we can see that $||e_m^A||_{op} \leq 1$
+    From here we can see that $||e_m^A||_{op} \leq 1$.
     Where we consider the matrix $VHV^T$ an operator on the space $V_h$
     % \begin{align*}
     %     ||e_m^A||_{op} &= ||e^{VHV^T}||_{op}\\
@@ -291,7 +296,7 @@ $(L_h)_{i,j} = P_{\theta_i}(L_h\theta_j)$
         & + \tau||\int^1_0e^{-\tau L_h(1-\theta)}d\theta (u_{h,m}^{n-1}- u_{h}^{n-1})||_1 \\
         & \lesssim ||(e_m^{-\tau L_h}-e^{-\tau L_h})\frac{u_{h,m}^{n-1}}{||u_{h,m}^{n-1}||_1}||_1||u_{h,m}^{n-1}||_1 \\
         & + ||e^{-\tau L_h}||_{op}||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
-        & + \tau||\int^1_0 (e_m^{-\tau L_h(1-\theta)}-e^{-\tau L_h(1-\theta)}) d\theta \frac{P_hf(t, u_{h,m}^{n-1})}{|| P_hf(t, u_{h,m}^{n-1})||_1}|||| P_hf(t, u_{h,m}^{n-1})||_1 \\
+        & + \tau||\int^1_0 (e_m^{-\tau L_h(1-\theta)}-e^{-\tau L_h(1-\theta)}) d\theta \frac{P_hf(t, u_{h,m}^{n-1})}{|| P_hf(t, u_{h,m}^{n-1})||_1}||_1|| P_hf(t, u_{h,m}^{n-1})||_1 \\
         & + \tau||\int^1_0e^{-\tau L_h(1-\theta)}d\theta||_{op}|| (u_{h,m}^{n-1}- u_{h}^{n-1})||_1 \\
         & \lesssim k(m,\tau, L_h)||u_{h,m}^{n-1}||_1 \\
         & + ||(u_{h,m}^{n-1}-u_{h}^{n-1})||_1 \\
@@ -311,12 +316,12 @@ $(L_h)_{i,j} = P_{\theta_i}(L_h\theta_j)$
     \end{align*}
 \end{proof}
 
-We can now prove the main theorem
+We can now prove the main theorem.
 \begin{theorem}
-    Suppose the function $f$ satisfies Assumptions \ref{assump:mildgrowth} \ref{assump:smooth} \ref{assump:regularity} and that $0\leq \tau \leq 1$
+    Suppose the function $f$ satisfies Assumptions \ref{assump:mildgrowth} \ref{assump:smooth} \ref{assump:regularity} and that $0\leq \tau \leq 1$.
     There exists a constant $h_0 > 0$ such that for $h<h_0$ we have
     \begin{align*}
-        ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + k(m,\tau, L_h)(\frac{1}{\tau}), \forall n = 1,..,N_T
+        ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + \frac{1}{\tau}k(m,\tau, L_h), \forall n = 1,..,N_T
     \end{align*}
 \end{theorem}
 \begin{proof}
@@ -324,16 +329,16 @@ We can now prove the main theorem
         ||u(t_n) - u_{h,m}^n||_1 &= ||u(t_n) - u_h^n + u_h^n - u_{h,m}^n||_1\\
         &\leq ||u(t_n) - u_h^n||_1 + ||u_h^n - u_{h,m}^n||_1
         \intertext{by the triangle inequality. We can now use theorem \ref{theorem:standard1} and lemma \ref{lemma:krylovbound} to see that}
-        &\leq \tau + h + k(m,\tau, L_h)(\frac{1}{\tau}), \forall n =1,...,N_T
+        &\leq \tau + h + \frac{1}{\tau}k(m,\tau, L_h), \forall n =1,...,N_T
     \end{align*}
 \end{proof}
 
 \begin{corollary}
-    Let $v\in V_h$ and $v'\in \mathbb{R}^{n\times n}$ with $n = dim(V_h)$ represents its coefficients.
+    Let $v\in V_h$ and then let $v'\in \mathbb{R}^{n\times n}$ with $n = dim(V_h)$ represent the coefficients of $v$.
     If we assume that $\exists c_h,C_h \in \mathbb{R}$ such that $c_h||v'|| \leq ||v||_1 \leq C_h||v'||$ holds for all $v$, where $||\cdot||$ is the Euclidian norm and $c_h,C_h$ may depend on $V_h$.
-    Likewise, assuming that $\exists c_{op}$ such that $||L_h||_{op} \leq c_{op} ||L_h||_{opm}||$, where $||\cdot||_{op}$ and $||\cdot||_{opm}$ represents the opeartor nomrs for operators on $H^1$ and $\mathbb{R}^n$ respectively.
+    Likewise, assuming that $\exists c_{op}$ such that $||L_h||_{op} \leq c_{op} ||L_h||_{opm}||$, where $||\cdot||_{op}$ and $||\cdot||_{opm}$ represents the operator norms for operators on $H^1$ and $\mathbb{R}^n$ respectively.
     $c_{op}$ again depends on $V_h$.
-    Then using the above theorem alongside what we already know about the convergence rates of Krylov subspaces we can observe the following:
+    Then using the above theorem, alongside what we already know about the convergence rates of Krylov subspaces, we can observe the following:
     \begin{align*}
         ||u(t_n) - u_{h,m}^n||_1 \lesssim \tau + h + 2 \frac{(\tau \rho)^m e^{\tau \rho}}{m!}h(\frac{1}{\tau}), \forall n = 1,..,N_T
     \end{align*}
@@ -344,10 +349,10 @@ We can now prove the main theorem
         ||u(t_n) - u_{h,m}^n||_1 &\lesssim \tau + h + k(m,\tau, L_h)(\frac{1}{\tau})\\
         &\lesssim \tau + h + (\frac{1}{\tau})max_{||v||_1=1 v\in V_h}||e^{\tau L_h}v - V_m e_m^{L_h}V^T_mv||_1 \\
         \intertext{considering $v'$ to be the coefficients of $v\in V_h$ and the matrices of the operators $e^{-\tau L_h}$ and $V_m e^{-\tau L_h} V^T_m$ we get the following}
-        &\lesssim \tau + h + (\frac{1}{\tau})C_hmax_{||v||_1=1 v\in V_h}||e^{\tau L_h}v - V_m e_m^{L_h}V^T_mv||_{fro}\\
-        &\lesssim \tau + h + (\frac{1}{\tau})max_{||v||_1=1 v\in V_h}||v||_{fro}||e^{\tau L_h}\frac{v}{||v||_{fro}} - V_m e_m^{L_h}V^T_m\frac{v}{||v||_{fro}}||_{fro}\\
+        &\lesssim \tau + h + (\frac{1}{\tau})C_hmax_{||v||_1=1 v\in V_h}||e^{\tau L_h}v - V_m e_m^{L_h}V^T_mv||\\
+        &\lesssim \tau + h + (\frac{1}{\tau})max_{||v||_1=1 v\in V_h}||v||||e^{\tau L_h}\frac{v}{||v||} - V_m e_m^{L_h}V^T_m\frac{v}{||v||}||\\
         &\lesssim \tau + h + (\frac{1}{\tau})c_h C_h\frac{(\tau \rho)^m e^{\tau \rho}}{m!}
     \end{align*}
 \end{proof}
 
-Further work is neccessary inorder to determin $c_h,C_h,c_{op}$
+Further work is necessary in order to determine $c_h,C_h,c_{op}$

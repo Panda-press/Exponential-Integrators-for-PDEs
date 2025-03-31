@@ -18,9 +18,9 @@ We implement the following Dirichlet boundary condition:
 \begin{align*}
     \psi &= \frac{1}{10\pi} sin(10\pi t) x \in S_L
 \end{align*}
-this will be the source of our waves.
+This will be the source of our waves.
 The remaining boundaries use homogeneous Neumann boundary conditions.
-Our methods, both exponential and backwards Euler, in section \ref{section:methods} require a first order equation with respect to the derivatives of $t$.
+Our methods, both exponential and backwards Euler, in section \ref{section:methods}, require a first order equation with respect to the derivatives of $t$.
 This means that we will need to use a substitution.
 We can use $\psi_t = -p$ to get the following:
 \begin{align*}
@@ -35,8 +35,8 @@ This equation is now compatible with the methods that we are using.
 
 \subsection{Numerical Solutions}
 We can now compare backwards Euler and the two exponential integrator methods.
-First, we show that the domain as well as a solution computed with the backwards Euler method.
-For the backwards Euler, a timestep of $\tau = 0.001$ was found to be optimal, with larger timesteps causing numerical issues, leading to instability and smaller timesteps requiring excessive computation.
+First, we show the domain as well as a solution computed with the backwards Euler method.
+For the backwards Euler, a timestep of $\tau = 0.001$ was found to be optimal, with larger timesteps causing numerical issues, leading to instability, and smaller timesteps requiring excessive computation.
 
 \begin{figure}[H]
     \centering
@@ -54,7 +54,7 @@ For the backwards Euler, a timestep of $\tau = 0.001$ was found to be optimal, w
 \end{figure}
 
 We now compare the backwards Euler to the first and second order exponential integrator methods.
-Note that due to the fact that the linear term given by $DN(u)$ is not symmetric we cannot use the Lanczos method for computing our matrix exponential.
+Note that, due to the fact that the linear term given by $DN(u)$ is not symmetric, we cannot use the Lanczos method for computing our matrix exponential.
 As a result, the Arnoldi algorithm for the matrix exponential has been used here exclusively.
 \begin{figure}[H]
     \centering
@@ -96,5 +96,5 @@ We present the methods used and the operator calls in the table below:
 We observe that the backwards Euler method requires significantly more calls to the operator than both the first and second order exponential methods.
 The second order method requires more calls to the operator than the first order method.
 Both exponential methods required a similar timestep size $\tau$.
-This suggests that the the exponential methods may be effective for computing solutions to the wave equation.
+This suggests that the exponential methods may be effective for computing solutions to the wave equation.
 This is significant as it shows the possible application of these methods to problems beyond parabolic PDEs.
