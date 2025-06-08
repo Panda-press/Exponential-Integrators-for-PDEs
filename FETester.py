@@ -161,7 +161,7 @@ if __name__ == "__main__":
             tau0 = end_time / 1
             taus = 9
             grids = [[128, 8], [256, 8], [512, 8]]
-            exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+            exp_methods = ["BE", "EXP1LAN", "EXP2LAN", "EXP1ALTLAN"]
             krylovSizes = [8, 16, 32, 64]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
         from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
@@ -184,7 +184,7 @@ if __name__ == "__main__":
         taus = 8
         krylovSizes = [4, 8, 16, 32]
         grids = [[60, 60]]
-        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+        exp_methods = ["BE", "EXP1LAN", "EXP2LAN", "EXP1ALTLAN"]
     elif sysargs.problem=="Snowflake":
         from snowflakes import dimR, time, sourceTime, domain
         from snowflakes import test1 as problem
@@ -208,7 +208,7 @@ if __name__ == "__main__":
         taus = 5
         start_time = 0
         problemName = "Reaction Diffusion"
-        exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+        exp_methods = ["BE", "EXP1LAN", "EXP2LAN", "EXP1ALTLAN"]
         krylovSizes = [8, 16, 32, 64]
         grids = [[128, 64], [256, 128]]
     elif sysargs.problem=="Test":

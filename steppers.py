@@ -262,6 +262,36 @@ class BEStepper(BaseStepper):
                                      callback=self.verbose)
         return {"iterations":0, "linIter":self.linIter}
 
+class CNStepper(BaseStepper):
+    def __init__(self, N, *, method="approx", mass='lumped',
+                 ftol=1e-6, verbose=False, **kwargs):
+        BaseStepper.__init__(self,N, method=method, mass=mass, **kwargs)
+        self.name = f"CN({self.method})"
+        self.verbose = self.callback if verbose else None
+        self.ftol = ftol
+
+    def callback(self,x,Fx): 
+        print(self.countN, max(abs(Fx)),flush=True)
+        self.linIter += 1
+
+    def __call__(self, target, tau):
+        try:
+            self.N.model.sourceTime += tau
+        except AttributeError:
+            pass
+        self.setup(target,tau)
+        
+        # non linear function (non-linear problem want f(x)=0)
+        fn = self.evalN(self.un.as_numpy)
+        def f(x):
+            return 0.5*(self.evalN(x) + fn) + ( x - self.un.as_numpy )
+
+        # get numpy vectors for target, residual, search direction
+        sol_coeff = target.as_numpy
+        sol_coeff[:] = newton_krylov(f, xin=sol_coeff, f_tol=self.ftol,
+                                     callback=self.verbose)
+        return {"iterations":0, "linIter":self.linIter}
+
 # %% [markdown]
 # ## A semi-implicit approach (with a linear implicit part)
 # solve d_t u + N(u) = 0 using u^{n+1} = u^n - tau A^n u^{n+1} - tau R^n(u^n)
@@ -373,6 +403,22 @@ class FristOrderExponentialStepper(ExponentialStepper):
             return scipyintegrate.quad_vec(func, a, b)[0]
 
 
+class FristOrderAltExponentialStepper(FristOrderExponentialStepper):
+    def __init__(self, N, exp_v, *, integration='simple', c=0.5, **kwargs):
+        FristOrderExponentialStepper.__init__(self, N=N, exp_v=exp_v, **kwargs)
+        self.name = f"ExpIntFirstOrderAlt({self.method},{exp_v[1]},{self.expv_args})"
+        self.c = c
+
+    def __call__(self, target, tau):
+        self.setup(target, tau)
+
+        H, V, beta = self.krylovMethod(self.A, -self.evalN(target.as_numpy), self.expv_args["m"])
+        
+        target.as_numpy[:] += V@self.phi_k(-H, 1)*beta
+        
+        return {"iterations":0, "linIter":0}
+
+
 # Seems to work?
 class SecondOrderExponentialStepper(FristOrderExponentialStepper):
     def __init__(self, N, exp_v, *, integration='simple', c=0.5, **kwargs):
@@ -419,14 +465,17 @@ class SecondOrderExponentialStepper(FristOrderExponentialStepper):
 
 steppersDict = {"FE": (FEStepper,{}),
                 "BE": (BEStepper,{}),
+                "CN": (CNStepper,{}),
                 "SI": (SIStepper,{}),
                 "EXPSCI": (ExponentialStepper, {"exp_v":expm_sci}),
                 "EXPLAN": (ExponentialStepper, {"exp_v":expm_lanzcos}),
                 "EXP1LAN": (FristOrderExponentialStepper, {"exp_v":expm_lanzcos, "krylovMethod":Lanzcos}),
+                "EXP1ALTLAN": (FristOrderAltExponentialStepper, {"exp_v":expm_lanzcos, "krylovMethod":Lanzcos}),
                 "EXP2LAN": (SecondOrderExponentialStepper, {"exp_v":expm_lanzcos, "krylovMethod":Lanzcos}),
                 "EXPNBLA": (ExponentialStepper, {"exp_v":expm_nbla}),
                 "EXPARN": (ExponentialStepper, {"exp_v":expm_arnoldi}),
                 "EXP1ARN": (FristOrderExponentialStepper, {"exp_v":expm_arnoldi, "krylovMethod":Arnoldi}),
+                "EXP1ALTARN": (FristOrderAltExponentialStepper, {"exp_v":expm_lanzcos, "krylovMethod":Arnoldi}),
                 "EXP2ARN": (SecondOrderExponentialStepper, {"exp_v":expm_arnoldi, "krylovMethod":Arnoldi}),
                 "EXPKIOPS": (ExponentialStepper, {"exp_v":expm_kiops}),
                }
