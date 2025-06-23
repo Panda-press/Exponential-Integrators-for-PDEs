@@ -154,14 +154,14 @@ if __name__ == "__main__":
         if sysargs.debug == True:
             krylovSizes = [64]
             tau0 = end_time / 16 # Any higher gives numerical issues
-            taus = 1
+            taus = 2
             grids = [[512, 8]]
-            exp_methods = ["BE", "EXP1LAN", "EXP2LAN"]
+            exp_methods = ["BE", "CN", "EXP1ALTLAN"]
         else:
             tau0 = end_time / 1
             taus = 9
             grids = [[128, 8], [256, 8], [512, 8]]
-            exp_methods = ["BE", "EXP1LAN", "EXP2LAN", "EXP1ALTLAN"]
+            exp_methods = ["BE", "CN", "EXP1ALTLAN"]
             krylovSizes = [8, 16, 32, 64]
     elif sysargs.problem == "TravellingWaveAllenCahn2":
         from travellingWaveAllenCahn2 import dimR, time, sourceTime, domain
@@ -393,30 +393,33 @@ if __name__ == "__main__":
         plt.close()
 
     # EOC for each grid size:
-    for grid_size in results["Grid Size"].unique():
-        fig, ax = plt.subplots()
-        fig.patch.set_visible(False)
-        ax.axis('off')
-        ax.axis('tight')
-        eocdata = []
-        tablehead = []
-        if "BE" not in exp_methods:
-            next
-        for i, exp_method in enumerate(results["Method"].unique()):
-            tablehead.append(exp_method)
-            trimmed_data = results[results["Method"] == exp_method]
-            trimmed_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
+    try:
+        for grid_size in results["Grid Size"].unique():
+            fig, ax = plt.subplots()
+            fig.patch.set_visible(False)
+            ax.axis('off')
+            ax.axis('tight')
+            eocdata = []
+            tablehead = []
+            if "BE" not in exp_methods:
+                next
+            for i, exp_method in enumerate(results["Method"].unique()):
+                tablehead.append(exp_method)
+                trimmed_data = results[results["Method"] == exp_method]
+                trimmed_data = trimmed_data[trimmed_data["Grid Size"] == grid_size]
 
-            error1 = trimmed_data["Error L2"][:-1].to_numpy()
-            error2 = trimmed_data["Error L2"][1:].to_numpy()
-            tau1 = trimmed_data["Tau"][:-1].to_numpy()
-            tau2 = trimmed_data["Tau"][1:].to_numpy()
-            eoc = np.log(error1/error2)/np.log(tau1/tau2)
-            eocdata.append(eoc.tolist())
+                error1 = trimmed_data["Error L2"][:-1].to_numpy()
+                error2 = trimmed_data["Error L2"][1:].to_numpy()
+                tau1 = trimmed_data["Tau"][:-1].to_numpy()
+                tau2 = trimmed_data["Tau"][1:].to_numpy()
+                eoc = np.log(error1/error2)/np.log(tau1/tau2)
+                eocdata.append(eoc.tolist())
 
-        eocdata = pd.DataFrame(np.array(eocdata).T, columns=tablehead)
+            eocdata = pd.DataFrame(np.array(eocdata).T, columns=tablehead)
 
-        ax.table(cellText=eocdata.values, colLabels=eocdata.columns, loc='center')
+            ax.table(cellText=eocdata.values, colLabels=eocdata.columns, loc='center')
 
-        fig.tight_layout()
-        fig.savefig(f"FEMethodPlots/EOC for {problemName} on grid size: {grid_size}.svg", format='svg', dpi=1200)
+            fig.tight_layout()
+            fig.savefig(f"FEMethodPlots/EOC for {problemName} on grid size: {grid_size}.svg", format='svg', dpi=1200)
+    except:
+        pass
