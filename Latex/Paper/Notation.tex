@@ -1,0 +1,25 @@
+\section{Backgroud}
+
+\subsection{Exponential Integrators}
+
+When considering an autonomous ODE of the form
+
+\begin{align*}
+    u'(t) &= F(u(t)), \quad u(t_0) = u_0
+\end{align*}
+
+We will be considering the second order exponential integrator scheme \cite{Hochbruck2009}:
+
+\begin{align*}
+    u_{n+1} &= e^{hJ_n}u_n + h\phi_1(hJ_n)g_n(u_n)\\
+    &= u_n + h\phi_1(hJ_n)F(u_n)
+\end{align*}
+
+Where we have that:
+
+\begin{align*}
+    \varphi_k(z) &= \int^1_0e^{(1-\theta)z}\frac{\theta^{k-1}}{(k-1)!}d\theta, k \geq 1
+\end{align*}
+
+\subsection{Krylov Subspace Methods}
+

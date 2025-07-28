@@ -1,0 +1,92 @@
+\section{Numerical Analysis}
+
+Here we aim to produce some analytical results, that extend current results of exponential integrators (cite) and include error arrising from the use of the Krylov subspace methods.
+
+\subsection{Current Results}
+
+\begin{assumption}\label{assump:semigroup}
+    The linear operator $J = DF(u)$ is the generator of a strongly continuous semigroup $e^{tJ}$ on a Banach space $X$.
+    More precicely, we assume that there exists constant $C$ and $\omega$ s.t. $||e^{tJ}||_{X \leftarrow X} \leq C e^{\omega t}, t \geq 0$
+    holds uniformly in a neighbourhood of the exact solution of \ref{TODO}
+\end{assumption}
+\begin{assumption}\label{assump:lipschitz}
+    We suppost that \ref{TODO} possesses a sufficiently smooth solution $u[0,T] \rightarrow X$ with derivatives in $X$,
+    and that $f:X\rightarrow X$ is sufficiently oftenFrichet differentiable in a strip along the exact solution.
+    Alloccuring derivatives are to be uniformly bounded.
+    $\Rightarrow ||J(u) - J(v)|| \leq C||u-v||$
+\end{assumption}
+
+\begin{theorem}\label{theorem:standard}
+    Let the initial value problem statisfy Assumptions \ref{assump:semigroup} and \ref{assump:lipschitz}.
+    Let the step size $h = \frac TN$ satisfy the condition:
+    \begin{align}
+        \sum^{n-1}_{k=1}(k-1)h &\leq C_H \label{stepsum}
+    \end{align}
+    with a constant $C_H$ that is uniform in $t_0 \leq t_n \leq T$.
+    The for $C_H$ sufficiently small, the numerical method converges with order $2$.
+    In particular, the numerical solution satisfies the error bound
+    \begin{align*}
+        ||u_n-u(t_n)|| \leq C \sum^{n-1}_{k=1} h^3
+    \end{align*}
+    uniformly on $t_0 \leq t_n \leq T$.
+    The constant $C$ is independent of the chosen steps size sequence satisfying \ref{stepsum}.
+\end{theorem}
+
+We notice that this is second order convergence.
+At time $T$ we have
+\begin{align*}
+    ||u_N-u(T)|| \leq C h^2
+\end{align*}
+
+\subsection{Extension to Krylov Subspace Methods}
+
+\begin{lemma}
+    The following holds
+    \begin{align*}
+        ||\int^1_0(e_m^{-\tau J(u^m_{n-1})(1-\theta)} - e^{-\tau J(u^m_{n-1})(1-\theta)})d\theta F(u^m_{n-1})|| \leq C k(m, \tau, J(u^m_{n-1}))||u^m_{n-1} + F(0)||
+    \end{align*}
+        
+    \begin{proof}
+        \begin{align*}
+            &||\int^1_0(e_m^{-\tau J(u^m_{n-1})(1-\theta)} - e^{-\tau J(u^m_{n-1})(1-\theta)})d\theta F(u^m_{n-1})||\\
+            &\leq ||\int^1_0(e_m^{-\tau J(u^m_{n-1})(1-\theta)} - e^{-\tau J(u^m_{n-1})(1-\theta)})d\theta \frac{F(u^m_{n-1})}{||F(u^m_{n-1})||}||||F(u^m_{n-1})||\\
+            &\leq C k(m, \tau, J(u^m_{n-1}))||F(u^m_{n-1})||\\
+            \intertext{From the definition of the Krylov error. We new apply Lipschitz continuity to get}
+            &\leq C k(m, \tau, J(u^m_{n-1}))(||u^m_{n-1}|| + ||F(0)||)
+            \intertext{Proving the result}
+        \end{align*}
+    \end{proof}
+\end{lemma}
+
+\begin{lemma}
+    The following holds
+    \begin{align*}
+        ||\int^1_0(e^{-\tau J(u^m_{n-1})(1-\theta)} - e^{-\tau J(u_{n-1})(1-\theta)})d\theta F(u^m_{n-1})|| \leq C ||u^m_{n-1} - u_{n-1}||(||u^m_{n-1} - F(0)||)
+    \end{align*}
+
+    \begin{proof}
+        \begin{align*}
+            &||\int^1_0(e^{-\tau J(u^m_{n-1})(1-\theta)} - e^{-\tau J(u_{n-1})(1-\theta)})d\theta F(u^m_{n-1})||
+            \intertext{We now use the Lipschitz continuity of $e^x$ along a strip}
+            &\leq C ||-\tau J(u^m_{n-1})(1-\theta) - -\tau J(u_{n-1})(1-\theta)|| ||F(u^m_{n-1})||
+            \intertext{We now use the Lipschitz continuity of $J$ along a strip}
+            &\leq C \tau||u^m_{n-1} - u_{n-1}|| (|| u^m_{n-1} ||+|| F(0) ||)
+        \end{align*}
+    \end{proof}
+\end{lemma}
+
+\begin{lemma}
+    The following holds
+    \begin{align*}
+        ||\int^1_0e^{-\tau J(u_{n-1})(1-\theta)}d\theta (F(u^m_{n-1}) - F(u_{n-1}))|| \leq C ||u^m_{n-1} - u_{n-1}||
+    \end{align*}
+        
+    \begin{proof}
+        \begin{align*}
+            &||\int^1_0e^{-\tau J(u_{n-1})(1-\theta)}d\theta (F(u^m_{n-1}) - F(u_{n-1}))||
+            \intertext{We now use that $J(u_{n-1})$ is positive definite to see that $||e^{-\tau J(u_{n-1})}||\leq 1$ and so}
+            &\leq C ||F(u^m_{n-1}) - F(u_{n-1})||\\
+            &\leq C ||u^m_{n-1} - u_{n-1}||
+        \end{align*}
+    \end{proof}
+\end{lemma}
