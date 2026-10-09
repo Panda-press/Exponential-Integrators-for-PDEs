@@ -735,6 +735,7 @@ if __name__ == "__main__":
             if exact is not None:
                 printResult(time.value,u_h-exact(time),stepper.countN)
             run += [(stepper.countN,linIter)]
+            gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
             try:
                 u_h[0].plot(gridLines=None, block=False)
                 plt.savefig(outputName(fileCount))
