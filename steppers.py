@@ -8,12 +8,13 @@
 import sys
 import argparse
 import time as tm
+from mpi4py import MPI
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import norm
 from scipy.sparse.linalg import lgmres, gmres, LinearOperator, aslinearoperator, expm_multiply
-from scipy.sparse import identity, diags
+from scipy.sparse import identity, diags, dia_matrix
 from scipy.optimize import newton_krylov, KrylovJacobian
 from scipy.special import factorial
 import scipy.integrate as scipyintegrate
@@ -33,10 +34,10 @@ expm_kiops = [lambda A,x,m: KiopsExp(A,x),"Kiops"]
 from dune.grid import cartesianDomain, OutputType
 from dune.alugrid import aluCubeGrid as leafGridView
 from dune.fem.space import lagrange
-from dune.fem import integrate, threading, globalRefine, mark, adapt, loadBalance
+from dune.fem import integrate, threading, globalRefine, mark, gridAdapt
 from dune.fem.view import adaptiveLeafGridView as view
-from dune.fem.operator import galerkin
-from dune.fem.function import gridFunction
+from dune.fem.scheme import galerkin
+from dune.fem.function import gridFunction, partitionFunction, levelFunction
 from ufl import dx, dot, inner, grad, TestFunction, TrialFunction
 # %% [markdown]
 #
@@ -77,6 +78,7 @@ class BaseStepper:
             self.massWeight = lambda u: 1
             self.hasMassWeigth = False
         else:
+            assert False # not tested
             self.massWeight = massWeight
             self.hasMassWeigth = True
 
@@ -101,20 +103,25 @@ class BaseStepper:
             # the action of -N. Since this is the only operator corrently
             # using the identity mass matrix we change the sign here
             # NEEDS FIXING
+            assert False # Where is this used - again not tested
             self.Minv = -identity(self.spc.size) 
         else:
             # inverse (lumped) mass matrix (see the explanation given in 'wave.py' tutorial example)
             # u^n v dx = sum_j u^n_j phi_j phi_i dx = M u^n
             # Mu^{n+1} = Mu^n - dt N(u^n) (for FE)
             # u^{n+1} = u^n - dt M^{-1}N(u^n)
-            # bug: u,v = TrialFunction(N.domainSpace), TestFunction(N.rangeSpace)
             u,v = TrialFunction(self.N.domainSpace.as_ufl()), TestFunction(self.N.rangeSpace.as_ufl())
-            
-            M = galerkin(self.massWeight(self.un) * dot(u,v)*dx).linear().as_numpy
+            M = galerkin(self.massWeight(self.un) *
+                         dot(u,v)*dx(metadata={"quadrature_rule":"lumped"})
+                        == 0).linear().as_numpy
             
             if self.mass == 'lumped':
-                Mdiag = M.sum(axis=1) # sum up the entries onto the diagonal
-                self.Minv = diags( 1/Mdiag.A1, shape=(np.shape(Mdiag)[0], np.shape(Mdiag)[0]) )
+                lumped = self.N.domainSpace.function(name="lump", dofVector=M.diagonal())
+                lumped.communicate()
+                self.Minv = dia_matrix(([1/lumped.as_numpy],[0]),shape=M.shape )
+            else:
+                assert self.mass == "exact"
+                assert False  # not tested in parallel
 
     # call before computing the next time step
     def setup(self,un,tau):
@@ -141,7 +148,7 @@ class BaseStepper:
             self.D = aslinearoperator(self.Dapprox(self, u))
             # self.test(u)
         else:
-            # assert False # we are not considering 'exact' at the moment
+            assert False # we are not considering 'exact' at the moment
             self.Nprime = self.N.linear()
             self.N.jacobian(u,self.Nprime)
             self.A = self.tau * self.Minv @ self.Nprime.as_numpy
@@ -238,6 +245,7 @@ class FEStepper(BaseStepper):
 class BEStepper(BaseStepper):
     def __init__(self, N, *, method="approx", mass='lumped',
                  ftol=1e-6, verbose=False, **kwargs):
+        assert MPI.COMM_WORLD.Get_size()==1, "scipy.newton_krylov not MPI aware"
         BaseStepper.__init__(self,N, method=method, mass=mass, **kwargs)
         self.name = f"BE({self.method})"
         self.verbose = self.callback if verbose else None
@@ -258,13 +266,21 @@ class BEStepper(BaseStepper):
         self.setup(target,tau)
         # get numpy vectors for target, residual, search direction
         sol_coeff = target.as_numpy
+
+        # try to compute a global max residual
+        comm = MPI.COMM_WORLD
+        def global_max_norm(v):
+            local_max = np.max(np.abs(v)) if v.size else 0.0
+            return comm.allreduce(local_max, op=MPI.MAX)
         sol_coeff[:] = newton_krylov(self.f, xin=sol_coeff, f_tol=self.ftol,
+                                     tol_norm=global_max_norm,
                                      callback=self.verbose)
         return {"iterations":0, "linIter":self.linIter}
 
 class CNStepper(BaseStepper):
     def __init__(self, N, *, method="approx", mass='lumped',
                  ftol=1e-6, verbose=False, **kwargs):
+        assert MPI.COMM_WORLD.Get_size()==1, "scipy.newton_krylov not MPI aware"
         BaseStepper.__init__(self,N, method=method, mass=mass, **kwargs)
         self.name = f"CN({self.method})"
         self.verbose = self.callback if verbose else None
@@ -322,13 +338,15 @@ class SIStepper(BaseStepper):
         self.linIter += 1
 
     def __call__(self, target, tau):
+        assert MPI.COMM_WORLD.Get_size()==1, "scipy.lgmres not MPI aware"
         self.explStep(target, tau)
 
         sol_coeff = target.as_numpy
         res_coeff = self.res.as_numpy
         self.linIter = 0
         # solve linear system
-        sol_coeff[:],_ = lgmres(self.D, res_coeff, # x0=self.un.as_numpy,
+        sol_coeff[:],_ = lgmres(self.D, res_coeff,
+                                # x0=self.un.as_numpy,
                                 rtol=1e-2,
                                 # callback=lambda x: self.callback(x),
                                 # callback_type='x'
@@ -495,7 +513,7 @@ if __name__ == "__main__":
     # print can be used as before but will only produce output on rank 0
     print = partial(print, flush=True) if comm.rank == 0 else lambda *args, **kwargs: None
 
-    threading.use = threading.max
+    threading.use = 1 # threading.max (for parallel testing)
     print(f"Threads: {threading.use}")
 
 
@@ -555,8 +573,7 @@ if __name__ == "__main__":
             def adaptGrid(u_h):
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))
                 mark(indicator,1.4,1.2,0,11)
-                adapt(u_h)
-                loadBalance(u_h) 
+                gridAdapt(u_h, loadBalance=False)
     elif sysargs.problem=="Snowflake3D":
         from snowflakes3D import dimR, time, sourceTime, domain
         from snowflakes3D import test1 as problem
@@ -626,8 +643,7 @@ if __name__ == "__main__":
                 indicator = dot(grad(u_h[0]),grad(u_h[0]))# + u_h[0] * dot(grad(u_h[1]),grad(u_h[1]))
                 #mark(indicator,0.001,0.001,0,17, markNeighbors = False)
                 mark(indicator,0.0001,0.0001,0,5, markNeighbors = False)
-                adapt(u_h)
-                loadBalance(u_h) 
+                gridAdapt(u_h, loadBalance=False)
     elif sysargs.problem=="Parabolic":
         from parabolicTest import dimR, time, sourceTime, domain
         from parabolicTest import paraTest2 as problem
@@ -680,13 +696,13 @@ if __name__ == "__main__":
         gridView.hierarchicalGrid.globalRefine(level)
         #tau *= 0.25**level
 
-    outputName = lambda n: f"{baseName}_{level}_{factor}_{n}_{sysargs.krylovsize[0]}.png"
+    outputName = f"{baseName}_{level}_{factor}_{sysargs.krylovsize[0]}_"
 
     # initial condition
     u_h = space.interpolate(u0, name='u_h')
 
     # stepper
-    op = galerkin(model, domainSpace=space, rangeSpace=space)
+    op = galerkin(model==0, domainSpace=space, rangeSpace=space)
     stepper = stepperFct(N=op,**args,**kwargs)
 
     # time loop
@@ -705,16 +721,19 @@ if __name__ == "__main__":
             u_h.interpolate(u0)
     try:
         u_h[0].plot(block=False)
-        plt.savefig(outputName(fileCount))
+        plt.savefig(outputName+f"{fileCount}.png")
     except:
-        gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
+        pass
+    vtk = gridView.sequencedVTK(outputName, pointdata=[*u_h],
+                 celldata=[levelFunction(gridView),partitionFunction(gridView)])
+    vtk()
     fileCount += 1
     if exact is not None:
         printResult(time.value,u_h-exact(time),stepper.countN)
 
     computeTime = 0
     while time.value < T - tau/2:
-        print(time.value)
+        # print(time.value,gridView.size(0))
         # this actually depends probably on the method we use, i.e., BE would
         # be + tau and the others without
         sourceTime.value = time.value
@@ -730,29 +749,28 @@ if __name__ == "__main__":
         n += 1
         
         if time.value >= plotTime - tau/2:
-            print(f"[{fileCount}]: time step {n}, time {time.value}, N {stepper.countN}, iterations {info}, compute time {computeTime}",
+            print(f"[{fileCount}]: time step {n}, time {time.value}, size {gridView.size(0)}, N {stepper.countN}, iterations {info}, compute time {computeTime}",
                     flush=True)
             if exact is not None:
                 printResult(time.value,u_h-exact(time),stepper.countN)
             run += [(stepper.countN,linIter)]
-            gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
+            vtk()
             try:
                 u_h[0].plot(gridLines=None, block=False)
-                plt.savefig(outputName(fileCount))
+                plt.savefig(outputName+f"{fileCount}.png")
             except:
-                gridView.writeVTK(outputName(fileCount), pointdata=[*u_h])
+                pass
             plotTime += nextTime
             fileCount += 1
 
+    vtk()
     print(f"Final time step {n}, time {time.value}, N {stepper.countN}, iterations {info}, compute time {computeTime}")
     try:
         u_h.plot(gridLines=None, block=False)
-        gridView.writeVTK(baseName, pointdata=[*u_h], subsampling=2)
-        plt.savefig(outputName(fileCount))
+        plt.savefig(outputName+f"{fileCount}.png")
         fileCount += 1
         u_h = space.interpolate(exact(T), name='u_h')
         u_h.plot(block=False)
         plt.savefig(outputName("Solution"))
     except:
         pass
-    
